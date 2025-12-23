@@ -63,7 +63,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'weather',
-    title: '2. 自然天气 (Nature & Weather)',
+    title: '2. 听感纹理 (Sound & Weather)',
     icon: <CloudLightning className="w-4 h-4" />,
     type: 'single',
     required: true,
@@ -82,9 +82,9 @@ export const CATEGORIES: Category[] = [
       { id: 'heavy_snow', label: '鹅毛大雪 (Heavy Snow)', value: 'heavy dense snowfall, large flakes, winter wonderland, accumulating fast on the window ledges' },
       { id: 'blizzard', label: '极寒风暴 (Blizzard)', value: 'whiteout blizzard conditions, horizontal snow driven by high winds, freezing cold atmosphere, zero visibility' },
       
-      // Others
-      { id: 'fog', label: '山林晨雾 (Misty Fog)', value: 'thick mysterious white fog clinging to the trees and landscape. High humidity, water dripping from condensation, quiet and eerie' },
-      { id: 'wind', label: '呼啸狂风 (High Wind)', value: 'hurricane force winds bending trees outside, debris flying, howling wind visuals without heavy rain' },
+      // Others - Adjusted for Sound Strategy
+      { id: 'fog', label: '迷雾风声 (Fog & Wind)', value: 'thick mysterious white fog clinging to the trees. Trees swaying in the wind, leaves rustling, high humidity, water dripping from condensation, quiet and eerie' },
+      { id: 'wind', label: '呼啸狂风 (Howling Wind)', value: 'hurricane force winds bending trees outside, debris flying, howling wind visuals without heavy rain' },
       
       // Disasters (Keep for legacy compatibility)
       { id: 'acid', label: '腐蚀酸雨 (Acid Rain)', value: 'corrosive green acid rain burning the landscape, yellow toxic fumes, dystopian atmosphere' },
@@ -199,7 +199,7 @@ export const CATEGORIES: Category[] = [
   },
 
   // ========================================================================
-  // 4. 生命与陪伴 (THE LIFE) - 关键修改：存在感策略
+  // 4. 生命与陪伴 (THE LIFE)
   // ========================================================================
   {
     id: 'character',
@@ -207,14 +207,9 @@ export const CATEGORIES: Category[] = [
     icon: <UserCheck className="w-4 h-4" />,
     type: 'single',
     items: [
-      // STRATEGY A: POV (Immersion)
       { id: 'none', label: 'POV: 无人 (Immersive)', value: 'no humans, empty room, first person view' },
-      
-      // STRATEGY B: Silhouette (Cinematic)
       { id: 'silhouette', label: '背影/剪影 (Cinematic)', value: 'a mysterious survivor sitting by the window, back turned to the camera, silhouetted against the light' },
       { id: 'driver_focused', label: '专注驾驶 (Driver)', value: 'a focused driver/pilot is visible at the controls, hands on the wheel/yoke, back turned to the camera' },
-      
-      // STRATEGY C: Passive (Cozy/Safe)
       { id: 'man_sleeping', label: '熟睡 (Passive Sleep)', value: 'a survivor sleeping deeply in the bunk, wrapped in blankets, face hidden, peaceful posture' },
       { id: 'survivor_reading', label: '阅读 (Passive Read)', value: 'a survivor sitting in an armchair reading a book, face obscured by the book, relaxed' },
       { id: 'writer', label: '书写 (Passive Work)', value: 'a survivor writing in a journal at the table, focused on the paper, head down' },
@@ -245,18 +240,15 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     items: [
       { id: 'none', label: '绝对独处 (Alone)', value: '' },
-      // FIX: Made neutral
       { id: 'npc_copilot', label: '副驾驶 (Co-Pilot)', value: 'a companion in the adjacent seat checking a large paper map, soft silhouette' },
-      // FIX: Made neutral
       { id: 'npc_family', label: '后排家人 (Family)', value: 'blurred shapes of family members sleeping or talking quietly in the background, domestic safety' },
       { id: 'npc_tactical', label: '护卫小队 (Tactical)', value: 'silhouettes of a tactical team in the background, keeping watch, soft focus' },
     ]
   },
 
   // ========================================================================
-  // 5. 氛围与细节 (THE VIBE) - 填充物
+  // 5. 氛围与细节 (THE VIBE)
   // ========================================================================
-  // Activity Category Removed - Merged into Amenities
   {
     id: 'amenities',
     title: '11. 物资与软装 (Amenities)',
@@ -334,10 +326,9 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      { id: '8h', label: '8 Hours (Sleep)', value: '8 Hours' },
-      { id: '4h', label: '4 Hours (Study)', value: '4 Hours' },
-      { id: '2h', label: '2 Hours (Nap)', value: '2 Hours' },
-      { id: 'loop', label: '4K Loop', value: '4K Loop' },
+      { id: '2h', label: '2 Hours (Test/Focus)', value: '2 Hours' },
+      { id: '8h', label: '8 Hours (Deep Sleep)', value: '8 Hours' },
+      // Removed 4H/Loop to enforce 3+1 strategy
     ]
   },
 ];

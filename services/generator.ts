@@ -16,6 +16,7 @@ const getEnglishTerm = (label: string): string => {
 
 const getConciseWeather = (label: string): string => {
   const eng = getEnglishTerm(label).toUpperCase();
+  // Sound Texture Mapping
   if (eng.includes('LUSH')) return 'FOREST RAIN';
   if (eng.includes('LIGHT RAIN')) return 'GENTLE RAIN';
   if (eng.includes('MEDIUM RAIN')) return 'RAINY DAY';
@@ -24,22 +25,60 @@ const getConciseWeather = (label: string): string => {
   if (eng.includes('LIGHT SNOW')) return 'SNOWFALL';
   if (eng.includes('HEAVY SNOW')) return 'HEAVY SNOW';
   if (eng.includes('BLIZZARD')) return 'BLIZZARD';
-  if (eng.includes('FOG')) return 'DENSE FOG';
+  if (eng.includes('FOG')) return 'FOG & WIND'; // Fixed: Fog needs sound texture
+  if (eng.includes('WIND')) return 'HOWLING WIND';
+  if (eng.includes('ACID')) return 'TOXIC RAIN';
+  if (eng.includes('SOLAR')) return 'SOLAR STORM';
   return 'STORM';
 };
 
 const getConciseStructure = (label: string): string => {
    const eng = getEnglishTerm(label).toUpperCase();
-   if (eng.includes('BUNKER')) return 'BUNKER';
-   if (eng.includes('CABIN')) return 'LOG CABIN';
-   if (eng.includes('TRAIN')) return 'SNOW TRAIN';
-   if (eng.includes('CLIFF')) return 'CLIFF HOUSE';
-   if (eng.includes('PENTHOUSE')) return 'SKY PENTHOUSE';
-   if (eng.includes('FACTORY')) return 'FACTORY BASE';
+   // FOUNDATION - Nature
+   if (eng.includes('CLIFF')) return 'CLIFF SHELTER';
+   if (eng.includes('FOREST')) return 'TREEHOUSE BASE'; 
    if (eng.includes('BOATHOUSE')) return 'LAKE HOUSE';
-   if (eng.includes('TRUCK')) return 'TRUCK CAB';
+   if (eng.includes('ZEN')) return 'JAPANESE GARDEN';
+   if (eng.includes('RIVER')) return 'RIVER COTTAGE';
+   if (eng.includes('IGLOO')) return 'GLASS IGLOO';
+   if (eng.includes('PEAK')) return 'MOUNTAIN BASE';
+   if (eng.includes('ROOFTOP')) return 'CITY ROOFTOP';
+   
+   // FOUNDATION - Moving
    if (eng.includes('RV')) return 'EXPEDITION RV';
-   return 'SHELTER';
+   if (eng.includes('TRUCK')) return 'TRUCK CABIN';
+   if (eng.includes('TRAIN')) return 'SNOW TRAIN';
+   if (eng.includes('BUS')) return 'NIGHT BUS';
+   if (eng.includes('JET')) return 'LUXURY JET';
+   if (eng.includes('YACHT')) return 'STORM YACHT';
+   if (eng.includes('TAXI')) return 'CYBER TAXI';
+   if (eng.includes('SPACESHIP')) return 'SPACESHIP';
+   if (eng.includes('METRO')) return 'METRO CAR';
+   
+   // FOUNDATION - Underground
+   if (eng.includes('BUNKER')) return 'DOOMSDAY BUNKER';
+   if (eng.includes('RAID')) return 'WWII SHELTER';
+   if (eng.includes('CAVE')) return 'CAVE BASE';
+   if (eng.includes('DRAIN')) return 'SEWER BASE';
+   if (eng.includes('VAULT')) return 'BANK VAULT';
+   
+   // FOUNDATION - Institutional
+   if (eng.includes('CHURCH')) return 'SAFE CHURCH';
+   if (eng.includes('TRAUMA') || eng.includes('HOSPITAL')) return 'ABANDONED HOSPITAL';
+   if (eng.includes('LIBRARY')) return 'SAFE LIBRARY';
+   
+   // FOUNDATION - Commercial
+   if (eng.includes('SUPERMARKET')) return 'SUPERMARKET';
+   if (eng.includes('FACTORY')) return 'FACTORY BASE';
+   if (eng.includes('WAREHOUSE')) return 'WAREHOUSE';
+   
+   // FOUNDATION - Residential
+   if (eng.includes('PENTHOUSE')) return 'SKY PENTHOUSE';
+   if (eng.includes('CABIN')) return 'COZY CABIN';
+   if (eng.includes('CONTAINER')) return 'CONTAINER HOME';
+   if (eng.includes('TREEHOUSE')) return 'TREE FORT';
+
+   return 'COZY SHELTER';
 };
 
 const analyzeSafety = (
@@ -57,41 +96,75 @@ const analyzeSafety = (
   return { score: Math.min(score, 100), feedback, psychologicalHooks: [] };
 };
 
-const generateLongFormDescription = (
-    structure: CategoryItem | undefined,
-    weather: CategoryItem | undefined,
-    duration: string,
+const generateModularDescription = (
+    structureName: string,
+    weatherName: string,
+    durationText: string,
     defense: CategoryItem[],
     warmth: CategoryItem[],
     amenities: CategoryItem[],
-    pet: CategoryItem | undefined
+    pet: CategoryItem | undefined,
+    soundKeyWords: string[]
 ): string => {
-    const sName = structure ? getEnglishTerm(structure.label) : "Shelter";
-    const wName = weather ? getEnglishTerm(weather.label) : "Storm";
     
-    const narrativeEN = `The world outside is dissolving into a fierce ${wName}, but here, within the reinforced walls of your ${sName}, time seems to stand still. Listen to the rhythmic drumming on the glass as you drift into a deep, uninterrupted slumber. You are safe. You are warm.`;
-    const narrativeZH = `欢迎回到你的私人避难所。窗外${wName}肆虐，但在打造精良的${sName}空间里，你拥有绝对的安全感。戴上耳机，让外界的喧嚣在这一刻彻底消失。`;
+    // SECTION 1: SEO Optimized Intro (Natural Phrasing)
+    // "Welcome to your [Scene Name]. Outside, the [Weather] is raging, but inside, you are safe.
+    // Enjoy the soothing sounds of [Sound 1], [Sound 2], and [Sound 3] designed to help you [Benefit] immediately."
+    
+    const benefit = durationText.includes('8') ? 'fall into a deep sleep' : 'focus and relax';
+    
+    // Improved sound list formatting
+    let soundsString = "";
+    if (soundKeyWords.length > 2) {
+      const last = soundKeyWords.pop();
+      soundsString = `${soundKeyWords.join(', ')}, and ${last}`;
+    } else {
+      soundsString = soundKeyWords.join(' and ');
+    }
+    
+    const intro = `Welcome to your ${structureName}. Outside, the ${weatherName} is raging, but inside, you are safe.\n\nEnjoy the soothing sounds of ${soundsString} designed to help you ${benefit} immediately.\n\nThis video features a ${durationText} loop without ads, perfect for uninterrupted sleep, study, or relaxation.`;
 
+    // SECTION 2: Inventory / Lore (Brand Asset)
     const inventory = [
-        `🏠 **Base:** ${sName}`,
-        `⛈️ **Atmosphere:** ${wName}`,
+        `🏠 **Base:** ${structureName}`,
+        `⛈️ **Atmosphere:** ${weatherName}`,
         `🔥 **Hearth:** ${warmth.map(w => getEnglishTerm(w.label)).join(', ') || 'Thermal System'}`,
         `🛡️ **Security:** ${defense.map(d => getEnglishTerm(d.label)).join(', ')}`,
         `📦 **Resources:** ${amenities.map(a => getEnglishTerm(a.label)).join(', ')}`,
         pet && pet.id !== 'none' ? `🐾 **Companion:** ${getEnglishTerm(pet.label)}` : ''
     ].filter(Boolean).join('\n');
 
-    return `${narrativeEN}\n\n━━━━━━━━━━━━━━━━━━━━\n\n${narrativeZH}\n\n━━━━━━━━━━━━━━━━━━━━\n\n🎒 **SHELTER INVENTORY**\n${inventory}\n\n━━━━━━━━━━━━━━━━━━━━\n\n⏰ **TIMESTAMP**\n0:00:00 Intro & Ambient Setup\n0:05:00 Deep Sleep White Noise Phase\n${duration.replace('h','')} Hours Loop End\n\n#${sName.replace(/\s+/g, '')} #${wName.replace(/\s+/g, '')} #CozyAmbience #RainSounds #SleepAid #ASMR`;
+    // SECTION 3: Hashtags (Standardized)
+    // #Ambience #SleepSounds #ASMR #[SceneName] #[Weather]
+    const sceneTag = structureName.replace(/\s+/g, '');
+    const weatherTag = weatherName.replace(/\s+/g, '');
+    const hashtags = `#${sceneTag} #${weatherTag} #WhiteNoise #CozyAmbience #SleepSounds`;
+
+    return `${intro}\n\n━━━━━━━━━━━━━━━━━━━━\n\n🎒 **SHELTER INVENTORY**\n${inventory}\n\n━━━━━━━━━━━━━━━━━━━━\n\n${hashtags}`;
 };
 
-const generateTags = (sName: string, wName: string, warmth: CategoryItem[], amenities: CategoryItem[]): string => {
-    const tags = [
-        `${sName} ambience`, `${sName} sounds`, `cozy ${sName}`, `rain on ${sName}`,
-        `${wName} sounds`, `${wName} for sleep`, "sleep sounds", "relaxing white noise",
-        "insomnia relief", "study music", "focus aid", "asmr ambience", "fireplace sounds",
-        "shelter ambience", "doomsday shelter", "rain and thunder", "snowstorm sleep"
+const generateTagsMatrix = (sName: string, wName: string, warmth: CategoryItem[], amenities: CategoryItem[]): string => {
+    // Group 1: Basic (Universal)
+    const basicTags = [
+        "ambience", "sleeping sounds", "white noise for sleep", "insomnia relief", 
+        "cozy ambience", "relaxing music", "asmr sleep", "no ads", "deep sleep", "soundscape"
     ];
-    return tags.slice(0, 30).join(', ');
+
+    // Group 2: Weather (Texture)
+    const weatherTags = [
+        `${wName} sounds`, `${wName} on window`, `${wName} ambience`, 
+        "heavy rain", "thunderstorm sounds", "wind sounds", "storm for sleep"
+    ];
+
+    // Group 3: Scene (Specific)
+    const sceneTags = [
+        `${sName} ambience`, `cozy ${sName}`, `${sName} sounds`, 
+        "abandoned places", "shelter ambience", "safehouse", "bunker sounds"
+    ];
+    
+    // Combine and dedupe
+    const allTags = Array.from(new Set([...basicTags, ...weatherTags, ...sceneTags]));
+    return allTags.slice(0, 40).join(', ');
 };
 
 export const generateContent = (selections: SelectionState): GeneratedContent => {
@@ -107,15 +180,45 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
   const time = getSelectedItems(selections, 'time')[0];
   const shot = getSelectedItems(selections, 'shot_type')[0];
   const durationRaw = getSelectedItems(selections, 'duration')[0]?.id || '8h';
-  const durationText = durationRaw.replace('h', ' HOURS');
+  const durationText = durationRaw === '8h' ? '8 Hours' : '2 Hours';
 
   const analysis = analyzeSafety(defense, warmth, pet, amenities);
-  const sName = structure ? getEnglishTerm(structure.label) : "Shelter";
-  const wName = weather ? getEnglishTerm(weather.label) : "Storm";
-
-  // --- NANO BANANA 2 STRUCTURED PROMPT LOGIC ---
   
-  // 1. Gather all interior details
+  // Naming Standardization
+  const conciseStructureName = getConciseStructure(structure?.label || '');
+  const conciseWeatherName = getConciseWeather(weather?.label || '');
+  const primaryWarmth = warmth.length > 0 ? getEnglishTerm(warmth[0].label) : 'Heater';
+
+  // --- NEW TITLE FORMULA (SOP) ---
+  // Formula: [Scene] + [Texture] + [Benefit] | [Badge]
+  // 8H: SLEEP in [Structure] 🌧️ [Weather] Sounds | 8 Hours Deep Sleep | No Ads
+  // 2H: [Structure] in [Weather] 🌧️ Cozy White Noise for Focus | 2 Hours No Loop
+  
+  let youtubeTitle = "";
+  if (durationRaw === '8h') {
+      youtubeTitle = `SLEEP in ${conciseStructureName} 🌧️ ${conciseWeatherName} Sounds | 8 Hours Deep Sleep | No Ads`;
+  } else {
+      youtubeTitle = `${conciseStructureName} in ${conciseWeatherName} 🌧️ Cozy White Noise for Sleep & Focus | 2 Hours No Loop`;
+  }
+
+  // --- THUMBNAIL STRATEGY ---
+  // Text: 3-4 words max. Badge: NO ADS.
+  const thumbnailText = [
+      conciseStructureName.toUpperCase(), // e.g. CLIFF SHELTER
+      `${conciseWeatherName} | NO ADS`    // e.g. HEAVY RAIN | NO ADS
+  ];
+
+  // Color Psychology
+  // Sleep (8H) = Cold (Blue/Purple/Black)
+  // Focus (2H) = Warm (Orange/Yellow/Brown)
+  const thumbnailDesign: ThumbnailDesign = durationRaw === '8h' 
+      ? { textColor: "#FFFFFF", accentColor: "#4F46E5", fontRecommendation: "Impact", layoutTip: "Cold Tones (Blue/Black), High Contrast White Text" } // Indigo
+      : { textColor: "#FFFFFF", accentColor: "#EA580C", fontRecommendation: "Impact", layoutTip: "Warm Tones (Orange/Amber), Golden Lighting" }; // Orange
+
+  // --- SOUND STRATEGY ---
+  const soundKeywords = [`${conciseWeatherName} striking the glass`, `warm hum of the ${primaryWarmth}`, "deep Brown Noise"];
+
+  // --- PROMPT LOGIC ---
   const interiorDetails = [
       ...warmth.map(i => i.value),
       ...amenities.map(i => i.value),
@@ -125,10 +228,8 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
       npc?.value
   ].filter(Boolean).join('. ');
 
-  // 2. Determine "Openness" Logic for Safety Constraints
   const isOpenStructure = ['terrace', 'balcony', 'porch'].some(k => structure?.id.includes(k));
   
-  // 3. Construct the Script (The 9-Point Framework)
   const imagePrompt = `
 [TASK] Create a professional cinematic concept art for a YouTube Ambience Video.
 [SUBJECT] ${structure?.value || 'A cozy shelter interior'}.
@@ -145,8 +246,6 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
 4. Perspective must be perfect.
   `.trim();
 
-  // -----------------------------------------------------
-
   const i2vPrompt = `[Camera]: Static Tripod, locked perspective. [Internal Atmosphere]: Warm, completely still air. [Energy & Particles]: ${warmth.length > 0 ? 'flickering orange flames in fireplace' : 'soft dust motes floating'}. [Exterior Physics]: ${getEnglishTerm(weather?.label || 'Rain')} striking the outer glass pane, trees swaying OUTSIDE the shelter. [Biological]: Subtle breathing of the animal companion if visible.`;
 
   return {
@@ -155,29 +254,20 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
     imagePrompt,
     videoPrompt: "",
     i2vPrompt,
-    youtubeTitle: `${getConciseStructure(structure?.label || '')} vs ${getConciseWeather(weather?.label || '')} | ${durationText} Sleep Ambience | NO ADS`,
-    youtubeDescription: generateLongFormDescription(structure, weather, durationRaw, defense, warmth, amenities, pet),
-    thumbnailText: [
-      getConciseStructure(structure?.label || ''), 
-      `${getConciseWeather(weather?.label || '')} | SLEEP ${durationText}`
-    ],
-    thumbnailDesign: { 
-      textColor: "#FFFFFF", 
-      accentColor: "#FF8C00", 
-      fontRecommendation: "Impact", 
-      layoutTip: "Centered bottom, heavy black stroke, use white text for main headline" 
-    },
-    // NEW: Initialize with default centered positions
+    youtubeTitle,
+    youtubeDescription: generateModularDescription(conciseStructureName, conciseWeatherName, durationText, defense, warmth, amenities, pet, soundKeywords),
+    thumbnailText,
+    thumbnailDesign,
     thumbnailConfig: {
       headline: { x: 640, y: 540, fontSize: 120 },
       subhead: { x: 640, y: 630, fontSize: 50 }
     },
-    tags: generateTags(sName, wName, warmth, amenities),
+    tags: generateTagsMatrix(conciseStructureName, conciseWeatherName, warmth, amenities),
     analysis,
     audioGuide: [
-      { layer: "1. Room Tone", sound: "Low-end hum of air filtration", mixingNotes: "Cut above 500Hz" },
-      { layer: "2. External Storm", sound: `High fidelity ${wName} hitting glass`, mixingNotes: "Stereo 120% width" },
-      { layer: "3. Hearth", sound: "Crackling wood fire", mixingNotes: "Center channel, add reverb" }
+      { layer: "1. Base Layer (Brown Noise)", sound: "Deep rumble / Air filtration hum", mixingNotes: "EQ: Low Pass @ 300Hz, -15dB" },
+      { layer: "2. External Texture (Main)", sound: `High fidelity ${conciseWeatherName} hitting glass`, mixingNotes: "Stereo 120% width, -6dB" },
+      { layer: "3. Near Field (ASMR)", sound: `${primaryWarmth} crackle / ${amenities[0] ? getEnglishTerm(amenities[0].label) : 'Page Turning'}`, mixingNotes: "Center channel, crisp high-end, -12dB" }
     ],
     selectedItems: selections,
     score: analysis.score
@@ -268,7 +358,9 @@ export const generateRandomSelections = (): SelectionState => {
     s['npc'] = [pick('npc')];
     s['amenities'] = pickMulti('amenities', 4);
     s['vibe'] = [pick('vibe')];
-    s['duration'] = [pick('duration')];
+    
+    // Randomly assign 2H or 8H (weighted towards 8H for safety)
+    s['duration'] = [Math.random() > 0.3 ? '8h' : '2h'];
 
     return s;
 };

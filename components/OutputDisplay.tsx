@@ -112,19 +112,20 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
 
   const copyAll = () => {
     const text = `
-【视频标题/Title】: ${local.youtubeTitle}
-━━━━━━━━━━━━━━━━━━━━
-【视频描述/Description】:
+【Title / 标题】
+${local.youtubeTitle}
+
+【Description / 简介】
 ${local.youtubeDescription}
-━━━━━━━━━━━━━━━━━━━━
-【SEO 搜索标签/Tags】: ${local.tags}
-━━━━━━━━━━━━━━━━━━━━
-【封面大字设定/Thumbnail】: ${thumbText.join(' | ')}
-━━━━━━━━━━━━━━━━━━━━
-【视频物理动效指令 (I2V Prompt)】: ${local.i2vPrompt}
+
+【Backend Tags / 后台标签】
+${local.tags}
+
+【I2V Prompt / 动效指令】
+${local.i2vPrompt}
     `.trim();
     navigator.clipboard.writeText(text);
-    alert("全案运营参数已一键打包复制！");
+    alert("全案运营参数已复制！");
   };
 
   const downloadThumbnail = () => {
@@ -146,24 +147,25 @@ ${local.youtubeDescription}
   return (
     <div className="h-full flex flex-col bg-slate-950 overflow-hidden">
       {/* 顶部全案控制栏 */}
-      <div className="px-8 py-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-2xl z-30">
-        <div className="flex items-center gap-5">
-          <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-900/40">
+      <div className="px-8 py-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-2xl z-30 shrink-0">
+        <div className="flex items-center gap-5 flex-1 min-w-0 mr-8">
+          <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-900/40 shrink-0">
             <ShieldCheck className="text-white" size={28}/>
           </div>
-          <div>
-            <h2 className="text-white font-black text-2xl tracking-tighter truncate max-w-[400px]">{local.youtubeTitle}</h2>
+          <div className="min-w-0">
+            {/* 修复：移除 truncate，允许换行，调整字体大小适应 */}
+            <h2 className="text-white font-black text-xl leading-tight tracking-tighter mb-1 break-words">{local.youtubeTitle}</h2>
             <div className="flex gap-4 items-center">
-               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Growth Phase: {local.score >= 90 ? 'Alpha' : 'Beta'}</span>
-               <div className="h-1 w-1 bg-slate-700 rounded-full"></div>
-               <div className="flex items-center gap-1.5">
+               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest whitespace-nowrap">Growth Phase: {local.score >= 90 ? 'Alpha' : 'Beta'}</span>
+               <div className="h-1 w-1 bg-slate-700 rounded-full shrink-0"></div>
+               <div className="flex items-center gap-1.5 whitespace-nowrap">
                  <Activity size={12} className="text-green-500"/>
                  <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Engagement Score: {local.score}</span>
                </div>
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 shrink-0">
           <button onClick={() => onToggleFavorite(local)} className={`p-4 rounded-2xl border-2 transition-all ${isFavorite ? 'bg-yellow-500 border-yellow-500 text-white shadow-lg shadow-yellow-900/20' : 'border-slate-800 text-slate-500 hover:text-white hover:bg-slate-800'}`}><Star size={24} fill={isFavorite ? 'currentColor' : 'none'}/></button>
           <button onClick={copyAll} className="flex items-center gap-3 px-10 py-4 bg-green-600 hover:bg-green-500 text-white rounded-2xl text-sm font-black shadow-2xl shadow-green-900/40 transition-all active:scale-95"><Copy size={20}/> 一键复制全案参数</button>
         </div>
@@ -389,13 +391,24 @@ ${local.youtubeDescription}
            <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
              <FileText size={18} className="text-green-500"/> 04. YouTube 运营全案 (SEO)
            </div>
+
+           {/* NEW: 独立的标题展示卡片 */}
+           <div className="bg-slate-900 border-2 border-slate-800 rounded-[2.5rem] p-8 shadow-xl relative group overflow-hidden">
+             <div className="absolute top-6 right-8 opacity-0 group-hover:opacity-100 transition-opacity">
+               <button onClick={() => { navigator.clipboard.writeText(local.youtubeTitle); alert("Title Copied!"); }} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all shadow-lg"><Copy size={20}/></button>
+             </div>
+             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">【Title / 标题】</div>
+             <div className="text-xl md:text-3xl font-black text-white leading-tight tracking-tight selection:bg-green-500/30 pr-12">
+               {local.youtubeTitle}
+             </div>
+           </div>
            
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               {/* Description Section */}
               <div className="lg:col-span-2 space-y-6">
                  <div className="bg-slate-900 border-2 border-slate-800 rounded-[3.5rem] overflow-hidden shadow-2xl">
                     <div className="px-10 py-6 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center">
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Video Description (Optimized)</span>
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">【Description / 简介】</span>
                        <button onClick={() => { navigator.clipboard.writeText(local.youtubeDescription); alert("Description Copied!"); }} className="bg-slate-950 p-4 rounded-2xl text-slate-500 hover:text-white transition-all shadow-xl"><Copy size={22}/></button>
                     </div>
                     <div className="p-12 text-sm text-slate-400 font-mono whitespace-pre-wrap leading-loose h-[600px] overflow-y-auto bg-slate-950/20 scrollbar-hide">
@@ -408,7 +421,7 @@ ${local.youtubeDescription}
               <div className="space-y-6">
                  <div className="bg-slate-900 border-2 border-slate-800 rounded-[3.5rem] overflow-hidden shadow-2xl h-full flex flex-col">
                     <div className="px-10 py-6 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center">
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Hash size={14}/> SEO Tags Matrix</span>
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Hash size={14}/> 【Backend Tags / 后台标签】</span>
                        <button onClick={() => { navigator.clipboard.writeText(local.tags); alert("All Tags Copied!"); }} className="bg-slate-950 p-3 rounded-xl text-slate-500 hover:text-white transition-all"><Copy size={16}/></button>
                     </div>
                     <div className="p-10 flex flex-wrap gap-2 overflow-y-auto flex-1 bg-slate-950/40">

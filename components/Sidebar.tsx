@@ -6,7 +6,8 @@ import { parsePromptToSelections } from '../services/generator';
 import { 
   Check, ChevronDown, ChevronUp, Zap, RotateCcw, Save, Trash2, FolderOpen, X, 
   BookOpen, Terminal, Calendar, PlayCircle, Info, Wand2, Eye, History, Settings2, Target,
-  Cpu, Lightbulb, PenTool, Layers, AlertTriangle
+  Cpu, Lightbulb, PenTool, Layers, AlertTriangle, Aperture, Fingerprint, Palette, Link as LinkIcon,
+  Brain, Globe, Layout, Type, Eraser, Box, ScanFace, FileJson
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -106,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         {CATEGORIES.map(cat => (
           <div key={cat.id} className="space-y-3">
             <button 
-              onClick={() => setOpenCategories(prev => prev.includes(cat.id) ? prev.filter(x => x !== cat.id) : [...prev, cat.id])} 
+              onClick={() => setOpenCategories(prev => prev.includes(cat.id) ? prev.filter(cid => cid !== cat.id) : [...prev, cat.id])} 
               className="w-full flex items-center justify-between group"
             >
               <span className="flex items-center gap-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover:text-slate-300 transition-colors">
@@ -200,7 +201,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                    </div>
                    <div>
                       <h3 className="text-xl md:text-2xl font-black text-white tracking-tighter">Nano Banana 2 <span className="text-blue-500">PRO</span></h3>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Gemini 2.5 Flash Image 深度攻略</p>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">官方权威全书 (The Complete Guide)</p>
                    </div>
                 </div>
                 <button onClick={() => setIsGuideOpen(false)} className="p-3 hover:bg-slate-800 rounded-full text-slate-500 hover:text-white transition-all"><X size={24}/></button>
@@ -212,91 +213,171 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 <section className="space-y-6">
                   <div className="p-6 bg-blue-900/10 border border-blue-500/20 rounded-2xl">
                     <p className="font-medium text-blue-200">
-                      本文档旨在为专业级生成艺术家、Prompt 工程师和AI应用开发者提供一套关于 Nano Banana (NB) 模型系列——即 Gemini 2.5 Flash Image 及其升级版 Nano Banana 2 (Pro) 的详尽、可执行的图像生成技巧。
+                      Nano-Banana Pro (Gemini 2.5) 是从“娱乐”生图向“功能性”专业资产制作的重大飞跃。本指南基于谷歌官方 "10 Tips for Professional Asset Production"，涵盖核心能力及最佳实践。
                     </p>
                   </div>
                 </section>
 
-                {/* Chapter 1 */}
+                {/* Tip 0: Golden Rules */}
                 <section className="space-y-6">
-                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Cpu size={24} className="text-blue-500"/> 第一章：模型重塑与技术解析</h3>
-                   <div className="prose prose-invert max-w-none text-slate-400">
-                      <p>NB2 的核心革新在于其集成了一个更强大的语言理解和规划层。传统扩散模型通常依赖直接的关键词匹配，而 NB2 内部引入了一个 <strong>“计划-生成-审查-修正”的多步工作流</strong>。这意味着提示词不再是简单的指令列表，而应被视为一个向内部规划器提供的清晰情境脚本。</p>
-                   </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800">
-                         <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nano Banana 1</div>
-                         <ul className="list-disc list-inside space-y-2 text-sm text-slate-400">
-                            <li>1024x1024 基础分辨率</li>
-                            <li>文本渲染不可靠（乱码）</li>
-                            <li>仅理解基本场景逻辑</li>
-                            <li>依赖手动迭代重绘</li>
-                         </ul>
-                      </div>
-                      <div className="p-6 bg-blue-950/20 rounded-2xl border border-blue-500/20">
-                         <div className="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">Nano Banana 2 (Pro)</div>
-                         <ul className="list-disc list-inside space-y-2 text-sm text-blue-100 font-medium">
-                            <li>原生 2K/4K 商业级分辨率</li>
-                            <li><strong>完美文本渲染</strong> (海报/图表)</li>
-                            <li><strong>强大的逻辑推理</strong> (物理/结构)</li>
-                            <li>内置“计划与修正”工作流</li>
-                         </ul>
-                      </div>
-                   </div>
-                </section>
-
-                {/* Chapter 2 */}
-                <section className="space-y-6">
-                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Lightbulb size={24} className="text-yellow-500"/> 第二章：思维转变 - 从标签到剧本</h3>
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Lightbulb size={24} className="text-yellow-500"/> 第0章：提示词黄金法则 (Golden Rules)</h3>
                    <div className="space-y-4">
-                      <h4 className="text-lg font-bold text-white">2.1 “思考型模型” (Thinking Model)</h4>
-                      <p>放弃传统的“关键词堆砌” (Tag Soup) 策略。高质量提示词应当是<strong>叙事性的</strong>，采用连贯的段落来描述场景。</p>
+                      <p>停止使用关键词堆砌（Tag Soup）。Nano-Banana Pro 是一个“思考型”模型，它理解意图、物理和构图。</p>
                       
-                      <h4 className="text-lg font-bold text-white mt-8">2.2 高效迭代：Edit, Don't Re-roll</h4>
-                      <p>NB Pro 具有强大的<strong>图像状态记忆</strong>。如果图像完成了 80%，请使用自然语言指令进行微调，而不是重新生成。</p>
-                      <div className="bg-slate-900 p-4 rounded-xl border-l-4 border-yellow-500 text-sm text-slate-300 italic">
-                         “这很棒，但请把灯光改为日落氛围，并将文本改为霓虹蓝。”
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div className="space-y-2">
+                            <h4 className="font-bold text-white">1. Edit, Don't Re-roll (编辑，别重抽)</h4>
+                            <p className="text-sm text-slate-400">如果图有80%满意，不要重新生成。直接说：“这很棒，但请把灯光改为日落氛围，并将文本改为霓虹蓝。”</p>
+                         </div>
+                         <div className="space-y-2">
+                            <h4 className="font-bold text-white">2. 自然语言与完整句子</h4>
+                            <p className="text-sm text-slate-400">❌ 坏: "Cool car, neon, city."<br/>✅ 好: "A cinematic wide shot of a futuristic sports car speeding through a rainy Tokyo street."</p>
+                         </div>
                       </div>
                    </div>
                 </section>
 
-                {/* Chapter 3 */}
+                {/* Tip 1: Text & Infographics */}
                 <section className="space-y-6">
-                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><PenTool size={24} className="text-green-500"/> 第三章：高级提示词解剖学 (核心公式)</h3>
-                   <div className="p-6 bg-slate-900 border border-slate-700 rounded-2xl overflow-x-auto">
-                      <code className="text-green-400 font-mono text-sm md:text-base font-bold whitespace-nowrap">
-                         [task] + [subject] + [composition] + [environment] + [lighting] + [camera] + [style] + [output] + [constraints]
-                      </code>
-                   </div>
-                   <div className="space-y-4 text-sm">
-                      <div className="flex gap-4 border-b border-slate-800 pb-4">
-                         <span className="w-32 font-black text-green-500 uppercase">Subject</span>
-                         <span className="text-slate-400">主体必须具体。例如：A stoic robot barista with glowing blue optics.</span>
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Type size={24} className="text-indigo-500"/> 第1章：文本渲染与信息图 (Text & Visual Synthesis)</h3>
+                   <p className="text-sm text-slate-400">NB Pro 具备 SOTA 级别的文本渲染能力，可直接生成 PPT 素材、图表和白板图。</p>
+                   
+                   <div className="space-y-4">
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-indigo-400 uppercase tracking-widest mb-2">复古信息图 (Retro Infographic)</h4>
+                         <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-indigo-200 border border-indigo-500/20 leading-relaxed">
+                           "Make a retro, 1950s-style infographic about the history of the American diner. Include distinct sections for 'The Food,' 'The Jukebox,' and 'The Decor.' Ensure all text is legible and stylized to match the period."
+                         </div>
                       </div>
-                      <div className="flex gap-4 border-b border-slate-800 pb-4">
-                         <span className="w-32 font-black text-green-500 uppercase">Composition</span>
-                         <span className="text-slate-400">景别与视角。例如：Medium full shot, centered composition with negative space.</span>
-                      </div>
-                      <div className="flex gap-4 border-b border-slate-800 pb-4">
-                         <span className="w-32 font-black text-green-500 uppercase">Hard Constraints</span>
-                         <span className="text-slate-400">NB2 独有功能。例如：Ensure historical accuracy for Victorian era.</span>
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-indigo-400 uppercase tracking-widest mb-2">教学白板 (Educational Whiteboard)</h4>
+                         <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-indigo-200 border border-indigo-500/20 leading-relaxed">
+                           "Summarize the concept of 'Transformer Neural Network Architecture' as a hand-drawn whiteboard diagram. Use different colored markers for Encoder and Decoder blocks, with legible labels for 'Self-Attention'."
+                         </div>
                       </div>
                    </div>
                 </section>
 
-                {/* Chapter 6 */}
+                {/* Tip 2: Character Consistency */}
                 <section className="space-y-6">
-                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><AlertTriangle size={24} className="text-red-500"/> 第六章：质量保障 (负面提示词)</h3>
-                   <p>即使是 NB2 也需要“底层质量排除”。请在所有 Prompt 中包含以下负面词表：</p>
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><ScanFace size={24} className="text-pink-500"/> 第2章：角色一致性与病毒图 (Consistency)</h3>
+                   <div className="space-y-4">
+                      <p className="text-sm text-slate-400">支持多达 14 张参考图。核心指令是 <strong>"Identity Locking"</strong>。</p>
+                      
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-pink-400 uppercase tracking-widest mb-2">病毒缩略图 (Viral Thumbnail)</h4>
+                         <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-pink-200 border border-pink-500/20 leading-relaxed">
+                           "Design a viral video thumbnail using the person from Image 1.<br/>
+                           <strong>Face Consistency:</strong> Keep facial features exactly the same as Image 1, but make expression excited.<br/>
+                           <strong>Subject:</strong> Place a delicious avocado toast on the right.<br/>
+                           <strong>Graphics:</strong> Add a bold yellow arrow connecting person to toast.<br/>
+                           <strong>Text:</strong> Overlay massive text: '3分钟搞定!' (Done in 3 mins!)."
+                         </div>
+                      </div>
+
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-pink-400 uppercase tracking-widest mb-2">多图故事 (Storyboarding)</h4>
+                         <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-pink-200 border border-pink-500/20 leading-relaxed">
+                           "Create a funny 10-part story with these 3 fluffy friends. Keep the attire and identity consistent for all 3 characters, but vary expressions. Only have one of each character in each image."
+                         </div>
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 3: Grounding */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Globe size={24} className="text-blue-500"/> 第3章：谷歌搜索接地 (Grounding)</h3>
+                   <p className="text-sm text-slate-400">利用实时数据生成图表，减少幻觉。</p>
+                   <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                      <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-blue-200 border border-blue-500/20">
+                         "Generate an infographic of the best times to visit U.S. National Parks in 2025 based on current travel trends."
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 4: Advanced Editing */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Eraser size={24} className="text-green-500"/> 第4章：高级编辑与修复 (Editing)</h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-green-400 uppercase tracking-widest mb-2">物体移除 (In-painting)</h4>
+                         <p className="text-xs text-slate-400 mb-2">无需手动遮罩，自然语言指令即可。</p>
+                         <div className="p-3 bg-black/50 rounded-lg text-xs font-mono text-green-200 border border-green-500/20">
+                           "Remove tourists from the background and fill space with logical textures (cobblestones) matching the environment."
+                         </div>
+                      </div>
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-green-400 uppercase tracking-widest mb-2">本地化 (Localization)</h4>
+                         <p className="text-xs text-slate-400 mb-2">翻译文字 + 文化背景适配。</p>
+                         <div className="p-3 bg-black/50 rounded-lg text-xs font-mono text-green-200 border border-green-500/20">
+                           "Localize this ad to Tokyo. Translate tagline to Japanese. Change background to Shibuya street at night."
+                         </div>
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 5 & 6: Dimensions & High Res */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Box size={24} className="text-orange-500"/> 第5章：维度转换 (2D ↔ 3D)</h3>
+                   <p className="text-sm text-slate-400">设计师神器：将平面图转为3D，或将表情包3D化。</p>
+                   <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                      <h4 className="text-sm font-black text-orange-400 uppercase tracking-widest mb-2">平面图转室内设计 (Floor Plan to 3D)</h4>
+                      <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-orange-200 border border-orange-500/20 leading-relaxed">
+                         "Based on the uploaded 2D floor plan, generate a professional interior design board. Layout: Collage with large main image (living area) and smaller detail shots. Style: Modern Minimalist with oak flooring."
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 9: Structural Control */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Layout size={24} className="text-purple-500"/> 第6章：结构控制 (Structure & Layout)</h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-2">草图转广告 (Sketch to Ad)</h4>
+                         <div className="p-3 bg-black/50 rounded-lg text-xs font-mono text-purple-200 border border-purple-500/20">
+                           "Create a ad for a [product] following this sketch exactly."
+                         </div>
+                      </div>
+                      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                         <h4 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-2">线框图转 UI (Wireframe to UI)</h4>
+                         <div className="p-3 bg-black/50 rounded-lg text-xs font-mono text-purple-200 border border-purple-500/20">
+                           "Create a high-fidelity UI mock-up following these wireframe guidelines."
+                         </div>
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 7: Thinking */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><Brain size={24} className="text-teal-500"/> 第7章：思维与推理 (Thinking)</h3>
+                   <p className="text-sm text-slate-400">利用思维链解决数学或逻辑问题。</p>
+                   <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                      <div className="p-4 bg-black/50 rounded-xl text-xs font-mono text-teal-200 border border-teal-500/20">
+                         {`"Solve log_{x^2+1}(x^4-1)=2 in C on a white board. Show the steps clearly."`}
+                      </div>
+                   </div>
+                </section>
+
+                {/* Tip 10: Negative Prompts */}
+                <section className="space-y-6">
+                   <h3 className="text-2xl font-black text-white flex items-center gap-3"><AlertTriangle size={24} className="text-red-500"/> 第8章：质量保障 (Negative Prompts)</h3>
+                   <p className="text-sm text-slate-400">即使是 Pro 模型，也建议保留以下负面词以确保商业级输出。</p>
                    <div className="bg-red-950/20 border border-red-500/30 p-6 rounded-2xl">
-                      <h5 className="text-xs font-black text-red-400 uppercase tracking-widest mb-4">Table 6.1: 推荐负面提示词清单</h5>
-                      <p className="font-mono text-xs md:text-sm text-red-200 leading-relaxed">
+                      <p className="font-mono text-xs md:text-sm text-red-200 leading-relaxed select-all">
                          worst quality, normal quality, low quality, low res, blurry, artifacts, jpeg artifacts, washed-out backgrounds, low detail, extra limbs, distorted hands, incorrect anatomy, poorly drawn hands, poorly drawn feet, missing digits, extra digits, interlocked fingers, deformed bows, Polydactyly, multiple limbs, watermark, signature, text, logo, username, error, cut off, out of frame, body out of frame, draft, simple background, blank background, abstract background, tiling
                       </p>
                    </div>
                 </section>
 
-                <div className="text-center pt-10 border-t border-white/10">
+                <div className="text-center pt-10 border-t border-white/10 space-y-6">
+                   <a 
+                     href="https://x.com/googleaistudio/status/1994480371061469306?s=46" 
+                     target="_blank" 
+                     rel="noreferrer"
+                     className="inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white rounded-2xl font-black transition-all group"
+                   >
+                     <LinkIcon size={18}/> View Original Tutorial on X <span className="text-slate-500 group-hover:text-blue-200">↗</span>
+                   </a>
                    <p className="text-xs font-black text-slate-600 uppercase tracking-[0.5em]">END OF STRATEGY GUIDE</p>
                 </div>
 
