@@ -44,6 +44,11 @@ const getConciseStructure = (label: string): string => {
    if (eng.includes('PEAK')) return 'MOUNTAIN BASE';
    if (eng.includes('ROOFTOP')) return 'CITY ROOFTOP';
    
+   // FOUNDATION - Ocean
+   if (eng.includes('CRUISE')) return 'GHOST CRUISE';
+   if (eng.includes('RIG')) return 'OIL RIG BASE';
+   if (eng.includes('ISLAND')) return 'ISLAND BASE';
+
    // FOUNDATION - Moving
    if (eng.includes('RV')) return 'EXPEDITION RV';
    if (eng.includes('TRUCK')) return 'TRUCK CABIN';
@@ -79,6 +84,22 @@ const getConciseStructure = (label: string): string => {
    if (eng.includes('TREEHOUSE')) return 'TREE FORT';
 
    return 'COZY SHELTER';
+};
+
+const getCharacterMotion = (charId: string): string => {
+  switch (charId) {
+    case 'cooking_stew': return 'Looping motion: Hand slowly stirring the pot in a perfect circle, steam rising vertically.';
+    case 'retro_gaming': return 'Looping motion: Thumbs pressing buttons on controller, blue screen light flickering rhythmically on face.';
+    case 'playing_cards': return 'Looping motion: One hand slowly dealing a card, or shuffling a small stack. Subtle head nod.';
+    case 'polishing_gear': return 'Looping motion: Hand moving a cloth in small circles over the metal object. Slow and methodical.';
+    case 'reading_nook': return 'Looping motion: Occasional page turn (every 5 seconds), hand tracing a line of text.';
+    case 'writing_diary': return 'Looping motion: Hand moving pen across paper left to right, subtle head movement.';
+    case 'knitting': return 'Looping motion: Rhythmic clicking of knitting needles, yarn moving.';
+    case 'guitar_strum': return 'Looping motion: Hand gently strumming strings up and down, head bobbing slowly to rhythm.';
+    case 'window_trace': return 'Looping motion: Finger slowly tracing a raindrop sliding down the glass.';
+    case 'cat_petting': return 'Looping motion: Hand stroking the cat from head to tail repeatedly. Cat breathing.';
+    default: return 'Character posture remains static with subtle breathing motion.';
+  }
 };
 
 const analyzeSafety = (
@@ -179,6 +200,8 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
   const perspective = getSelectedItems(selections, 'perspective')[0];
   const time = getSelectedItems(selections, 'time')[0];
   const shot = getSelectedItems(selections, 'shot_type')[0];
+  const visualStyle = getSelectedItems(selections, 'visual_style')[0]; // NEW: Visual Style
+
   const durationRaw = getSelectedItems(selections, 'duration')[0]?.id || '8h';
   const durationText = durationRaw === '8h' ? '8 Hours' : '2 Hours';
 
@@ -230,6 +253,9 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
 
   const isOpenStructure = ['terrace', 'balcony', 'porch'].some(k => structure?.id.includes(k));
   
+  // NEW: Dynamic Style Injection
+  const stylePrompt = visualStyle ? visualStyle.value : 'Unreal Engine 5 render, cozy atmosphere, high contrast';
+
   const imagePrompt = `
 [TASK] Create a professional cinematic concept art for a YouTube Ambience Video.
 [SUBJECT] ${structure?.value || 'A cozy shelter interior'}.
@@ -237,7 +263,7 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
 [ENVIRONMENT] The location is isolated. Outside, a ${weather?.value || 'storm'} is occurring.
 [LIGHTING] ${time?.value || 'Warm interior lighting'}.
 [CAMERA] Photorealistic, 8k, highly detailed textures, 35mm lens.
-[STYLE] Unreal Engine 5 render, cozy atmosphere, high contrast.
+[STYLE] ${stylePrompt}.
 [OUTPUT FORMAT] 16:9 Aspect Ratio.
 [HARD CONSTRAINTS] 
 1. ${isOpenStructure ? 'Rain splashes naturally on the open terrace.' : 'THE WINDOWS ARE HERMETICALLY SEALED. The interior is 100% DRY and WARM. Rain streaks are strictly on the OUTER surface of the glass.'}
@@ -246,7 +272,10 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
 4. Perspective must be perfect.
   `.trim();
 
-  const i2vPrompt = `[Camera]: Static Tripod, locked perspective. [Internal Atmosphere]: Warm, completely still air. [Energy & Particles]: ${warmth.length > 0 ? 'flickering orange flames in fireplace' : 'soft dust motes floating'}. [Exterior Physics]: ${getEnglishTerm(weather?.label || 'Rain')} striking the outer glass pane, trees swaying OUTSIDE the shelter. [Biological]: Subtle breathing of the animal companion if visible.`;
+  // DYNAMIC MOTION INJECTION
+  const charMotion = getCharacterMotion(character?.id || 'none');
+
+  const i2vPrompt = `[Camera]: Static Tripod, locked perspective. [Internal Atmosphere]: Warm, completely still air. [Energy & Particles]: ${warmth.length > 0 ? 'flickering orange flames in fireplace' : 'soft dust motes floating'}. [Exterior Physics]: ${getEnglishTerm(weather?.label || 'Rain')} striking the outer glass pane, trees swaying OUTSIDE the shelter. [Character Motion]: ${charMotion}. [Biological]: Subtle breathing of the animal companion if visible.`;
 
   return {
     id: crypto.randomUUID(),
@@ -298,11 +327,12 @@ export const generateRandomSelections = (): SelectionState => {
 
     let archetype: 'vehicle' | 'scifi' | 'rustic' | 'urban' = 'rustic';
     
-    if (['rv', 'truck', 'train', 'night_bus', 'luxury_jet', 'yacht', 'cyber_taxi', 'subway_moving', 'spaceship'].includes(structureId)) {
+    // Updated Logic for new Ocean items
+    if (['rv', 'truck', 'train', 'night_bus', 'luxury_jet', 'yacht', 'cyber_taxi', 'subway_moving', 'spaceship', 'cruise_ship'].includes(structureId)) {
         archetype = 'vehicle';
-    } else if (['glass_igloo', 'mountain_peak', 'penthouse', 'bunker', 'vault'].includes(structureId)) {
+    } else if (['glass_igloo', 'mountain_peak', 'penthouse', 'bunker', 'vault', 'ocean_island'].includes(structureId)) {
         archetype = 'scifi'; // Or extreme/modern
-    } else if (['supermarket', 'factory', 'warehouse_store', 'hospital_ward', 'library', 'church'].includes(structureId)) {
+    } else if (['supermarket', 'factory', 'warehouse_store', 'hospital_ward', 'library', 'church', 'oil_rig'].includes(structureId)) {
         archetype = 'urban';
     } else {
         archetype = 'rustic'; // Cabins, nature, etc.
@@ -351,6 +381,14 @@ export const generateRandomSelections = (): SelectionState => {
     s['sleeping'] = [pick('sleeping', (i) => {
         if (archetype === 'vehicle') return ['car_seat', 'hammock'].includes(i.id);
         return !['car_seat'].includes(i.id);
+    })];
+    
+    // NEW: Random Visual Style based on archetype (Updated to include new styles)
+    s['visual_style'] = [pick('visual_style', (i) => {
+        if (archetype === 'scifi') return ['cyber_neon', 'unreal_5', 'realistic_8k', 'davinci_grade'].includes(i.id);
+        if (archetype === 'urban') return ['vhs_tape', 'analog_horror', 'gothic_noir', 'leica_bw'].includes(i.id);
+        if (archetype === 'rustic') return ['cinematic_35mm', 'vintage_70s', 'realistic_8k', 'japanese_wafu', 'davinci_grade'].includes(i.id);
+        return true;
     })];
     
     s['character'] = [pick('character')];

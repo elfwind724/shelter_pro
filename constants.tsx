@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Shield, Home, Flame, Coffee, Package, CloudLightning, Skull, Bed, Scroll, Clock, Hourglass, Camera, Ruler, Heart, Users, Map, Ghost, Lock, Dog, UserCheck, Armchair } from 'lucide-react';
+import { Shield, Home, Flame, Coffee, Package, CloudLightning, Skull, Bed, Scroll, Clock, Hourglass, Camera, Ruler, Heart, Users, Map, Ghost, Lock, Dog, UserCheck, Armchair, Palette } from 'lucide-react';
 import { Category } from './types';
 
 export const CATEGORIES: Category[] = [
@@ -14,6 +14,13 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
+      // --- OCEAN & MARITIME (The Abyss) - OPTIMIZED ---
+      { id: 'cruise_ship', label: '幽灵邮轮 (Ghost Liner)', value: 'Interior of a First Class Stateroom on a 1920s vintage Art Deco ocean liner. Key elements: Rows of heavy ROUND BRASS PORTHOLES (not large windows) dripping with condensation. Walls are varnished dark mahogany with brass trim. Furniture is bolted to the floor. The ceiling is low with decorative beams. Outside the thick circular glass, massive dark waves are rolling by. The horizon is tilted. Atmospheric nautical decay, Bioshock aesthetic' },
+      { id: 'oil_rig', label: '海上油井 (Oil Rig)', value: 'Interior of a suspended industrial control module on a deep-sea oil rig. Architectural style: High-tech industrial brutalism. Walls are corrugated metal with yellow hazard stripes and peeling rust. Windows are THICK, SLANTED, REINFORCED GLASS with heavy wipers, looking down 100 feet at the churning black ocean. Metal grating floor, hanging chains, red emergency lighting. Heavy rain hammering the steel structure' },
+      { id: 'ocean_island', label: '黑沙孤岛 (Black Island)', value: 'Interior of a minimalist concrete bunker embedded into a black basalt cliff face. Architecture: Nordic Brutalist. Frameless horizontal ribbon windows strictly framing the violent surf where white foam hits black volcanic sand. Dark grey slate walls, sheepskin textures, suspended fireplace. The ocean spray hits the glass constantly. Death Stranding atmosphere, isolation' },
+      { id: 'submarine', label: '核潜艇 (Submarine)', value: 'Interior of a cramped submarine officer quarters. Curved steel hull walls covered in pipes, valves, and pressure gauges. No windows, but a digital periscope screen showing the stormy surface. Red tactical lighting, narrow bunk, metallic claustrophobia, Das Boot aesthetic' },
+      { id: 'lighthouse', label: '孤峰灯塔 (Lighthouse)', value: 'Interior of the lantern room at the top of an old brick lighthouse. 360-degree glass reinforced with heavy iron cage frames. The massive fresnel lens machinery is visible in the center, rotating slowly. Rain lashes against the glass. High altitude view of the storm raging over the dark sea below' },
+
       // --- NATURE & SEMI-OPEN (The "Terrace" Vibe) ---
       { id: 'cliff_terrace', label: '悬崖露台 (Cliff Terrace)', value: 'interior of a modern cliffside home with massive sliding glass doors opening onto a wet wooden terrace. The terrace extends out into the rain without a roof, collecting puddles and rain splashes. Located at mid-mountain altitude, surrounded by a dense canopy of nature' },
       { id: 'forest_aerie', label: '森林树顶 (Forest Canopy)', value: 'interior of a structure built high into the canopy of massive ancient trees. A large balcony extends out, unprotected from the rain. Rain is dripping heavily from the lush giant leaves and branches onto the balcony floor. View of the deep green forest depth below and thick tree trunks nearby' },
@@ -68,25 +75,16 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      // Rain Intensities
       { id: 'light_rain', label: '绵绵细雨 (Light Rain)', value: 'gentle light rain falling softly. Delicate droplets on glass, peaceful atmosphere, grey sky but not dark. Soft tapping sound visuals' },
       { id: 'medium_rain', label: '淅沥中雨 (Medium Rain)', value: 'steady medium rain shower. Consistent rainfall, wet surfaces, classic rainy mood. Grey overcast light' },
       { id: 'rain', label: '倾盆大雨 (Heavy Rain)', value: 'heavy intense rainfall hammering down. Water splashing on surfaces, reduced visibility, dramatic atmosphere' },
       { id: 'thunder', label: '雷暴轰鸣 (Thunderstorm)', value: 'violent thunderstorm with heavy rain. Lightning flashes illuminating the dark clouds, dramatic contrast' },
-      
-      // Nature Combos
       { id: 'rain_lush', label: '森林暴雨 (Lush Rain)', value: 'heavy torrential rain pouring down on a lush green forest. Vibrant wet leaves, mossy rocks, and ferns are visible through the window/terrace. The atmosphere is wet and green. Nature is thriving in the storm' },
-      
-      // Snow Intensities
       { id: 'light_snow', label: '静谧飘雪 (Light Snow)', value: 'gentle light snowflakes falling slowly. Peaceful silence, soft white blanket forming, magical winter atmosphere' },
       { id: 'heavy_snow', label: '鹅毛大雪 (Heavy Snow)', value: 'heavy dense snowfall, large flakes, winter wonderland, accumulating fast on the window ledges' },
       { id: 'blizzard', label: '极寒风暴 (Blizzard)', value: 'whiteout blizzard conditions, horizontal snow driven by high winds, freezing cold atmosphere, zero visibility' },
-      
-      // Others - Adjusted for Sound Strategy
       { id: 'fog', label: '迷雾风声 (Fog & Wind)', value: 'thick mysterious white fog clinging to the trees. Trees swaying in the wind, leaves rustling, high humidity, water dripping from condensation, quiet and eerie' },
       { id: 'wind', label: '呼啸狂风 (Howling Wind)', value: 'hurricane force winds bending trees outside, debris flying, howling wind visuals without heavy rain' },
-      
-      // Disasters (Keep for legacy compatibility)
       { id: 'acid', label: '腐蚀酸雨 (Acid Rain)', value: 'corrosive green acid rain burning the landscape, yellow toxic fumes, dystopian atmosphere' },
       { id: 'solar', label: '太阳风暴 (Solar Flare)', value: 'blinding bright solar flare radiation storm outside, harsh shadows, magnetic interference visual' },
     ]
@@ -133,24 +131,15 @@ export const CATEGORIES: Category[] = [
     type: 'multi',
     required: true,
     items: [
-      // Entrances
       { id: 'iron_door', label: '重型铁门 (Iron Door)', value: 'massive rusted blast-proof solid iron door, shut tight, triple deadbolt locked, no way in' },
       { id: 'airlock', label: '气闸舱门 (Airlock)', value: 'circular heavy pressure airlock door, closed and sealed, rotating locking mechanism engaged' },
       { id: 'bulkhead', label: '耐压舱门 (Bulkhead)', value: 'heavy industrial watertight bulkhead door with a rotating locking wheel, submarine style, hermetically sealed' },
-      
-      // Active Defense (New for Open Areas)
       { id: 'turret', label: '自动炮台 (Sentry Turret)', value: 'automated twin-barrel sentry turret mounted on the terrace railing, scanning the perimeter with a green laser sight, high-tech defense' },
-      
-      // Windows / Openness
       { id: 'glass_dome', label: '装甲天顶 (Armored Glass Dome)', value: 'massive reinforced glass skylight/dome overhead, allowing full view of the sky but completely bulletproof' },
       { id: 'bars', label: '防暴格栅 (Security Bars)', value: 'viewport reinforced with heavy cross-hatched steel prison grid bars' },
       { id: 'shutters', label: '装甲百叶 (Armored Shutters)', value: 'heavy mechanical metal security shutters, lowered to cover half the window' },
       { id: 'blast_glass', label: '防弹玻璃 (Ballistic Glass)', value: '4-inch thick multi-layered green-tinted bulletproof glass, distinct layers visible' },
-      
-      // Perimeter
       { id: 'fence', label: '通电铁网 (Electric Fence)', value: 'perimeter high-voltage electric barbed wire fence visible outside, humming with power' },
-      
-      // Tech
       { id: 'camera', label: '监控探头 (CCTV Cam)', value: 'security camera mounted on wall with blinking red LED, motion sensor active' },
     ]
   },
@@ -165,17 +154,12 @@ export const CATEGORIES: Category[] = [
     type: 'multi',
     required: true,
     items: [
-      // Standard Combustion (Buildings)
       { id: 'fireplace', label: '开放壁炉 (Open Fireplace)', value: 'large stone fireplace with a massive roaring, crackling open fire, intense orange light' },
       { id: 'stove', label: '可视铸铁炉 (Glass Stove)', value: 'heavy cast iron wood stove with a clean glass door revealing intense dancing flames inside' },
       { id: 'barrel', label: '油桶火炉 (Burn Barrel)', value: 'rusted 55-gallon oil drum converted into a stove, fire raging inside, industrial improvised feel' },
-      
-      // Vehicle Safe Options (New)
       { id: 'diesel_heater', label: '柴油暖风 (Diesel Heater)', value: 'compact Webasto style diesel heater control unit with a red digital display, emitting a cozy warm air, safe sealed heating system' },
       { id: 'hologram', label: '全息火焰 (Holo-Fire)', value: 'high-tech holographic screen displaying a looping video of a fireplace, providing psychological warmth without smoke' },
       { id: 'reactor', label: '核心余热 (Core Glow)', value: 'shielded power core unit pulsating with a gentle warm orange radiation light, heating the cabin' },
-      
-      // Ambient
       { id: 'candles', label: '大量蜡烛 (Candle Sea)', value: 'hundreds of beeswax candles creating a warm sanctuary glow everywhere' },
       { id: 'oil_lamp', label: '复古油灯 (Oil Lanterns)', value: 'vintage kerosene lanterns hanging and casting warm protective shadows' },
       { id: 'heater', label: '电暖器 (Space Heater)', value: 'industrial electric heater glowing bright orange coils, heat waves visible' },
@@ -195,6 +179,16 @@ export const CATEGORIES: Category[] = [
       { id: 'hammock', label: '重型吊床 (Hammock)', value: 'sturdy canvas hammock suspended with heavy chains, filled with sheepskins' },
       { id: 'car_seat', label: '放倒座椅 (Reclined Seat)', value: 'driver seat reclined all the way back, turned into a makeshift bed with sleeping bags' },
       { id: 'hospital_bed', label: '医院病床 (Hospital Bed)', value: 'vintage iron hospital bed with wheels locked, piled with non-medical cozy wool blankets' },
+      
+      // NEW ADDITIONS
+      { id: 'window_nook', label: '窗边卧榻 (Window Nook)', value: 'deep cushioned window seat alcove built directly into the glass wall, rain is inches away from the pillow, ultimate rain immersion' },
+      { id: 'indoor_tent', label: '室内帐篷 (Indoor Fort)', value: 'a camping tent pitched inside the room, unzipped to show a cozy nest of glowing lanterns and sleeping bags inside, double protection' },
+      { id: 'bathtub', label: '浴缸枕海 (Bathtub Nest)', value: 'vintage clawfoot bathtub filled with blankets and pillows instead of water, creating a porcelain womb, extremely safe and enclosed' },
+      { id: 'loft_bed', label: '高架阁楼 (Loft Platform)', value: 'sleeping platform high up near the ceiling rafters reached by a wooden ladder, overlooking the safety of the room below' },
+      { id: 'suspended_net', label: '悬浮网床 (Cargo Net)', value: 'heavy-duty cargo net suspended tautly across a ceiling void, filled with pillows, floating in the air' },
+      { id: 'cryo_pod', label: '休眠舱 (Cryo Pod)', value: 'sleek sci-fi hibernation capsule with glass cover open, glowing blue interior light, sterile and futuristic comfort' },
+      { id: 'sofa_island', label: '沙发岛屿 (Sofa Island)', value: 'massive modular sectional sofa pushed together to form a giant square bed island in the center of the room, surrounded by supplies' },
+      { id: 'tatami_raised', label: '榻榻米地台 (Raised Tatami)', value: 'raised wooden platform with authentic tatami mats, minimal futon, zen aesthetic' },
     ]
   },
 
@@ -203,16 +197,21 @@ export const CATEGORIES: Category[] = [
   // ========================================================================
   {
     id: 'character',
-    title: '8. 人物策略 (Presence Strategy)',
+    title: '8. 人物动作 (Action Loops)',
     icon: <UserCheck className="w-4 h-4" />,
     type: 'single',
     items: [
       { id: 'none', label: 'POV: 无人 (Immersive)', value: 'no humans, empty room, first person view' },
-      { id: 'silhouette', label: '背影/剪影 (Cinematic)', value: 'a mysterious survivor sitting by the window, back turned to the camera, silhouetted against the light' },
-      { id: 'driver_focused', label: '专注驾驶 (Driver)', value: 'a focused driver/pilot is visible at the controls, hands on the wheel/yoke, back turned to the camera' },
-      { id: 'man_sleeping', label: '熟睡 (Passive Sleep)', value: 'a survivor sleeping deeply in the bunk, wrapped in blankets, face hidden, peaceful posture' },
-      { id: 'survivor_reading', label: '阅读 (Passive Read)', value: 'a survivor sitting in an armchair reading a book, face obscured by the book, relaxed' },
-      { id: 'writer', label: '书写 (Passive Work)', value: 'a survivor writing in a journal at the table, focused on the paper, head down' },
+      { id: 'cooking_stew', label: '搅拌热汤 (Cooking Stew)', value: 'Back view of a survivor standing at the stove/hearth, slowly stirring a steaming pot of stew with a wooden spoon. Relaxed posture, focused on the food. Steam rising rhythmically. Homey atmosphere' },
+      { id: 'retro_gaming', label: '复古游戏 (Retro Gaming)', value: 'A survivor sitting on the floor rug, back to camera, playing a vintage game console on a small CRT TV. The blue light from the screen flickers on their silhouette. Relaxed gaming posture' },
+      { id: 'playing_cards', label: '双人牌局 (Playing Cards)', value: 'Two survivors sitting opposite each other at a low table, playing cards. Focus on the table and hands. One is dealing cards, the other holding a hand. Quiet social moment, faces in shadow' },
+      { id: 'polishing_gear', label: '擦拭装备 (Maintenance)', value: 'A survivor sitting in an armchair, slowly polishing a rifle or a helmet with a cloth. Methodical, rhythmic motion. Sense of preparation and care. Tools spread on the table' },
+      { id: 'reading_nook', label: '窗边阅读 (Reading)', value: 'A survivor sitting in the window nook, holding a hardcover book. Soft light from the window illuminates the page. Occasional page turn. Peaceful intellectual vibe' },
+      { id: 'writing_diary', label: '书写日记 (Journaling)', value: 'Close up on a survivor sitting at a desk, writing in a leather-bound journal with a pen. Hand moving across the paper. Recording the days events. Introspective vibe' },
+      { id: 'knitting', label: '编织毛衣 (Knitting)', value: 'Close up on hands knitting a thick wool blanket or scarf. Rhythmic clicking of needles. Cozy domestic vibe, creating warmth' },
+      { id: 'guitar_strum', label: '弹奏吉他 (Guitar)', value: 'A figure sitting on the rug gently strumming an acoustic guitar (visual only, imply sound). Head down, lost in music. Relaxed posture' },
+      { id: 'window_trace', label: '触碰雨滴 (Window Trace)', value: 'Silhouette of a person leaning against the glass, tracing the path of a raindrop with their finger. Melancholic and contemplative pose. Connection with the storm' },
+      { id: 'cat_petting', label: '撸猫 (Petting Cat)', value: 'A survivor sitting on the sofa with a cat in their lap, rhythmically stroking the cats fur. The cat is sleeping. Pure stress relief' },
     ]
   },
   {
@@ -222,15 +221,28 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     items: [
       { id: 'none', label: '无宠物 (None)', value: '' },
+      // DOGS
       { id: 'dog', label: '金毛犬 (Golden Retriever)', value: 'loyal golden retriever in deep unconscious sleep on a thick rug, completely motionless body' },
-      { id: 'cat', label: '橘猫 (Fat Cat)', value: 'fluffy fat cat curled up tight sleeping next to heat, face tucked in tail' },
-      { id: 'gsd', label: '德牧 (German Shepherd)', value: 'alert German Shepherd resting head on paws, watching the door, protective energy' },
-      { id: 'rottweiler', label: '罗威纳 (Rottweiler)', value: 'muscular Rottweiler dog sitting calmly near the door, imposing silhouette, absolute loyalty, protective posture' },
-      { id: 'bernese', label: '伯恩山犬 (Bernese Mtn)', value: 'massive gentle Bernese Mountain Dog sleeping heavily like a bear rug, tri-color fluffy fur, pure comfort' },
-      { id: 'mainecoon', label: '缅因巨猫 (Maine Coon)', value: 'gigantic Maine Coon cat with lion-like mane, resting on the highest furniture, observing the room with majesty' },
-      { id: 'duo_dogs', label: '双犬护卫 (Two Dogs)', value: 'two large dogs (a Labrador and a Husky) sleeping back-to-back near the heat, pack safety vibe' },
-      { id: 'cat_dog', label: '猫狗双全 (Cat & Dog)', value: 'a dog and a cat sleeping curled up together in a pile of fur, interlocked harmony, ultimate peace' },
-      { id: 'cat_window', label: '窗边的猫 (Window Cat)', value: 'cat sitting on the windowsill watching the storm outside, tail twitching' },
+      { id: 'shiba', label: '柴犬 (Shiba Inu)', value: 'cute Shiba Inu curled up in a donut bed, eyes closed, deep sleep, motionless' },
+      { id: 'corgi', label: '柯基 (Corgi)', value: 'fluffy Corgi splooting flat on the rug near the heater, eyes closed, fast asleep' },
+      { id: 'samoyed', label: '萨摩耶 (Samoyed)', value: 'large white fluffy Samoyed dog sleeping like a cloud, eyes closed tight, peaceful deep sleep' },
+      { id: 'husky', label: '哈士奇 (Husky)', value: 'Siberian Husky curled up into a ball on the rug, tail covering nose, deep sleeping, motionless' },
+      { id: 'gsd', label: '德牧 (German Shepherd)', value: 'German Shepherd lying on side, eyes closed, in deep deep sleep, paws twitching slightly in dream' },
+      { id: 'rottweiler', label: '罗威纳 (Rottweiler)', value: 'large Rottweiler sleeping heavily on its back, legs in the air, belly exposed, trusting and safe deep sleep' },
+      { id: 'bernese', label: '伯恩山犬 (Bernese Mtn)', value: 'massive gentle Bernese Mountain Dog sleeping heavily like a bear rug, motionless, eyes closed' },
+      { id: 'duo_dogs', label: '双犬护卫 (Two Dogs)', value: 'two large dogs (a Labrador and a Husky) sleeping back-to-back near the heat, both fast asleep' },
+      
+      // CATS
+      { id: 'cat', label: '橘猫 (Fat Cat)', value: 'fluffy fat cat curled up tight sleeping next to heat, face tucked in tail, motionless' },
+      { id: 'mainecoon', label: '缅因巨猫 (Maine Coon)', value: 'gigantic Maine Coon cat sprawled out sleeping on the highest furniture, long fur draped over edge, deep sleep' },
+      { id: 'black_cat', label: '黑猫 (Black Cat)', value: 'sleek black cat curled into a ball on the windowsill, asleep, looking like a black void' },
+      { id: 'cat_dog', label: '猫狗双全 (Cat & Dog)', value: 'a dog and a cat sleeping curled up together in a pile of fur, interlocked harmony, deep sleep' },
+      
+      // WILD / EXOTIC
+      { id: 'bunny', label: '垂耳兔 (Lop Bunny)', value: 'small fluffy lop-eared rabbit sleeping inside a hay basket, eyes closed, nose still' },
+      { id: 'fox', label: '驯化狐狸 (Pet Fox)', value: 'red fox curled up in a perfect circle on the armchair, big tail covering nose, deep sleep' },
+      { id: 'raccoon', label: '干脆面 (Raccoon)', value: 'chubby raccoon sleeping inside a wooden crate, paws tucked under chin, eyes closed tight' },
+      { id: 'owl', label: '猫头鹰 (Owl)', value: 'great horned owl perched on a high rafter, head tucked into chest feathers, eyes closed, sleeping profoundly' },
     ]
   },
   {
@@ -255,23 +267,38 @@ export const CATEGORIES: Category[] = [
     icon: <Package className="w-4 h-4" />,
     type: 'multi',
     items: [
-      { id: 'tea_set', label: '热茶套组 (Steaming Tea)', value: 'In the immediate foreground, a small low wooden table is set with a steaming ceramic teapot and delicate cups, hot white steam rising vigorously against the cold background, creating a cozy tea time atmosphere' },
-      { id: 'coffee', label: '手冲咖啡 (Pour-over Coffee)', value: 'Close-up focus on a glass chemex coffee maker and a ceramic mug with fresh dark coffee steaming on the side table, distinct aroma of coffee visual' },
-      { id: 'cooking_pot', label: '沸腾炖锅 (Bubbling Pot)', value: 'In the center foreground, a heavy cast iron cooking pot is hanging over the fire, bubbling hot food, white steam rising, aroma of spices' },
-      { id: 'radio', label: 'LoFi电台 (LoFi Radio)', value: 'Feature a vintage radio with tubes glowing orange on the desk, playing low fidelity jazz beats, static frequency visual' },
-      { id: 'map', label: '导航地图 (Nav Map)', value: 'A detailed topographic map or digital navigation screen is spread out on the table, illuminated by dashboard lights' },
-      { id: 'feast', label: '盛宴长桌 (Holiday Feast)', value: 'The table is overflowing with abundant hot food, roasted meat, mashed potatoes, red wine bottles, fresh bread, a true survivor\'s feast' },
-      { id: 'bakery', label: '新鲜烘焙 (Fresh Bakery)', value: 'Wicker baskets filled with rustic sourdough bread and croissants placed in the foreground, flour dusting the table, warm bakery vibe' },
-      { id: 'pizza', label: '披萨派对 (Pizza Stack)', value: 'Stacks of cardboard pizza boxes with hot cheesy pizza and soda bottles on the table, modern comfort food feast' },
-      { id: 'sushi', label: '豪华刺身 (Sushi Boat)', value: 'A platter of fresh high-end sushi and sashimi is placed on the table, stark contrast to the apocalypse outside' },
-      { id: 'shelves', label: '爆满货架 (Full Shelves)', value: 'Background shelves groaning under the weight of organized canned food and mason jars, zero empty space' },
-      { id: 'water', label: '储水桶 (Water Supply)', value: 'Stack of large blue filtered water containers in the corner, reliable hydration' },
+      // DRINKS & FOOD (The Comfort)
+      { id: 'tea_set', label: '热茶套组 (Steaming Tea)', value: 'In the foreground, a low wooden table with a steaming ceramic teapot and delicate cups, hot white steam rising vigorously' },
+      { id: 'coffee', label: '手冲咖啡 (Pour-over)', value: 'Close-up on a glass chemex coffee maker and a ceramic mug with fresh dark coffee steaming on the side table' },
+      { id: 'cocoa', label: '热可可 (Hot Cocoa)', value: 'Mug of hot chocolate topped with marshmallows and whipped cream, steam rising, cozy winter vibe' },
+      { id: 'whiskey', label: '威士忌 (Whiskey)', value: 'Crystal glass with amber whiskey and a large ice cube, vintage bottle next to it, cigar smoke in ashtray' },
+      { id: 'wine_cheese', label: '红酒芝士 (Wine & Cheese)', value: 'Bottle of red wine breathing in a decanter, glass of wine, wooden board with artisanal cheese and grapes' },
+      { id: 'ramen', label: '豚骨拉面 (Ramen)', value: 'Steaming bowl of Tonkotsu ramen with soft boiled egg, chashu pork and nori, chopsticks resting on bowl, comfort food' },
+      { id: 'burger', label: '汉堡套餐 (Burger Meal)', value: 'Juicy cheeseburger with fries on a tray, greaseproof paper, soda bottle, american diner vibe' },
+      { id: 'pizza', label: '披萨派对 (Pizza)', value: 'Open cardboard pizza box with hot cheesy pepperoni pizza slices, soda cans, modern comfort' },
+      { id: 'sushi', label: '豪华刺身 (Sushi)', value: 'Platter of fresh premium sushi and sashimi, soy sauce dish, wasabi, elegant contrast to storm' },
+      { id: 'cooking_pot', label: '炖锅料理 (Stew Pot)', value: 'Heavy cast iron dutch oven hanging over the fire, bubbling beef stew, steam and aroma visual' },
+      { id: 'bakery', label: '烘焙面包 (Bakery)', value: 'Basket of fresh sourdough bread and croissants, flour dusting on table, butter dish' },
+
+      // HOBBIES & TECH (The Distraction)
+      { id: 'radio', label: 'LoFi电台 (LoFi Radio)', value: 'Vintage tube radio glowing orange, frequency dial lit up, playing low fidelity jazz beats' },
+      { id: 'vinyl', label: '黑胶唱机 (Vinyl Player)', value: 'Vintage turntable spinning a black vinyl record, needle arm on the groove, album covers stacked nearby' },
+      { id: 'typewriter', label: '打字机 (Typewriter)', value: 'Antique mechanical typewriter with a half-written page, ink ribbon, crumpled paper balls' },
+      { id: 'gaming_setup', label: '复古游戏 (Retro Gaming)', value: 'Small CRT TV glowing with pixel art game, vintage game console controller on the table, 8-bit vibe' },
+      { id: 'laptop', label: '黑客笔电 (Cyber Deck)', value: 'Rugged military laptop with code scrolling on screen, cables connected to hard drives, cyber deck vibe' },
+      { id: 'telescope', label: '望远镜 (Telescope)', value: 'Brass telescope mounted on a tripod pointed out the window, star charts and compass on table' },
+      { id: 'painting', label: '油画架 (Easel)', value: 'Artist easel with a half-finished oil painting of the storm outside, palette with wet paint, brushes' },
+      { id: 'guitar', label: '吉他 (Guitar)', value: 'Acoustic guitar leaning against the armchair, worn wood texture, music sheet on stand' },
+      { id: 'books', label: '书籍堆积 (Book Piles)', value: 'Stacks of old leather-bound books, maps and open journals filling every available surface' },
+
+      // DECOR & ATMOSPHERE (The Mood)
+      { id: 'salt_lamp', label: '盐灯 (Salt Lamp)', value: 'Himalayan pink salt lamp glowing with a warm diffuse orange light, calming ionization vibe' },
+      { id: 'fairy_lights', label: '串灯 (Fairy Lights)', value: 'String of warm white fairy lights draped across the ceiling and shelves, magical bokeh effect' },
+      { id: 'dreamcatcher', label: '捕梦网 (Dreamcatcher)', value: 'Intricate dreamcatcher with feathers hanging near the window, swaying gently' },
+      { id: 'rugs', label: '波斯地毯 (Persian Rugs)', value: 'Layers of vintage persian rugs covering the cold floor, rich red and patterned textures' },
+      { id: 'plants', label: '室内绿植 (Plants)', value: 'Potted monstera and fern plants growing under purple grow-lights, vibrant green life' },
+      { id: 'tech', label: '监控屏幕 (Monitors)', value: 'Stack of glowing CRT security monitors showing green night-vision feeds of the exterior' },
       { id: 'ammo', label: '弹药箱 (Ammo Crates)', value: 'Heavy green metal military ammo crates stacked in the corner, sense of preparedness' },
-      { id: 'rugs', label: '波斯地毯 (Persian Rugs)', value: 'Layers of vintage persian rugs covering the cold floor, sound dampening' },
-      { id: 'books', label: '书籍堆积 (Book Piles)', value: 'Stacks of old books, maps and journals filling every available surface' },
-      { id: 'plants', label: '室内绿植 (Plants)', value: 'Potted fern plants and herbs growing under grow-lights, touch of life' },
-      { id: 'guitar', label: '吉他 (Guitar)', value: 'Acoustic guitar leaning against the armchair, worn wood texture' },
-      { id: 'tech', label: '监控屏幕 (Monitors)', value: 'Glowing security monitors showing green camera feeds of the safe exterior' },
     ]
   },
 
@@ -301,9 +328,40 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      { id: 'medium', label: '叙事中景 (Medium Shot)', value: 'Cinematic medium shot, capturing the cozy living space and the window view' },
-      { id: 'medium_close', label: '细节特写 (Close Up)', value: 'Medium close-up, focusing tightly on the foreground elements and rain on the glass' },
-      { id: 'wide_interior', label: '广角全景 (Wide Interior)', value: 'Wide angle shot capturing the entire length of the interior living space' },
+      { id: 'extreme_wide', label: '远景/大环境 (Extreme Wide)', value: 'Extreme wide shot establishing the shelter in its vast environment, tiny house in big nature' },
+      { id: 'wide_interior', label: '室内全景 (Wide Interior)', value: 'Wide angle interior shot capturing the entire room layout from wall to wall' },
+      { id: 'full_shot', label: '全身景 (Full Shot)', value: 'Full shot showing the character or furniture completely from top to bottom within the space' },
+      { id: 'cowboy', label: '牛仔景 (Cowboy/American)', value: 'Cowboy shot (American shot), framing from mid-thigh up, perfect for a character sitting in an armchair' },
+      { id: 'medium', label: '叙事中景 (Medium Shot)', value: 'Cinematic medium shot, framing the subject from waist up, standard storytelling distance' },
+      { id: 'medium_close', label: '近景 (Medium Close-Up)', value: 'Medium close-up, focusing on the upper chest and face, intimate but not claustrophobic' },
+      { id: 'close_up', label: '特写 (Close Up)', value: 'Close-up shot, tight framing on the face or specific object, capturing emotions and details' },
+      { id: 'extreme_close', label: '微距特写 (Macro)', value: 'Extreme close-up macro shot, focusing on tiny details like raindrops on glass, texture of wool, or steam rising' },
+    ]
+  },
+  
+  // ========================================================================
+  // 7. 视觉风格 (VISUAL STYLE) - NEW
+  // ========================================================================
+  {
+    id: 'visual_style',
+    title: '14. 视觉风格 (Visual Style)',
+    icon: <Palette className="w-4 h-4" />,
+    type: 'single',
+    required: true,
+    items: [
+      { id: 'davinci_grade', label: '达芬奇调色 (DaVinci Resolve)', value: 'Color graded in DaVinci Resolve, teal and orange Hollywood look, rich contrast, cinematic skin tones, master quality' },
+      { id: 'japanese_wafu', label: '日式清新 (Fuji Superia)', value: 'Shot on Fujifilm Superia 400, Japanese summer aesthetic, slight film grain, fresh and transparent color grading, highlights with lime green tint, airy atmosphere, youthful energy, high key lighting, soft focus, overexposed' },
+      { id: 'leica_bw', label: '徕卡黑白 (Leica Monochrome)', value: 'Shot on Leica M11 Monochrom, high contrast black and white photography, rich deep blacks, artistic, emotional, fine art' },
+      { id: 'unreal_5', label: '数字拟真 (Unreal Engine 5)', value: 'Unreal Engine 5 Lumen Render, raytracing, clean textures, perfect lighting, commercial game asset quality' },
+      { id: 'realistic_8k', label: '极致写实 (Hyper-Realistic)', value: '8k raw photo, shot on Phase One IQ4 150MP, sharp focus, incredibly detailed textures, photorealistic lighting, dSLR quality' },
+      { id: 'cinematic_35mm', label: '胶片电影 (Cinematic 35mm)', value: 'Shot on Kodak Portra 400 film, 35mm movie aesthetic, slight film grain, warm analog color grading, cinematic lighting, movie still' },
+      { id: 'vhs_tape', label: '复古录像 (VHS Found Footage)', value: '1990s VHS tape aesthetic, slight tracking noise, chromatic aberration, soft focus, found footage vibe, raw and authentic' },
+      { id: 'analog_horror', label: '类比恐怖 (Liminal/Analog)', value: 'Liminal space aesthetic, flash photography look, dark corners, unsettling realism, early 2000s digital camera vibe' },
+      { id: 'cyber_neon', label: '赛博霓虹 (Cyberpunk Neon)', value: 'Cyberpunk aesthetic, high contrast blue and pink neon lighting, wet surfaces reflecting colored lights, futuristic noir atmosphere' },
+      { id: 'vintage_70s', label: '怀旧70年代 (Vintage 70s)', value: '1970s vintage photo aesthetic, warm orange and brown tones, soft hazy lighting, retro furniture look, Kodachrome slide' },
+      { id: 'nordic_minimal', label: '北欧冷淡 (Nordic Minimal)', value: 'Scandi minimalist aesthetic, desaturated colors, bright soft white lighting, clean lines, Architectural Digest photography' },
+      { id: 'gothic_noir', label: '暗黑哥特 (Gothic Noir)', value: 'Film Noir aesthetic, high contrast chiaroscuro lighting, deep shadows, moody atmosphere, desaturated colors, dramatic' },
+      { id: 'anime_makoto', label: '新海诚风 (Anime Art)', value: 'Makoto Shinkai anime art style, 2D/3D hybrid, vibrant emotional skies, exaggerated lighting effects, detailed background art' },
     ]
   },
 
@@ -328,7 +386,6 @@ export const CATEGORIES: Category[] = [
     items: [
       { id: '2h', label: '2 Hours (Test/Focus)', value: '2 Hours' },
       { id: '8h', label: '8 Hours (Deep Sleep)', value: '8 Hours' },
-      // Removed 4H/Loop to enforce 3+1 strategy
     ]
   },
 ];

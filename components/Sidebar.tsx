@@ -22,39 +22,114 @@ interface SidebarProps {
   onDeletePreset: (presetId: string) => void;
 }
 
-// 精心调校的 24 天爆款矩阵方案 - REVISED HIGH DETAIL VERSION
-const GROWTH_PLAN_24 = [
-  { week: "Week 1: 流量基石系列", theme: "高搜索量经典题材", items: [
-    { title: "Day 1: 丛林木屋-雷暴之夜", selections: { structure: ['cabin'], weather: ['thunder'], time: ['night'], danger: ['none'], defense: ['iron_door', 'shutters', 'fence'], warmth: ['fireplace', 'candles'], sleeping: ['corner_bed'], character: ['none'], pets: ['dog'], npc: ['none'], amenities: ['tea_set', 'rugs', 'books', 'guitar', 'plants'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 2: 悬崖露台-治愈暴雨", selections: { structure: ['cliff_terrace'], weather: ['rain'], time: ['noon'], danger: ['none'], defense: ['blast_glass', 'turret'], warmth: ['stove'], sleeping: ['canopy'], character: ['survivor_reading'], pets: ['cat'], npc: ['none'], amenities: ['coffee', 'plants', 'books', 'radio'], perspective: ['terrace_view'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['4h'] } },
-    { title: "Day 3: 雪国列车-极寒旅行", selections: { structure: ['train'], weather: ['blizzard'], time: ['morning'], danger: ['none'], defense: ['blast_glass', 'bulkhead'], warmth: ['heater', 'oil_lamp'], sleeping: ['bunk'], character: ['none'], pets: ['cat_dog'], npc: ['none'], amenities: ['bakery', 'radio', 'map', 'tea_set'], perspective: ['cinematic'], shot_type: ['wide_interior'], vibe: ['cozy_travel'], duration: ['8h'] } },
-    { title: "Day 4: 湖畔船屋-静谧雨滴", selections: { structure: ['lake_boathouse'], weather: ['medium_rain'], time: ['night'], danger: ['none'], defense: ['iron_door', 'bars'], warmth: ['oil_lamp', 'candles'], sleeping: ['floor_mat'], character: ['none'], pets: ['cat'], npc: ['none'], amenities: ['tea_set', 'guitar', 'plants', 'rugs'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 5: 末日地堡-深层睡眠", selections: { structure: ['bunker'], weather: ['rain'], time: ['emergency'], danger: ['none'], defense: ['bulkhead', 'camera', 'airlock'], warmth: ['reactor'], sleeping: ['bunk'], character: ['man_sleeping'], pets: ['gsd'], npc: ['none'], amenities: ['shelves', 'tech', 'water', 'ammo'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 6: 重卡驾驶-雨夜国道", selections: { structure: ['truck'], weather: ['rain'], time: ['night'], danger: ['none'], defense: ['blast_glass'], warmth: ['diesel_heater'], sleeping: ['car_seat'], character: ['driver_focused'], pets: ['dog'], npc: ['none'], amenities: ['coffee', 'radio', 'map', 'pizza'], perspective: ['over_shoulder'], shot_type: ['medium_close'], vibe: ['cozy_travel'], duration: ['2h'] } }
+// 2026年1月 HAVEN NIGHTS 发布方案 (完整映射版 - 包含视觉风格)
+const JAN_2026_PLAN = [
+  { week: "Phase 1: 流量基石 (Jan 1-7)", theme: "核心热门题材启动", items: [
+    { 
+      title: "Jan 1: 雨日木屋 (Rainy Cabin)", 
+      selections: { 
+        structure: ['cabin'], weather: ['rain'], time: ['night'], warmth: ['fireplace'], 
+        defense: ['shutters'], duration: ['8h'], vibe: ['cozy_safe'],
+        danger: ['none'], sleeping: ['corner_bed'], shot_type: ['medium'], amenities: ['tea_set', 'books', 'rugs', 'oil_lamp'],
+        perspective: ['terrace_view'],
+        visual_style: ['cinematic_35mm'] // 经典胶片质感
+      } 
+    },
+    { 
+      title: "Jan 4: 工业阁楼 (Ind. Loft)", 
+      selections: { 
+        structure: ['factory'], weather: ['rain'], time: ['night'], defense: ['blast_glass'], 
+        warmth: ['heater'], duration: ['8h'], vibe: ['cozy_safe'],
+        danger: ['none'], sleeping: ['floor_mat'], shot_type: ['wide_interior'], amenities: ['radio', 'canned_food', 'water', 'tech'],
+        perspective: ['standard'],
+        visual_style: ['vintage_70s'] // 怀旧工业风
+      } 
+    },
+    { 
+      title: "Jan 7: 森林树屋 (Treehouse)", 
+      selections: { 
+        structure: ['forest_aerie'], weather: ['rain_lush'], time: ['morning'], warmth: ['stove'], 
+        duration: ['8h'], vibe: ['cozy_safe'], defense: ['shutters'],
+        danger: ['none'], sleeping: ['canopy'], shot_type: ['terrace_view'], amenities: ['plants', 'books', 'coffee'],
+        perspective: ['terrace_view'],
+        visual_style: ['realistic_8k'] // 极致自然写实
+      } 
+    },
   ]},
-  { week: "Week 2: 视觉差异系列", theme: "高点击率奇观题材", items: [
-    { title: "Day 7: 极光玻璃屋-梦幻飘雪", selections: { structure: ['glass_igloo'], weather: ['light_snow'], time: ['moonlight'], danger: ['none'], defense: ['blast_glass', 'turret'], warmth: ['stove', 'candles'], sleeping: ['canopy'], character: ['none'], pets: ['mainecoon'], npc: ['none'], amenities: ['tea_set', 'rugs', 'books', 'plants'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 8: 山巅哨站-云海之上", selections: { structure: ['mountain_peak'], weather: ['fog'], time: ['morning'], danger: ['none'], defense: ['blast_glass', 'bulkhead'], warmth: ['reactor', 'heater'], sleeping: ['bunk'], character: ['writer'], pets: ['none'], npc: ['none'], amenities: ['coffee', 'tech', 'radio', 'map'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['4h'] } },
-    { title: "Day 9: 日式缘侧-和风落雨", selections: { structure: ['zen_garden'], weather: ['rain_lush'], time: ['noon'], danger: ['none'], defense: ['fence'], warmth: ['candles'], sleeping: ['floor_mat'], character: ['none'], pets: ['cat'], npc: ['none'], amenities: ['tea_set', 'plants', 'books', 'rugs'], perspective: ['terrace_view'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 10: 私人飞机-风暴飞行", selections: { structure: ['luxury_jet'], weather: ['thunder'], time: ['night'], danger: ['none'], defense: ['blast_glass', 'airlock'], warmth: ['reactor'], sleeping: ['canopy'], character: ['none'], pets: ['none'], npc: ['npc_copilot'], amenities: ['sushi', 'pizza', 'tech', 'water'], perspective: ['back_seat'], shot_type: ['medium'], vibe: ['cozy_travel'], duration: ['2h'] } },
-    { title: "Day 11: 废弃医院-最后港湾", selections: { structure: ['hospital_ward'], weather: ['rain'], time: ['emergency'], danger: ['zombies'], defense: ['bars', 'camera', 'iron_door'], warmth: ['candles', 'heater'], sleeping: ['hospital_bed'], character: ['none'], pets: ['rottweiler'], npc: ['npc_tactical'], amenities: ['shelves', 'water', 'tech', 'rugs'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 12: 房车宿营-森林午后", selections: { structure: ['rv'], weather: ['light_rain'], time: ['morning'], danger: ['none'], defense: ['shutters'], warmth: ['diesel_heater'], sleeping: ['hammock'], character: ['none'], pets: ['dog'], npc: ['none'], amenities: ['cooking_pot', 'radio', 'map', 'guitar'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_travel'], duration: ['4h'] } }
+  { week: "Phase 2: 差异化爆款 (Jan 10-16)", theme: "末日与冥想双赛道", items: [
+    { 
+      title: "Jan 10: 末日+狗 (Shelter Dog)", 
+      selections: { 
+        structure: ['bunker'], weather: ['rain'], pets: ['gsd'], warmth: ['fireplace'], time: ['night'], 
+        duration: ['8h'], vibe: ['cozy_safe'], defense: ['iron_door'], 
+        danger: ['zombies'], sleeping: ['floor_mat'], shot_type: ['medium_close'], amenities: ['ammo', 'water', 'canned_food'],
+        perspective: ['standard'],
+        visual_style: ['unreal_5'] // 游戏质感
+      } 
+    },
+    { 
+      title: "Jan 13: 雷暴地堡 (Thunder Bunker)", 
+      selections: { 
+        structure: ['bunker'], weather: ['thunder'], time: ['night'], defense: ['bulkhead'], warmth: ['fireplace'], 
+        duration: ['8h'], vibe: ['cozy_safe'],
+        danger: ['none'], sleeping: ['bunk'], shot_type: ['cinematic'], amenities: ['radio', 'map', 'oil_lamp'],
+        perspective: ['standard'],
+        visual_style: ['vhs_tape'] // 战地录像带风格
+      } 
+    },
+    { 
+      title: "Jan 16: 冥想雨声 (Calm Rain)", 
+      selections: { 
+        structure: ['zen_garden'], weather: ['light_rain'], time: ['night'], warmth: ['fireplace'], 
+        duration: ['8h'], vibe: ['cozy_safe'], defense: ['shutters'], 
+        danger: ['none'], sleeping: ['floor_mat'], shot_type: ['medium'], amenities: ['tea_set', 'plants', 'candles'],
+        perspective: ['standard'],
+        visual_style: ['nordic_minimal'] // 极简冷淡
+      } 
+    },
   ]},
-  { week: "Week 3: 废墟美学系列", theme: "高粘度生存氛围", items: [
-    { title: "Day 13: 摩天豪宅-末日全景", selections: { structure: ['penthouse'], weather: ['fog'], time: ['night'], danger: ['drones'], defense: ['blast_glass', 'camera', 'turret'], warmth: ['hologram', 'heater'], sleeping: ['corner_bed'], character: ['silhouette'], pets: ['mainecoon'], npc: ['none'], amenities: ['pizza', 'tech', 'sushi', 'rugs'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 14: 重工工厂-钢铁巢穴", selections: { structure: ['factory'], weather: ['rain'], time: ['floodlight'], danger: ['none'], defense: ['bars', 'iron_door', 'camera'], warmth: ['barrel'], sleeping: ['bunk'], character: ['none'], pets: ['gsd'], npc: ['none'], amenities: ['cooking_pot', 'water', 'ammo', 'shelves'], perspective: ['isometric'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 15: 银行金库-绝对静谧", selections: { structure: ['vault'], weather: ['none'], time: ['night'], danger: ['none'], defense: ['iron_door', 'bulkhead'], warmth: ['oil_lamp'], sleeping: ['corner_bed'], character: ['none'], pets: ['cat'], npc: ['none'], amenities: ['shelves', 'ammo', 'water', 'rugs'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['loop'] } },
-    { title: "Day 16: 改造地铁-城市孤岛", selections: { structure: ['subway_moving'], weather: ['medium_rain'], time: ['night'], danger: ['none'], defense: ['bars', 'blast_glass'], warmth: ['heater', 'oil_lamp'], sleeping: ['bunk'], character: ['silhouette'], pets: ['dog'], npc: ['none'], amenities: ['radio', 'rugs', 'books', 'water'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_travel'], duration: ['4h'] } },
-    { title: "Day 17: 树顶吊舱-雨林深处", selections: { structure: ['forest_aerie'], weather: ['rain_lush'], time: ['morning'], danger: ['wildlife'], defense: ['shutters', 'turret'], warmth: ['stove'], sleeping: ['hammock'], character: ['none'], pets: ['cat'], npc: ['none'], amenities: ['tea_set', 'plants', 'books', 'guitar'], perspective: ['terrace_view'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 18: 物资超市-囤货狂喜", selections: { structure: ['supermarket'], weather: ['rain'], time: ['noon'], danger: ['none'], defense: ['iron_door', 'bars', 'camera'], warmth: ['stove'], sleeping: ['bunk'], character: ['none'], pets: ['none'], npc: ['none'], amenities: ['shelves', 'water', 'ammo', 'feast', 'bakery'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } }
+  { week: "Phase 3: 节日与长尾 (Jan 19-22)", theme: "特定场景优化", items: [
+    { 
+      title: "Jan 19: 圣诞余温 (Holiday)", 
+      selections: { 
+        structure: ['cabin'], weather: ['light_snow'], time: ['night'], warmth: ['fireplace', 'candles'], 
+        amenities: ['feast', 'tea_set', 'rugs'], duration: ['8h'], vibe: ['cozy_safe'],
+        defense: ['shutters'], danger: ['none'], sleeping: ['canopy'], shot_type: ['medium'],
+        perspective: ['standard'],
+        visual_style: ['cinematic_35mm']
+      } 
+    },
+    { 
+      title: "Jan 22: 深夜4K (Night Sounds)", 
+      selections: { 
+        structure: ['cabin'], weather: ['fog'], time: ['night'], danger: ['none'], duration: ['8h'], vibe: ['cozy_safe'],
+        defense: ['shutters'], warmth: ['stove'], sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['books', 'coffee'],
+        perspective: ['standard'],
+        visual_style: ['realistic_8k']
+      } 
+    },
   ]},
-  { week: "Week 4: 赛博与未知系列", theme: "探索新流量蓝海", items: [
-    { title: "Day 19: 星际座舱-深空漫游", selections: { structure: ['spaceship'], weather: ['none'], time: ['night'], danger: ['aliens'], defense: ['blast_glass', 'airlock'], warmth: ['reactor', 'hologram'], sleeping: ['canopy'], character: ['none'], pets: ['cat'], npc: ['npc_copilot'], amenities: ['tech', 'pizza', 'water', 'map'], perspective: ['first_person'], shot_type: ['medium_close'], vibe: ['cozy_travel'], duration: ['8h'] } },
-    { title: "Day 20: 赛博出租-霓虹雨夜", selections: { structure: ['cyber_taxi'], weather: ['rain'], time: ['night'], danger: ['drones'], defense: ['blast_glass'], warmth: ['hologram'], sleeping: ['car_seat'], character: ['driver_focused'], pets: ['none'], npc: ['none'], amenities: ['radio', 'coffee', 'tech', 'map'], perspective: ['first_person'], shot_type: ['medium'], vibe: ['cozy_travel'], duration: ['2h'] } },
-    { title: "Day 21: 古典书馆-烛光学习", selections: { structure: ['library'], weather: ['medium_rain'], time: ['night'], danger: ['none'], defense: ['bars', 'iron_door'], warmth: ['candles', 'fireplace'], sleeping: ['corner_bed'], character: ['survivor_reading'], pets: ['cat'], npc: ['none'], amenities: ['tea_set', 'books', 'rugs', 'plants'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['4h'] } },
-    { title: "Day 22: 跨海游艇-海浪咆哮", selections: { structure: ['yacht'], weather: ['rain'], time: ['floodlight'], danger: ['none'], defense: ['bulkhead', 'blast_glass'], warmth: ['reactor'], sleeping: ['bunk'], character: ['driver_focused'], pets: ['dog'], npc: ['npc_copilot'], amenities: ['coffee', 'tech', 'radio', 'map'], perspective: ['over_shoulder'], shot_type: ['medium_close'], vibe: ['cozy_travel'], duration: ['2h'] } },
-    { title: "Day 23: 山林晨雾-隐秘石屋", selections: { structure: ['river_cottage'], weather: ['fog'], time: ['morning'], danger: ['none'], defense: ['iron_door', 'fence'], warmth: ['fireplace'], sleeping: ['floor_mat'], character: ['none'], pets: ['cat_dog'], npc: ['none'], amenities: ['tea_set', 'bakery', 'plants', 'books'], perspective: ['standard'], shot_type: ['medium'], vibe: ['cozy_safe'], duration: ['8h'] } },
-    { title: "Day 24: 旗舰地堡-雷雨睡眠", selections: { structure: ['bunker'], weather: ['thunder'], time: ['night'], danger: ['none'], defense: ['bulkhead', 'camera', 'turret', 'iron_door'], warmth: ['reactor', 'fireplace'], sleeping: ['corner_bed'], character: ['man_sleeping'], pets: ['duo_dogs'], npc: ['npc_family'], amenities: ['shelves', 'water', 'feast', 'tech', 'rugs'], perspective: ['standard'], shot_type: ['wide_interior'], vibe: ['cozy_safe'], duration: ['8h'] } }
+  { week: "Phase 4: 拓展与压轴 (Jan 25-28)", theme: "LoFi与终极组合", items: [
+    { 
+      title: "Jan 25: 学习节拍 (Lo-Fi Study)", 
+      selections: { 
+        structure: ['library'], weather: ['medium_rain'], time: ['night'], amenities: ['coffee', 'books', 'radio', 'plants'], 
+        vibe: ['cozy_travel'], duration: ['8h'], defense: ['bars'], 
+        warmth: ['heater'], danger: ['none'], sleeping: ['corner_bed'], shot_type: ['medium'],
+        perspective: ['standard'],
+        visual_style: ['anime_makoto'] // 新海诚动画风
+      } 
+    },
+    { 
+      title: "Jan 28: 终极雷暴 (Ultimate Story)", 
+      selections: { 
+        structure: ['cabin'], weather: ['thunder'], pets: ['dog'], warmth: ['fireplace'], time: ['night'], 
+        duration: ['8h'], vibe: ['cozy_safe'], defense: ['shutters', 'iron_door'], 
+        danger: ['wildlife'], sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['feast', 'rugs', 'guitar'],
+        perspective: ['cinematic'],
+        visual_style: ['gothic_noir'] // 暗黑哥特
+      } 
+    },
   ]}
 ];
 
@@ -99,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           onClick={() => setIsPlanOpen(true)} 
           className="w-full flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-2xl text-sm font-black shadow-xl shadow-green-900/30 transition-all active:scale-[0.98]"
         >
-          <Target size={18} /> 开启 24 天黄金增长清单
+          <Calendar size={18} /> 2026年1月发布日程
         </button>
       </div>
 
@@ -153,15 +228,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <div className="p-10 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-slate-900 to-slate-950">
               <div>
                 <h3 className="text-3xl font-black text-white flex items-center gap-4 tracking-tighter">
-                  <Target className="text-green-500" size={32}/> 下一月 24 天爆款增长计划
+                  <Calendar className="text-green-500" size={32}/> 2026年1月发布日程
                 </h3>
-                <p className="text-slate-500 mt-2 font-medium">目标：月播放 10,000+ | 系列化、高频、长尾流量黄金策略组合</p>
+                <p className="text-slate-500 mt-2 font-medium">HAVEN NIGHTS 频道专属 • 10个高潜力视频 • 目标月播放 10K+</p>
               </div>
               <button onClick={() => setIsPlanOpen(false)} className="p-4 hover:bg-slate-800 rounded-full text-slate-500 hover:text-white transition-all"><X size={32}/></button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-10 space-y-12">
-              {GROWTH_PLAN_24.map((week, idx) => (
+              {JAN_2026_PLAN.map((week, idx) => (
                 <div key={idx} className="space-y-6">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <span className="text-xl font-black text-green-400 tracking-tight">{week.week}</span>
@@ -175,10 +250,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                         className="p-6 bg-slate-950 border border-slate-800 rounded-3xl hover:border-green-500 hover:bg-slate-800 transition-all text-left group relative overflow-hidden"
                       >
                         <div className="absolute top-0 left-0 w-1 h-full bg-green-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Day {idx * 6 + i + 1}</div>
+                        <div className="text-xs font-black text-slate-500 mb-2 uppercase tracking-widest flex justify-between">
+                           <span>VIDEO #{idx * 3 + i + 1}</span>
+                           <span className="text-green-500/50">8H NO ADS</span>
+                        </div>
                         <div className="text-sm font-black text-slate-200 mb-4 group-hover:text-green-400 leading-tight">{item.title}</div>
                         <div className="flex items-center gap-2 text-[10px] text-slate-600 font-bold group-hover:text-slate-400">
-                          <PlayCircle size={14}/> 载入黄金参数并生成
+                          <PlayCircle size={14}/> 加载全案参数
                         </div>
                       </button>
                     ))}
