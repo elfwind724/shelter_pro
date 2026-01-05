@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Shield, Home, Flame, Coffee, Package, CloudLightning, Skull, Bed, Scroll, Clock, Hourglass, Camera, Ruler, Heart, Users, Map, Ghost, Lock, Dog, UserCheck, Armchair, Palette } from 'lucide-react';
+import { Shield, Home, Flame, Coffee, Package, CloudLightning, Skull, Bed, Scroll, Clock, Hourglass, Camera, Ruler, Heart, Users, Map, Ghost, Lock, Dog, UserCheck, Armchair, Palette, Feather } from 'lucide-react';
 import { Category } from './types';
 
 export const CATEGORIES: Category[] = [
@@ -14,67 +14,117 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      // --- OCEAN & MARITIME (The Abyss) - OPTIMIZED ---
-      { id: 'cruise_ship', label: '幽灵邮轮 (Ghost Liner)', value: 'Interior of a First Class Stateroom on a 1920s vintage Art Deco ocean liner. Key elements: Rows of heavy ROUND BRASS PORTHOLES (not large windows) dripping with condensation. Walls are varnished dark mahogany with brass trim. Furniture is bolted to the floor. The ceiling is low with decorative beams. Outside the thick circular glass, massive dark waves are rolling by. The horizon is tilted. Atmospheric nautical decay, Bioshock aesthetic' },
-      { id: 'oil_rig', label: '海上油井 (Oil Rig)', value: 'Interior of a suspended industrial control module on a deep-sea oil rig. Architectural style: High-tech industrial brutalism. Walls are corrugated metal with yellow hazard stripes and peeling rust. Windows are THICK, SLANTED, REINFORCED GLASS with heavy wipers, looking down 100 feet at the churning black ocean. Metal grating floor, hanging chains, red emergency lighting. Heavy rain hammering the steel structure' },
-      { id: 'ocean_island', label: '黑沙孤岛 (Black Island)', value: 'Interior of a minimalist concrete bunker embedded into a black basalt cliff face. Architecture: Nordic Brutalist. Frameless horizontal ribbon windows strictly framing the violent surf where white foam hits black volcanic sand. Dark grey slate walls, sheepskin textures, suspended fireplace. The ocean spray hits the glass constantly. Death Stranding atmosphere, isolation' },
-      { id: 'submarine', label: '核潜艇 (Submarine)', value: 'Interior of a cramped submarine officer quarters. Curved steel hull walls covered in pipes, valves, and pressure gauges. No windows, but a digital periscope screen showing the stormy surface. Red tactical lighting, narrow bunk, metallic claustrophobia, Das Boot aesthetic' },
-      { id: 'lighthouse', label: '孤峰灯塔 (Lighthouse)', value: 'Interior of the lantern room at the top of an old brick lighthouse. 360-degree glass reinforced with heavy iron cage frames. The massive fresnel lens machinery is visible in the center, rotating slowly. Rain lashes against the glass. High altitude view of the storm raging over the dark sea below' },
+      // STRATEGY SPECIAL
+      { id: 'ship_cabin', label: '船长室 (Ship Cabin)', value: 'ARCHITECTURAL STYLE: 19th Century Maritime. Interior of a heavy wooden ship captain\'s cabin. KEY ELEMENTS: Dark polished mahogany walls, brass instruments, gimbaled lanterns, slanted walls following the hull shape. A round brass porthole dripping with condensation. NO MODERN WINDOWS.' },
 
-      // --- NATURE & SEMI-OPEN (The "Terrace" Vibe) ---
-      { id: 'cliff_terrace', label: '悬崖露台 (Cliff Terrace)', value: 'interior of a modern cliffside home with massive sliding glass doors opening onto a wet wooden terrace. The terrace extends out into the rain without a roof, collecting puddles and rain splashes. Located at mid-mountain altitude, surrounded by a dense canopy of nature' },
-      { id: 'forest_aerie', label: '森林树顶 (Forest Canopy)', value: 'interior of a structure built high into the canopy of massive ancient trees. A large balcony extends out, unprotected from the rain. Rain is dripping heavily from the lush giant leaves and branches onto the balcony floor. View of the deep green forest depth below and thick tree trunks nearby' },
-      { id: 'lake_boathouse', label: '湖畔船屋 (Lakeside Boathouse)', value: 'interior of a cozy wooden boathouse right on the water level. Large open cargo doors look out directly onto a misty lake. Rain is hitting the lake surface creating thousands of ripples. Tall reeds, birch trees, and water lilies are visible near the deck. Calm water atmosphere' },
-      { id: 'zen_garden', label: '日式缘侧 (Zen Garden)', value: 'interior of a traditional Japanese room looking out through open shoji doors onto a wet Engawa (wooden porch) and a lush mossy garden. Rain drips rhythmically from the tiled roof eaves onto stone basins. Vibrant green maple trees, bamboo, and stone lanterns visible in the rain' },
-      { id: 'river_cottage', label: '河谷石屋 (River Cottage)', value: 'interior of a stone cottage situated on a river bank. Large picture window looks out at a rushing river flowing over smooth river stones. Giant weeping willow branches hang down in front of the window, swaying in the rain. Ferns and wet rocks are close by' },
-      { id: 'glass_igloo', label: '极光玻璃屋 (Glass Igloo)', value: 'interior of a geodesic glass dome cabin deep in a snowy forest. Floor-to-ceiling triangular glass panels offer a 360-degree view of nature. Warm and safe inside, surrounded by a winter wonderland' },
+      // =================================================================
+      // [REALISM] HIDDEN CORNERS (现实隐秘角落)
+      // =================================================================
+      { id: 'fire_lookout', label: '森林瞭望塔 (Fire Lookout)', value: 'ARCHITECTURAL STYLE: US Forest Service Lookout. Interior of a high-altitude square room with 360-degree windows on all sides. KEY ELEMENTS: Osborne Fire Finder in the center, utilitarian steel furniture, propane stove. Visible horizon line above the trees. High exposure feeling.' },
+      { id: 'skoolie', label: '改造校车 (Converted Bus)', value: 'ARCHITECTURAL STYLE: Vehicle Conversion (Skoolie). Interior of a long, narrow metal bus shell. KEY ELEMENTS: Curved metal ceiling ribs, long perspective, driver seat visible at far end, wood stove installed near back door. Windows on both sides showing passing scenery. DIY wood paneling.' },
+      { id: 'attic_studio', label: '斜顶阁楼 (Slanted Attic)', value: 'ARCHITECTURAL STYLE: A-Frame Attic. Interior of a dusty artist garret under the roof. KEY ELEMENTS: Sharp triangular ceiling beams, massive slanted skylight window (rain hammering on it), low headroom on sides. Cluttered, artistic, bohemian atmosphere.' },
+      { id: 'projection_booth', label: '放映室 (Cinema Booth)', value: 'ARCHITECTURAL STYLE: Vintage Industrial. Interior of a cramped movie theater projection room. KEY ELEMENTS: Small square observation ports looking out into a dark void (the theater), massive film reels, projector beam cutting the dust. Concrete walls, humming electronics.' },
+      { id: 'radio_station', label: '深夜电台 (Radio Station)', value: 'ARCHITECTURAL STYLE: Soundproof Studio. Interior of a broadcasting booth. KEY ELEMENTS: Walls lined with acoustic foam pyramids, "ON AIR" red sign, microphone on boom arm, mixing console with VU meters. Rain visible through the heavy soundproof glass window.' },
+      { id: 'laundromat', label: '深夜洗衣房 (Laundromat)', value: 'ARCHITECTURAL STYLE: Retro Commercial. Interior of a 24-hour coin laundry. KEY ELEMENTS: Rows of washing machines with round glass doors spinning rhythmically, fluorescent tube lighting, checkerboard floor, plastic chairs. Urban loneliness.' },
+      { id: 'clock_tower', label: '钟楼密室 (Clock Tower)', value: 'ARCHITECTURAL STYLE: Steampunk Industrial. Interior of the gear room behind a giant clock face. KEY ELEMENTS: Massive brass cogs and gears (some turning), the back of a giant glass clock face serves as the window. Rain running down the Roman numerals. Amber light.' },
 
-      // --- HIGH ALTITUDE (Sealed) ---
-      { id: 'mountain_peak', label: '山巅哨站 (Mountain Peak)', value: 'high altitude vantage point, interior of a high-tech observation outpost perched on the very tip of a jagged snowy mountain peak. 360-degree panoramic polygon windows looking down at clouds. Surrounded by swirling clouds far below, snow-capped ridges, and aerial views' },
-      { id: 'rooftop_garden', label: '摩天楼顶层 (Skyscraper Rooftop)', value: 'extreme height, interior of a fortified luxury penthouse with a glass-enclosed winter garden on the 80th floor. Looking down at the rain falling on the distant city lights glowing dimly in the fog below. Aerial view of a ruined metropolitan skyline' },
+      // =================================================================
+      // [SPECIAL] UNIQUE STRUCTURES (特色建筑)
+      // =================================================================
+      { id: 'arctic_station', label: '极地科考站 (Arctic Station)', value: 'ARCHITECTURAL STYLE: Modular Sci-Fi Prefab. Interior of an Antarctic research outpost. KEY ELEMENTS: Orange insulated panel walls, heavy blast doors, thick multi-pane portholes. Scientific servers blinking. Sterile but warm interior vs Whiteout Blizzard outside.' },
+      { id: 'earthship', label: '沙漠生态屋 (Earthship)', value: 'ARCHITECTURAL STYLE: Organic Biotecture. Interior of a sustainable Earthship. KEY ELEMENTS: Walls made of adobe and colored bottles, south-facing angled glass wall, indoor planter beds with jungle plants growing inside. Curved organic shapes, no sharp corners.' },
+      { id: 'yurt', label: '游牧蒙古包 (Cozy Yurt)', value: 'ARCHITECTURAL STYLE: Central Asian Nomad. Interior of a circular felt tent. KEY ELEMENTS: Wooden lattice walls (Khana), central roof wheel (Toono) with chimney, heavy patterned rugs everywhere, curved roof poles. Round communal space, warm and enclosed.' },
+      { id: 'botanical_lab', label: '植物实验室 (Botanical Lab)', value: 'ARCHITECTURAL STYLE: Overgrown Science. Interior of a glass-walled research pod in the jungle. KEY ELEMENTS: Condensation on glass, grow lights (purple/pink), creeping vines inside, microscopes. The feeling of being inside a terrarium looking out at a monsoon.' },
+      { id: 'aquarium_tunnel', label: '水族馆隧道 (Aquarium)', value: 'ARCHITECTURAL STYLE: Underwater Acrylic Tunnel. Interior of a dry transparent tube. KEY ELEMENTS: 180-degree view of water overhead, sharks and fish swimming above, caustic light patterns on the floor. Thick curved glass walls. Blue ambient light.' },
 
-      // --- MOVING SANCTUARIES (Travel / LoFi Vibes) ---
-      { id: 'rv', label: '末日房车 (Expedition RV)', value: 'interior of a heavy-duty 6x6 expedition vehicle (Unimog style), moving on a muddy road. Cramped but high-tech cockpit, dashboard with navigation systems, quilted insulation on walls, rain drumming on metal roof. The driver is focused on the road' },
-      { id: 'truck', label: '重卡座舱 (Semi Truck)', value: 'interior of a massive sleeper semi-truck cabin moving on a highway at night. Dashboard lights glowing with distinct gauges. Spacious sleeper berth visible behind seats. Rain streaking horizontally on windshield. Cozy long-haul trucker vibe' },
-      { id: 'train', label: '雪国列车 (Snow Train)', value: 'interior of a fortified armored train cabin moving rapidly through a frozen landscape. Vintage wood paneling, heavy velvet curtains, brass fixtures. View of blurring snow rushing past the window. Rhythmic mechanical vibration' },
-      { id: 'night_bus', label: '夜行巴士 (Night Bus)', value: 'interior of a Japanese style night highway bus. Rows of empty plush velvet seats, soft ambient floor lights. Rain streaks moving horizontally across the panoramic windshield. The driver is visible in silhouette handling the wheel. Melancholic travel vibe' },
-      { id: 'luxury_jet', label: '私人飞机 (Private Jet)', value: 'interior of a luxury Gulfstream private jet flying through a storm at night. Cream leather seats, walnut wood tables, champagne glass vibrating slightly on the table. Rain freezing on the oval windows. Cockpit door slightly ajar showing pilot instruments' },
-      { id: 'yacht', label: '跨海游艇 (Expedition Yacht)', value: 'interior of a reinforced expedition yacht bridge/wheelhouse navigating rough seas. Wipers fighting heavy rain on the slanted reinforced glass. Glowing radar screens. The captain is piloting the wheel. Dark ocean waves crashing outside' },
-      { id: 'cyber_taxi', label: '赛博出租 (Cyberpunk Taxi)', value: 'interior of a flying taxi in a futuristic rainy city. Neon lights from skyscrapers streaking past the rain-covered canopy. Holographic dashboard displays. The pilot is navigating through sky traffic. Blade Runner aesthetic' },
-      { id: 'spaceship', label: '星际飞船 (Spaceship)', value: 'interior of a long-haul spacesuit cockpit drifting through an asteroid field. Hexagonal reinforced windows. Starfields and rocks floating past. Zero-G floating pen. Silent, sterile, but cozy high-tech safety' },
-      { id: 'subway_moving', label: '行驶地铁 (Moving Metro)', value: 'interior of a moving subway car, empty except for the survivor. Tiled tunnel lights flashing past the windows rhythmically. Overhead handles swaying with the motion. Urban isolation' },
+      // =================================================================
+      // [CLASSIC] OCEAN & MARITIME
+      // =================================================================
+      { id: 'cruise_ship', label: '幽灵邮轮 (Ghost Liner)', value: 'ARCHITECTURAL STYLE: Art Deco 1920s. Interior of a luxury ocean liner stateroom. KEY ELEMENTS: Dark varnished wood paneling, brass trim, round portholes (not square windows), bolted-down furniture. Tilted horizon line. Bioshock atmosphere.' },
+      { id: 'oil_rig', label: '海上油井 (Oil Rig)', value: 'ARCHITECTURAL STYLE: Industrial Brutalism. Interior of a suspended control module. KEY ELEMENTS: Corrugated metal walls, yellow hazard stripes, floor grating, heavy steel watertight doors. View looking DOWN at the black churning ocean through slanted reinforced windows.' },
+      { id: 'submarine', label: '核潜艇 (Submarine)', value: 'ARCHITECTURAL STYLE: Military Industrial. Interior of a submarine pressure hull. KEY ELEMENTS: Curved steel walls covered in pipes, valves, and analog gauges. Red tactical lighting. Cramped, claustrophobic, high-tech. No windows (periscope screen only).' },
+      { id: 'lighthouse', label: '孤峰灯塔 (Lighthouse)', value: 'ARCHITECTURAL STYLE: Cylindrical Stone Tower. Interior of the lantern room. KEY ELEMENTS: 360-degree glass reinforced with iron cage, massive Fresnel lens machinery in the center. High altitude view of storm. Iron spiral staircase.' },
+      { id: 'underwater_dome', label: '深海穹顶 (Abyssal Dome)', value: 'ARCHITECTURAL STYLE: Geodesic Glass Dome. Interior of a seabed habitat. KEY ELEMENTS: Triangular glass panels reinforced with steel frame. Pitch black outside with bioluminescent creatures. High pressure aesthetic. Subnautica style.' },
+      { id: 'canal_boat', label: '运河窄船 (Canal Narrowboat)', value: 'ARCHITECTURAL STYLE: British Narrowboat. Interior of a very long, narrow (6ft wide) wooden cabin. KEY ELEMENTS: Painted with "Roses and Castles" folk art, small solid fuel stove, low ceiling. Rain pattering right above head. Moored under a willow tree.' },
 
-      // --- DEEP UNDERGROUND (The Womb) ---
-      { id: 'bunker', label: '末日地堡 (Doomsday Bunker)', value: 'professional military-grade concrete bunker, cylindrical curved ceiling, thick blast doors with rotating wheels, air filtration pipes visible, cold concrete softened by rugs, windowless claustrophobic safety' },
-      { id: 'air_raid', label: '老式防空洞 (Air Raid Shelter)', value: 'vintage WWII era brick arched air raid shelter tunnel, curved masonry ceiling, long narrow geometry, wooden benches lining the walls converted into shelves, dusty ventilation boxes, warm incandescent bulb lighting, smell of damp earth and history' },
-      { id: 'cave', label: '深山岩洞 (Natural Cave)', value: 'massive natural limestone cavern converted into a home, uneven stalactite ceiling, rough hewn rock walls, entrance sealed by a massive improvised steel blast door, primitive but electrified' },
-      { id: 'sewer', label: '改造下水道 (Storm Drain)', value: 'massive cylindrical concrete storm drain tunnel (10ft diameter) converted into a base, curved walls, echoing acoustics, steel grate welded over the opening, flowing water channel covered by planks' },
-      { id: 'vault', label: '银行金库 (Bank Vault)', value: 'inside a massive circular steel bank vault, walls lined with thousands of safety deposit boxes, metallic floor, main vault door is 3ft thick steel gear mechanism, impenetrable silence' },
+      // =================================================================
+      // [NATURE] WILDERNESS & ORGANIC
+      // =================================================================
+      { id: 'hobbit_hole', label: '霍比特洞 (Hobbit Hole)', value: 'ARCHITECTURAL STYLE: Underground Fantasy. Interior of a hill-burrow. KEY ELEMENTS: Round wooden door with central knob, curved plaster walls, heavy oak timber beams (no straight lines). Low ceiling. Cozy, earthy, warm yellow light. View of garden from ground level.' },
+      { id: 'waterfall_cave', label: '水帘洞天 (Waterfall Cave)', value: 'ARCHITECTURAL STYLE: Natural Rock Formation. Interior of a dry cave behind a waterfall. KEY ELEMENTS: The "Window" is a roaring curtain of falling water (distorted light). Stone floor covered in rugs. Damp but safe atmosphere. Blue-green filtered light.' },
+      { id: 'giant_tree', label: '巨木树洞 (Hollow Tree)', value: 'ARCHITECTURAL STYLE: Druidic Nature. Interior carved inside a massive living sequoia trunk. KEY ELEMENTS: Walls are living wood bark and smooth cambium. Windows are natural knotholes fitted with glass. Amber resin lamps. High up in the canopy.' },
+      { id: 'greenhouse', label: '末日温室 (Overgrown Greenhouse)', value: 'ARCHITECTURAL STYLE: Victorian Glasshouse. Interior of an iron-framed conservatory. KEY ELEMENTS: Rusted iron framework, broken panes patched up, overgrown with giant ferns and vines INSIDE. Smells of wet earth and plants. Foggy and humid.' },
+      { id: 'cliff_terrace', label: '悬崖露台 (Cliff Terrace)', value: 'ARCHITECTURAL STYLE: Modern Brutalist Concrete. Interior looking out. KEY ELEMENTS: Massive floor-to-ceiling glass walls, a raw concrete terrace cantilevered over a void. Rain splashing on the concrete deck. Minimalist furniture.' },
+      { id: 'forest_aerie', label: '森林树顶 (Forest Canopy)', value: 'ARCHITECTURAL STYLE: Wooden Platform. Interior of a treehouse high in the branches. KEY ELEMENTS: Wooden planks, rope railings, surrounded by thick leaves and branches pressing against the windows. Swaying motion. Bird\'s eye view of the forest floor.' },
+      { id: 'zen_garden', label: '日式缘侧 (Zen Garden)', value: 'ARCHITECTURAL STYLE: Traditional Japanese Kyoto Temple. Interior of a Washitsu (Tatami room). KEY ELEMENTS: Straw Tatami mats on floor, Shoji sliding paper doors (open), looking out onto a wet wooden Engawa porch and a mossy rock garden. Low wooden ceiling. Paper lanterns. NO WESTERN SOFAS.' },
+      { id: 'glass_igloo', label: '极光玻璃屋 (Glass Igloo)', value: 'ARCHITECTURAL STYLE: Geodesic Dome. Interior of a frameless glass pod. KEY ELEMENTS: Triangular glass panels offering 100% sky view. Heated glass (no fog). Lying in bed looking directly up at snow falling on the glass. Modern, Scandinavian.' },
 
-      // --- INSTITUTIONAL & PUBLIC (The Stronghold) ---
-      { id: 'church', label: '末日教堂 (Fortified Church)', value: 'interior of a grand Gothic cathedral nave, the living space is established up in the raised choir loft (mezzanine) overlooking the empty nave below, stained glass windows reinforced with welded heavy steel rebar grids, the high vantage point provides safety without enclosing the space' },
-      { id: 'hospital_ward', label: '废弃医院 (Trauma Center)', value: 'interior of a dark abandoned hospital trauma center, central circular nurses station fortified with overturned metal filing cabinets, surrounding glass-walled ICU isolation rooms, biohazard curtains acting as soft partitions, medical monitors repurposed for security feeds, sterile blue atmosphere softened by warm yellow kerosene lamps' },
-      { id: 'library', label: '古老图书馆 (Grand Library)', value: 'grand victorian library hall, two stories of bookshelves reached by rolling ladders, the living space is nestled in the reading nook between two massive oak bookcases, high arched windows boarded up with stacks of hardcover books, leather armchairs, dust motes in light shafts' },
-      
-      // --- COMMERCIAL & INDUSTRIAL (The Scavenger) ---
-      { id: 'supermarket', label: '物资超市 (Supermarket)', value: 'interior of a vast abandoned big-box superstore, high industrial ceiling with exposed ducts, the living area is located in the Manager\'s Office on the mezzanine overlooking the sales floor, huge glass observation window looks down on the aisles of metal shelving, commanding view of the supplies' },
-      { id: 'factory', label: '重工废墟 (Heavy Factory)', value: 'vast industrial assembly plant, sawtooth roof with north-facing windows, overhead crane yellow beams, the living quarters are established on the elevated steel catwalks and control platform high above the factory floor, using the height as natural defense, industrial vastness below' },
-      { id: 'warehouse_store', label: '仓储中心 (Warehouse)', value: 'interior of a massive abandoned IKEA-style warehouse store, high pallet racks filled with boxes forming a canyon-like maze, the living space is built into the racking system itself like a bunk, high off the ground, surrounded by supplies' },
+      // =================================================================
+      // [SKY] AERIAL & HIGH ALTITUDE
+      // =================================================================
+      { id: 'steampunk_airship', label: '蒸汽飞艇 (Steampunk Airship)', value: 'ARCHITECTURAL STYLE: Victorian Industrial Aerial. Interior of a dirigible gondola. KEY ELEMENTS: Brass piping, riveted aluminum walls, large slanted observation windows looking down at clouds. Leather pilot seat. Vibration of engines.' },
+      { id: 'cloud_temple', label: '云端神庙 (Cloud Temple)', value: 'ARCHITECTURAL STYLE: Ancient Stone Fantasy. Interior of a floating sanctuary. KEY ELEMENTS: White marble columns, open arches with no glass, looking out over a sea of clouds. mystical floating rocks. Ethereal, airy, high altitude.' },
+      { id: 'mountain_peak', label: '山巅哨站 (Mountain Peak)', value: 'ARCHITECTURAL STYLE: High-Tech Alpine. Interior of a summit weather station. KEY ELEMENTS: Reinforced geometric windows, steel cables anchoring the structure. Surrounded by swirling clouds and jagged rocks. The feeling of being on top of the world.' },
+      { id: 'rooftop_garden', label: '摩天楼顶层 (Skyscraper Rooftop)', value: 'ARCHITECTURAL STYLE: Cyberpunk Penthouse. Interior of a high-rise luxury apartment. KEY ELEMENTS: Floor-to-ceiling glass looking down at a rainy futuristic city. Neon lights reflecting on wet glass. Modern luxury furniture. Height vertigo.' },
 
-      // --- RESIDENTIAL & WILDERNESS (The Home) ---
-      { id: 'penthouse', label: '顶层豪宅 (High-Rise)', value: 'extreme height luxury penthouse on the 50th floor of a ruined skyscraper, floor-to-ceiling reinforced glass wall looking down 500 feet onto a ruined city shrouded in mist, sleek modern furniture, high altitude isolation' },
-      { id: 'cabin', label: '重木小屋 (Log Cabin)', value: 'classic survivalist cabin built with massive 12-inch thick logs, stone foundation, large stone hearth, chinking between logs, heavy wooden shutters bolted shut, deep forest isolation' },
-      { id: 'container', label: '集装箱房 (Container)', value: 'two shipping containers stacked and welded together, corrugated metal walls, narrow width, industrial airtight doors, buried halfway into a hillside for insulation' },
-      { id: 'treehouse', label: '钢铁树屋 (Treehouse)', value: 'structure suspended high in massive redwood trees, built from scrap metal and airplane parts, swaying gently in wind, rope bridge retracted, camouflage netting' },
+      // =================================================================
+      // [VEHICLE] MOVING SANCTUARIES
+      // =================================================================
+      { id: 'orient_express', label: '东方快车 (Luxury Train)', value: 'ARCHITECTURAL STYLE: 1920s Art Nouveau Train. Interior of a first-class compartment. KEY ELEMENTS: Inlaid marquetry wood, velvet seats, Tiffany lamps, crystal glass. Landscape rushing by horizontally outside the window. Rhythmic motion.' },
+      { id: 'scifi_rover', label: '火星漫游车 (Mars Rover)', value: 'ARCHITECTURAL STYLE: NASA/Sci-Fi Utility. Interior of a pressurized rover cockpit. KEY ELEMENTS: Hexagonal reinforced windows, digital HUD displays, white padded walls, joystick controls. Red dust storm outside. Cramped efficiency.' },
+      { id: 'camper_van', label: '暴雨露营车 (Van Life)', value: 'ARCHITECTURAL STYLE: Mercedes Sprinter Conversion. Interior of a compact van. KEY ELEMENTS: Back doors open to rain (with net), fairy lights, wood paneling, very small cozy bed. Rain drumming loudly on the metal roof. Parked near nature.' },
+      { id: 'rv', label: '末日房车 (Expedition RV)', value: 'ARCHITECTURAL STYLE: 6x6 Overland Truck. Interior of a heavy-duty expedition vehicle. KEY ELEMENTS: Quilted wall insulation, tactical storage nets, high dashboard with navigation screens. Rain on the windshield. Moving through mud.' },
+      { id: 'truck', label: '重卡座舱 (Semi Truck)', value: 'ARCHITECTURAL STYLE: American Semi-Truck. Interior of the sleeper cab. KEY ELEMENTS: Driver seat and steering wheel visible, cozy bunk bed behind seats, CB radio. Rain streaking horizontally on the windshield. Highway lights passing.' },
+      { id: 'night_bus', label: '夜行巴士 (Night Bus)', value: 'ARCHITECTURAL STYLE: Highway Coach. Interior of a passenger bus at night. KEY ELEMENTS: Rows of empty plush velvet seats, blue aisle floor lights. Rain on the massive panoramic windshield. The driver is a silhouette. Melancholic travel.' },
+      { id: 'spaceship', label: '星际飞船 (Spaceship)', value: 'ARCHITECTURAL STYLE: Hard Sci-Fi. Interior of a long-haul spacecraft. KEY ELEMENTS: White padded walls (Kubrick style), hexagonal windows showing starfields or asteroids. Zero-G floating objects (pen, cup). Silent, sterile, hum of life support.' },
+
+      // =================================================================
+      // [URBAN] CITY & INDUSTRIAL
+      // =================================================================
+      { id: 'cyber_pod', label: '赛博胶囊 (Cyberpunk Pod)', value: 'ARCHITECTURAL STYLE: Tokyo Capsule Hotel. Interior of a tiny plastic sleeping pod. KEY ELEMENTS: White molded plastic walls, integrated control panel, one wall is a smart window looking at neon signs. Extremely compact, futuristic coffin.' },
+      { id: 'noir_office', label: '侦探事务所 (Noir Office)', value: 'ARCHITECTURAL STYLE: 1940s Film Noir. Interior of a detective agency. KEY ELEMENTS: Frosted glass door with reverse lettering, venetian blinds casting slat shadows, ceiling fan, filing cabinets. Whiskey bottle. Rainy city street outside.' },
+      { id: 'server_room', label: '数据中心 (Server Hideout)', value: 'ARCHITECTURAL STYLE: Data Center. Interior of a server aisle. KEY ELEMENTS: Rows of black server racks with blinking green/blue LEDs. A cot set up on the raised floor tiles. Cables everywhere. Cold air conditioning, hum of fans.' },
+      { id: 'sewer', label: '改造下水道 (Storm Drain)', value: 'ARCHITECTURAL STYLE: Urban Exploration. Interior of a massive concrete cylindrical pipe. KEY ELEMENTS: Curved concrete walls, graffiti, a stream of water running in the center channel (covered by planks). Echoing acoustics. Ninja Turtles vibe.' },
+      { id: 'vault', label: '银行金库 (Bank Vault)', value: 'ARCHITECTURAL STYLE: Bank Strongroom. Interior of a steel vault. KEY ELEMENTS: Walls lined with safety deposit boxes (brass/steel), massive circular gear door (open or closed), piles of cash or gold. Metallic, cold, impenetrable.' },
+      { id: 'factory', label: '重工废墟 (Heavy Factory)', value: 'ARCHITECTURAL STYLE: Abandoned Industrial Hall. Interior of a vast factory. KEY ELEMENTS: Sawtooth roof windows, yellow overhead cranes, rusted machinery. The living space is a small "cage" or office elevated on a catwalk. Vast empty space below.' },
+
+      // =================================================================
+      // [HISTORICAL] MAGIC & HISTORY
+      // =================================================================
+      { id: 'alchemy_lab', label: '炼金工坊 (Alchemy Lab)', value: 'ARCHITECTURAL STYLE: Medieval Stone Tower. Interior of a wizard\'s study. KEY ELEMENTS: Rough stone walls, arched window, tables full of bubbling potions and glassware. Dried herbs hanging from rafters. Fireplace with cauldron. Harry Potter vibe.' },
+      { id: 'wine_cellar', label: '陈年酒窖 (Wine Cellar)', value: 'ARCHITECTURAL STYLE: Brick Vault. Interior of an underground cellar. KEY ELEMENTS: Curved brick ceiling (barrel vault), rows of dusty wine bottles, large oak barrels. Candlelight reflecting on glass. No windows. Smell of oak and dust.' },
+      { id: 'library', label: '古老图书馆 (Grand Library)', value: 'ARCHITECTURAL STYLE: Victorian Gothic. Interior of a massive library hall. KEY ELEMENTS: Floor-to-ceiling dark wood bookshelves, rolling ladders, leather armchairs, dust motes in light shafts. Smell of old paper. Silence.' },
+      { id: 'church', label: '末日教堂 (Fortified Church)', value: 'ARCHITECTURAL STYLE: Gothic Cathedral. Interior of the nave. KEY ELEMENTS: Stained glass windows (reinforced with steel bars), stone pillars, pews pushed aside for living space. High vaulted ceiling. Echoing rain sound.' },
+      { id: 'attic', label: '秘密阁楼 (Secret Attic)', value: 'ARCHITECTURAL STYLE: Suburban House Attic. Interior under the eaves. KEY ELEMENTS: Exposed insulation, wooden rafters, boxes of Christmas decorations, old dress forms. A small dusty window. The Goonies vibe. Hidden from the house below.' },
+
+      // =================================================================
+      // [SURVIVAL] BUNKER & FORTRESS
+      // =================================================================
+      { id: 'bunker', label: '末日地堡 (Doomsday Bunker)', value: 'ARCHITECTURAL STYLE: Cold War Concrete. Interior of a military bunker. KEY ELEMENTS: Curved concrete ceiling, blast doors with wheels, air filtration pipes, fluorescent lights. No windows (or fake digital windows). Survival supplies stacked.' },
+      { id: 'missile_silo', label: '导弹井 (Missile Silo)', value: 'ARCHITECTURAL STYLE: Decommissioned Silo. Interior of a round control room deep underground. KEY ELEMENTS: Metal grating floors, analog computer banks from the 80s, red phones. Echoing metallic space. The ultimate fortress.' },
+      { id: 'shipping_container', label: '悬崖集装箱 (Cliff Container)', value: 'ARCHITECTURAL STYLE: Upcycled Industrial. Interior of a shipping container home. KEY ELEMENTS: Corrugated metal walls (painted), narrow width, one end is replaced by a massive glass wall looking at a view. Modern minimalist.' },
+      { id: 'cabin', label: '重木小屋 (Log Cabin)', value: 'ARCHITECTURAL STYLE: Rustic Pioneer. Interior of a log cabin. KEY ELEMENTS: Massive round logs visible on walls, stone fireplace, chinking between logs, heavy wooden beams. Bear skin rug. Warm orange light. The classic cozy spot.' },
     ]
   },
   {
     id: 'weather',
     title: '2. 听感纹理 (Sound & Weather)',
     icon: <CloudLightning className="w-4 h-4" />,
-    type: 'single',
+    type: 'multi',
     required: true,
     items: [
+      // NEW: Normal & Seasonal Weather
+      { id: 'sunny', label: '风和日丽 (Sunny)', value: 'bright clear sunny day. Deep blue sky, sharp shadows cast by the sun, sunbeams entering the room. Peaceful nature atmosphere, birds chirping visual vibe' },
+      { id: 'overcast', label: '阴郁多云 (Overcast)', value: 'grey overcast sky, diffused flat soft lighting. No rain, dry pavement, mood is calm but slightly gloomy. Stillness in the air' },
+      { id: 'cloudy', label: '多云间晴 (Cloudy)', value: 'partly cloudy sky. Dynamic lighting with sun peaking through large white clouds. Dramatic sky texture, dry and comfortable atmosphere' },
+      { id: 'breeze', label: '清风徐来 (Breeze)', value: 'gentle breeze blowing. Trees and plants swaying rhythmically outside, curtains fluttering slightly. Dynamic gentle motion, peaceful atmosphere' },
+      
+      { id: 'spring', label: '早春生机 (Spring)', value: 'fresh spring atmosphere. Blooming flowers and cherry blossoms visible outside. Vibrant green grass, soft warm pastel sunlight. Birdsong vibe' },
+      { id: 'summer', label: '盛夏午后 (Summer)', value: 'mid-summer atmosphere. Intense bright sunlight, deep green vegetation, heat haze visible. The feeling of a hot lazy afternoon, cicadas buzzing' },
+      { id: 'autumn', label: '深秋落叶 (Autumn)', value: 'golden autumn atmosphere. Orange and red maple leaves falling from trees. Golden hour lighting, dry crisp cool air. Melancholic beauty' },
+      { id: 'winter', label: '冬日暖阳 (Winter)', value: 'clear winter day without snow falling. Frost on the window pane, barren trees outside. Cold blue sky but bright low sun. Crisp cold air visual' },
+
+      // Existing Heavy/Sci-Fi Weather
       { id: 'light_rain', label: '绵绵细雨 (Light Rain)', value: 'gentle light rain falling softly. Delicate droplets on glass, peaceful atmosphere, grey sky but not dark. Soft tapping sound visuals' },
       { id: 'medium_rain', label: '淅沥中雨 (Medium Rain)', value: 'steady medium rain shower. Consistent rainfall, wet surfaces, classic rainy mood. Grey overcast light' },
       { id: 'rain', label: '倾盆大雨 (Heavy Rain)', value: 'heavy intense rainfall hammering down. Water splashing on surfaces, reduced visibility, dramatic atmosphere' },
@@ -96,12 +146,15 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
+      { id: 'sunny_day', label: '晴朗正午 (Sunny Day)', value: 'bright clear sunny day with blue sky, sharp defined shadows, high visibility, vibrant natural colors, optimistic atmosphere' },
+      { id: 'golden_hour', label: '日落金光 (Golden Hour)', value: 'magical golden hour lighting, low sun casting long horizontal shadows, warm orange and gold hues filling the room, cinematic dust motes dancing in sunbeams' },
+      { id: 'soft_day', label: '柔和白昼 (Soft Daylight)', value: 'bright but diffused daylight, soft shadows, airy and fresh atmosphere, neutral white light balance, perfect visibility' },
+      { id: 'morning', label: '清晨微光 (Blue Hour)', value: 'early morning blue hour, cold light, frost on windows, peaceful silence' },
+      { id: 'noon', label: '阴霾正午 (Overcast)', value: 'diffused flat daylight, grey overcast sky, gloomy atmosphere, soft shadows' },
       { id: 'night', label: '漆黑深夜 (Pitch Black)', value: 'pitch black night, zero ambient light outside, only interior warmth visible' },
       { id: 'moonlight', label: '皓月当空 (Full Moon)', value: 'cold silver moonlight illuminating the landscape, eerie blue shadows, sharp contrast' },
       { id: 'floodlight', label: '工业泛光 (Floodlight)', value: 'harsh artificial halogen floodlight illuminating the rain in a specific cone, rest is pitch black, industrial safety feel' },
       { id: 'emergency', label: '警报红光 (Emergency Red)', value: 'rotating emergency red warning lights creating a tense but secure atmosphere, submarine mode' },
-      { id: 'morning', label: '清晨微光 (Blue Hour)', value: 'early morning blue hour, cold light, frost on windows, peaceful silence' },
-      { id: 'noon', label: '阴霾正午 (Overcast)', value: 'diffused flat daylight, grey overcast sky, gloomy atmosphere, soft shadows' },
       { id: 'toxic', label: '辐射绿光 (Toxic Glow)', value: 'sickly green bioluminescent environmental glow, radioactive atmosphere' },
     ]
   },
@@ -163,6 +216,7 @@ export const CATEGORIES: Category[] = [
       { id: 'candles', label: '大量蜡烛 (Candle Sea)', value: 'hundreds of beeswax candles creating a warm sanctuary glow everywhere' },
       { id: 'oil_lamp', label: '复古油灯 (Oil Lanterns)', value: 'vintage kerosene lanterns hanging and casting warm protective shadows' },
       { id: 'heater', label: '电暖器 (Space Heater)', value: 'industrial electric heater glowing bright orange coils, heat waves visible' },
+      { id: 'heated_floor', label: '地暖系统 (Heated Floor)', value: 'invisible underfloor heating system radiating gentle warmth upwards, keeping the floor dry and cozy to the touch' },
     ]
   },
   {
@@ -202,6 +256,41 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     items: [
       { id: 'none', label: 'POV: 无人 (Immersive)', value: 'no humans, empty room, first person view' },
+      
+      // --- LOFI MUSICIANS (NEW) ---
+      { 
+        id: 'lofi_pianist', 
+        label: '海上钢琴师 (Ocean Pianist)', 
+        value: '[LoFi Aesthetic] Night. An elegant adult male pianist sitting at an old upright piano INSIDE the dry cabin of a boat. Head bowed, focused on playing. Through the window, we see the deep blue ocean and rain. Blue-green color palette, grainy texture, melancholic and lonely atmosphere. The pianist is dry and warm.' 
+      },
+      { 
+        id: 'lofi_guitarist', 
+        label: '吉他手-背影 (Guitarist Back)', 
+        value: '[LoFi Aesthetic] View from behind. An adult guitarist sitting INSIDE on the edge of a bed, facing the warm heater. The silhouette is outlined by the orange glow. Strumming motion is visible in the shoulder movement, but hands are obscured by the body angle. Introspective and private.' 
+      },
+      { 
+        id: 'lofi_flamenco', 
+        label: '弗拉明戈-侧影 (Flamenco Side)', 
+        value: '[LoFi Aesthetic] Side profile view. A beautiful adult woman playing Flamenco guitar standing INSIDE the room, next to a closed glass door looking out at the heavy storm. The red shawl flutters. The guitar body hides the intricate fingerwork. Focus on the posture. She is safe and dry inside.' 
+      },
+      { 
+        id: 'lofi_flutist', 
+        label: '长笛手-侧影 (Flutist Side)', 
+        value: '[LoFi Aesthetic] Side view silhouette against the window. An elegant adult woman sitting on the wooden floor INSIDE the room playing the flute. Looking out at the rain. The hands are small and mostly hidden by the angle of the flute. Soft yellow interior light. Quiet, peaceful.' 
+      },
+      { 
+        id: 'lofi_violinist', 
+        label: '小提琴-背影 (Violinist Back)', 
+        value: '[LoFi Aesthetic] View from the back. A handsome adult male violinist standing INSIDE the room, directly in front of a large rain-streaked window. Facing the storm but protected by glass. The silhouette is elegant. The bow arm moves rhythmically up and down. Deep emotional atmosphere.' 
+      },
+      { 
+        id: 'lofi_cellist', 
+        label: '大提琴-侧背 (Cellist Side/Back)', 
+        value: '[LoFi Aesthetic] Angled side view, almost from behind. An adult female cellist sitting in a dark corner INSIDE the shelter. The body blocks the view of the strings. We see the rhythmic motion of the bowing arm and the swaying of the shoulders. Deep shadows and dust motes.' 
+      },
+
+      // --- STANDARD ACTIONS ---
+      { id: 'deep_sleep', label: '深沉睡眠 (Deep Sleep)', value: 'A survivor sleeping deeply in the comfortable nest, wrapped in heavy blankets. Only the rhythmic rising and falling of their chest is visible. Face partially hidden or peaceful. Absolute safety and exhaustion. The figure is integrated into the bedding' },
       { id: 'cooking_stew', label: '搅拌热汤 (Cooking Stew)', value: 'Back view of a survivor standing at the stove/hearth, slowly stirring a steaming pot of stew with a wooden spoon. Relaxed posture, focused on the food. Steam rising rhythmically. Homey atmosphere' },
       { id: 'retro_gaming', label: '复古游戏 (Retro Gaming)', value: 'A survivor sitting on the floor rug, back to camera, playing a vintage game console on a small CRT TV. The blue light from the screen flickers on their silhouette. Relaxed gaming posture' },
       { id: 'playing_cards', label: '双人牌局 (Playing Cards)', value: 'Two survivors sitting opposite each other at a low table, playing cards. Focus on the table and hands. One is dealing cards, the other holding a hand. Quiet social moment, faces in shadow' },
@@ -210,7 +299,7 @@ export const CATEGORIES: Category[] = [
       { id: 'writing_diary', label: '书写日记 (Journaling)', value: 'Close up on a survivor sitting at a desk, writing in a leather-bound journal with a pen. Hand moving across the paper. Recording the days events. Introspective vibe' },
       { id: 'knitting', label: '编织毛衣 (Knitting)', value: 'Close up on hands knitting a thick wool blanket or scarf. Rhythmic clicking of needles. Cozy domestic vibe, creating warmth' },
       { id: 'guitar_strum', label: '弹奏吉他 (Guitar)', value: 'A figure sitting on the rug gently strumming an acoustic guitar (visual only, imply sound). Head down, lost in music. Relaxed posture' },
-      { id: 'window_trace', label: '触碰雨滴 (Window Trace)', value: 'Silhouette of a person leaning against the glass, tracing the path of a raindrop with their finger. Melancholic and contemplative pose. Connection with the storm' },
+      { id: 'window_trace', label: '触碰雨滴 (Window Trace)', value: 'Silhouette of a person leaning against the glass from the INSIDE, tracing the path of a raindrop with their finger. Melancholic and contemplative pose. Connection with the storm but physically separated' },
       { id: 'cat_petting', label: '撸猫 (Petting Cat)', value: 'A survivor sitting on the sofa with a cat in their lap, rhythmically stroking the cats fur. The cat is sleeping. Pure stress relief' },
     ]
   },
@@ -263,23 +352,41 @@ export const CATEGORIES: Category[] = [
   // ========================================================================
   {
     id: 'amenities',
-    title: '11. 物资与软装 (Amenities)',
+    title: '11. 美食与软装 (Amenities)',
     icon: <Package className="w-4 h-4" />,
     type: 'multi',
     items: [
-      // DRINKS & FOOD (The Comfort)
+      // MEALS - HEARTY
+      { id: 'steak_dinner', label: '战斧牛排 (Tomahawk Steak)', value: 'Sizzling cast iron skillet with a massive Tomahawk steak, rosemary sprigs, garlic butter melting, roasted potatoes, red wine glass nearby' },
+      { id: 'roast_chicken', label: '烤全鸡 (Roast Chicken)', value: 'Golden brown roast chicken on a platter, steam rising, surrounded by roasted vegetables, lemons, and herbs, sunday dinner vibe' },
+      { id: 'bbq_ribs', label: '美式烤排 (BBQ Ribs)', value: 'Rack of sticky glazed BBQ ribs, coleslaw, corn on the cob, cold beer bottle with condensation, rustic feast' },
+      { id: 'sausages', label: '德式香肠 (Grilled Sausages)', value: 'Platter of assorted grilled sausages, sauerkraut, pretzels, and mugs of foaming amber beer, warm pub atmosphere' },
+      
+      // MEALS - ASIAN & HOT
+      { id: 'hot_pot', label: '重庆火锅 (Spicy Hot Pot)', value: 'Bubbling spicy red hot pot in the center of the table, plates of sliced wagyu beef, lotus root, and tofu arranged around it, steam filling the air' },
+      { id: 'dim_sum', label: '广式早茶 (Dim Sum)', value: 'Bamboo steamer baskets stacked high containing shrimp dumplings (har gow) and pork buns, tea pot, chili oil dipping sauce' },
+      { id: 'pho', label: '越南河粉 (Pho)', value: 'Large ceramic bowl of Pho with rare beef slices, fresh basil, bean sprouts, lime wedges, hoisin sauce, aromatic steam' },
+      { id: 'bibimbap', label: '石锅拌饭 (Bibimbap)', value: 'Hot stone bowl with rice, assorted colorful vegetables, fried egg on top, gochujang sauce, sizzling sound visual' },
+      
+      // MEALS - SEAFOOD & LUXURY
+      { id: 'seafood_boil', label: '海鲜大咖 (Seafood Boil)', value: 'Table covered in newspaper piled high with boiled crawfish, crab legs, corn, and potatoes, lemon wedges, cajun spice visual' },
+      { id: 'lobster', label: '黄油龙虾 (Grilled Lobster)', value: 'Whole grilled lobster with melted garlic butter dipping sauce, asparagus, white wine, luxury dining' },
+      { id: 'oysters', label: '冰镇生蚝 (Oysters)', value: 'Silver platter with fresh oysters on crushed ice, lemon wedges, tabasco sauce, glass of champagne' },
+      
+      // SWEETS & SNACKS
+      { id: 'pancakes', label: '松饼塔 (Pancakes)', value: 'Tall stack of fluffy pancakes dripping with maple syrup and melting butter, fresh berries on top, breakfast vibe' },
+      { id: 'donuts', label: '甜甜圈盒 (Donuts)', value: 'Open pink box filled with assorted colorful glazed donuts, sprinkles, chocolate frosted, coffee cup nearby' },
+      { id: 'popcorn', label: '爆米花桶 (Popcorn)', value: 'Large bucket of buttery movie theater popcorn, spilled slightly on the table, soda cup with straw, movie night vibe' },
+      { id: 'ice_cream', label: '圣代冰激凌 (Sundae)', value: 'Tall glass ice cream sundae with chocolate sauce, whipped cream, and a cherry on top, melting slightly' },
+      { id: 'fruit_platter', label: '热带果盘 (Fruit Platter)', value: 'Lush platter of cut tropical fruits: watermelon, pineapple, mango, grapes, refreshing contrast to the cozy room' },
+
+      // DRINKS (Existing kept for utility)
       { id: 'tea_set', label: '热茶套组 (Steaming Tea)', value: 'In the foreground, a low wooden table with a steaming ceramic teapot and delicate cups, hot white steam rising vigorously' },
       { id: 'coffee', label: '手冲咖啡 (Pour-over)', value: 'Close-up on a glass chemex coffee maker and a ceramic mug with fresh dark coffee steaming on the side table' },
       { id: 'cocoa', label: '热可可 (Hot Cocoa)', value: 'Mug of hot chocolate topped with marshmallows and whipped cream, steam rising, cozy winter vibe' },
       { id: 'whiskey', label: '威士忌 (Whiskey)', value: 'Crystal glass with amber whiskey and a large ice cube, vintage bottle next to it, cigar smoke in ashtray' },
       { id: 'wine_cheese', label: '红酒芝士 (Wine & Cheese)', value: 'Bottle of red wine breathing in a decanter, glass of wine, wooden board with artisanal cheese and grapes' },
-      { id: 'ramen', label: '豚骨拉面 (Ramen)', value: 'Steaming bowl of Tonkotsu ramen with soft boiled egg, chashu pork and nori, chopsticks resting on bowl, comfort food' },
-      { id: 'burger', label: '汉堡套餐 (Burger Meal)', value: 'Juicy cheeseburger with fries on a tray, greaseproof paper, soda bottle, american diner vibe' },
-      { id: 'pizza', label: '披萨派对 (Pizza)', value: 'Open cardboard pizza box with hot cheesy pepperoni pizza slices, soda cans, modern comfort' },
-      { id: 'sushi', label: '豪华刺身 (Sushi)', value: 'Platter of fresh premium sushi and sashimi, soy sauce dish, wasabi, elegant contrast to storm' },
-      { id: 'cooking_pot', label: '炖锅料理 (Stew Pot)', value: 'Heavy cast iron dutch oven hanging over the fire, bubbling beef stew, steam and aroma visual' },
-      { id: 'bakery', label: '烘焙面包 (Bakery)', value: 'Basket of fresh sourdough bread and croissants, flour dusting on table, butter dish' },
-
+      
       // HOBBIES & TECH (The Distraction)
       { id: 'radio', label: 'LoFi电台 (LoFi Radio)', value: 'Vintage tube radio glowing orange, frequency dial lit up, playing low fidelity jazz beats' },
       { id: 'vinyl', label: '黑胶唱机 (Vinyl Player)', value: 'Vintage turntable spinning a black vinyl record, needle arm on the groove, album covers stacked nearby' },
@@ -301,13 +408,35 @@ export const CATEGORIES: Category[] = [
       { id: 'ammo', label: '弹药箱 (Ammo Crates)', value: 'Heavy green metal military ammo crates stacked in the corner, sense of preparedness' },
     ]
   },
+  
+  // ========================================================================
+  // NEW: SOFT TEXTURES (The "Warmth" Solution)
+  // ========================================================================
+  {
+    id: 'textures',
+    title: '12. 极致触感 (Soft Textures)',
+    icon: <Feather className="w-4 h-4" />,
+    type: 'multi',
+    required: false,
+    items: [
+      { id: 'plush_carpet', label: '长毛地毯 (Plush Carpet)', value: 'Wall-to-wall high-pile beige plush carpet covering the entire floor. Soft, warm, and dry. No cold tiles visible. Sinking feet sensation.' },
+      { id: 'sheepskin', label: '羊皮皮草 (Sheepskins)', value: 'Multiple white fluffy sheepskin rugs layered on the floor and chairs. Soft organic textures, warm white tones, maximizing coziness.' },
+      { id: 'wood_floor', label: '温润木板 (Wood Floor)', value: 'Warm honey-colored polished hardwood flooring. Dry, smooth, and inviting. No cold stone or tiles.' },
+      { id: 'chunky_knit', label: '粗棒针织 (Chunky Knit)', value: 'Giant chunky knit merino wool blankets draped over everything. Oversized texture, extreme softness, tactile comfort.' },
+      { id: 'velvet_drapes', label: '丝绒重帘 (Velvet Drapes)', value: 'Heavy burgundy velvet curtains hanging floor to ceiling. Thick fabric texture, sound dampening, insulating against the cold window.' },
+      { id: 'beanbag', label: '懒人豆袋 (Bean Bag)', value: 'Oversized soft fabric bean bag chair sinking into the floor. Casual, unstructured comfort, inviting relaxation.' },
+      { id: 'tapestry', label: '挂毯壁饰 (Wall Tapestry)', value: 'Intricate woven fabric tapestries hanging on the walls to cover cold surfaces. Adding insulation and softness to the vertical space.' },
+      { id: 'warm_lighting', label: '暖黄氛围 (Warm Glow)', value: 'The entire room is bathed in a dedicated warm amber light (2700K). Enhancing the feeling of heat and dryness.' },
+      { id: 'cushion_pile', label: '枕头堆 (Cushion Pile)', value: 'A massive pile of assorted soft velvet and fur cushions in the corner, creating a dedicated soft landing spot.' },
+    ]
+  },
 
   // ========================================================================
   // 6. 镜头语言 (THE LENS)
   // ========================================================================
   {
     id: 'perspective',
-    title: '12. 镜头视角 (Perspective)',
+    title: '13. 镜头视角 (Perspective)',
     icon: <Camera className="w-4 h-4" />,
     type: 'single',
     required: false,
@@ -319,11 +448,22 @@ export const CATEGORIES: Category[] = [
       { id: 'back_seat', label: '后方视角 (Back Room)', value: 'View from the back of the room looking forward through the window, framing the main living area' },
       { id: 'isometric', label: '等轴上帝 (Isometric)', value: 'Isometric orthographic 3D render, diorama style, cutaway ceiling' },
       { id: 'cinematic', label: '电影特写 (Split Diopter)', value: 'Cinematic split-diopter shot, deep depth of field keeping both foreground detail and background storm in sharp focus' },
+      
+      // NEW: DRONE PERSPECTIVES (Inside vs Outside Contrast)
+      { id: 'drone_god', label: '无人机-上帝俯视 (Drone God View)', value: 'High-altitude drone shot looking down at the shelter amidst the vast stormy landscape. The roof and surrounding terrain are visible. Through a skylight or large window, the warm glowing interior and the tiny survivor are visible, creating a massive contrast between the cold vastness outside and the warm safety inside.' },
+      
+      // REFINED: Drone Level Hover (Was Peek)
+      { id: 'drone_peek', label: '无人机-悬停平视 (Drone Level Hover)', value: 'Cinematic drone shot hovering in mid-air OUTSIDE the shelter. The camera is OUTSIDE looking IN through the window or balcony. We see the rain/snow falling between the lens and the glass. The shot frames the entire window, clearly showing the warm interior life inside.' },
+      
+      { id: 'drone_orbit', label: '无人机-中景环绕 (Drone Orbit)', value: 'Cinematic mid-range drone shot orbiting the shelter at a 45-degree angle. Capturing the structural details of the hideout against the harsh weather, while simultaneously framing the large window that reveals the full interior layout and life inside. Establishing the isolated location.' },
+      
+      // REPLACED: Drone 45° Cinematic (Was Top-Down)
+      { id: 'drone_cinematic_45', label: '无人机-45度侧俯 (Drone 45° Side)', value: 'Classic cinematic drone establishing shot from a 45-degree elevated angle. Capturing the corner of the shelter structure, showing both the roof texture and the lit window side simultaneously. The shelter sits isolated in the vast stormy landscape. Depth and scale.' },
     ]
   },
   {
     id: 'shot_type',
-    title: '13. 镜头距离 (Shot Size)',
+    title: '14. 镜头距离 (Shot Size)',
     icon: <Ruler className="w-4 h-4" />,
     type: 'single',
     required: true,
@@ -344,7 +484,7 @@ export const CATEGORIES: Category[] = [
   // ========================================================================
   {
     id: 'visual_style',
-    title: '14. 视觉风格 (Visual Style)',
+    title: '15. 视觉风格 (Visual Style)',
     icon: <Palette className="w-4 h-4" />,
     type: 'single',
     required: true,
@@ -373,8 +513,14 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      { id: 'cozy_travel', label: '旅途白噪 (Travel/LoFi)', value: 'lofi' },
-      { id: 'cozy_safe', label: '极致安全 (Cozy/Safe)', value: 'cozy' },
+      { id: 'cozy_travel', label: '旅途/专注 (Travel/Focus)', value: 'lofi' },
+      { id: 'cozy_safe', label: '安全/睡眠 (Safe/Sleep)', value: 'cozy' },
+      // JAN 2026 NARRATIVE STRATEGY VIBES (Triggers specific SEO templates)
+      { id: 'narrative_scientist', label: '叙事: 海洋学家 (Scientist)', value: 'Marine Scientist Safe Haven' },
+      { id: 'narrative_refugee', label: '叙事: 避难者 (Refugee)', value: 'Refugee First Safe Night' },
+      { id: 'narrative_fugitive', label: '悬疑: 亡命天涯 (The Fugitive)', value: 'Fugitive Rest Storm Guardian' }, 
+      { id: 'narrative_fresh_start', label: '叙事: 重获新生 (Fresh Start)', value: 'Fresh Start After Loss' },
+      { id: 'narrative_nomad', label: '叙事: 漂泊游牧 (The Nomad)', value: 'Nomad Haven Home' },
     ]
   },
   {
@@ -384,10 +530,8 @@ export const CATEGORIES: Category[] = [
     type: 'single',
     required: true,
     items: [
-      { id: '2h', label: '2 Hours (Test/Focus)', value: '2 Hours' },
+      { id: '2h', label: '2 Hours (Nap/Focus)', value: '2 Hours' },
       { id: '8h', label: '8 Hours (Deep Sleep)', value: '8 Hours' },
     ]
   },
 ];
-
-export const SEO_KEYWORDS = {};

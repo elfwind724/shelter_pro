@@ -63,6 +63,8 @@ export interface GeneratedContent {
   id: string;
   timestamp: number;
   imagePrompt: string;
+  thumbnailPrompt: string; // Dedicated high-contrast prompt for 16:9 covers
+  verticalThumbnailPrompt: string; // NEW: Dedicated prompt for 9:16 Shorts covers
   videoPrompt: string; // Legacy T2V prompt
   i2vPrompt: string;   // New: Optimized for Image-to-Video (Veo/Sora)
   youtubeTitle: string;
@@ -75,8 +77,32 @@ export interface GeneratedContent {
   audioGuide: AudioLayer[]; // New: Sound engineering blueprint
   selectedItems: SelectionState;
   score: number;
-  generatedImage?: string; // Base64 string of the AI generated preview
-  thumbnailImage?: string; // Base64 string of the composited thumbnail
+  generatedImage?: string; // Base64 string of the AI generated preview (Scene)
+  thumbnailImage?: string; // Base64 string of the dedicated viral thumbnail (Cover 16:9)
+  verticalThumbnailImage?: string; // NEW: Base64 string of the vertical thumbnail (Cover 9:16)
+}
+
+// NEW: Advanced SEO Analytics Data Structure
+export interface AnalyticsRecord {
+  id: string;
+  date: string;
+  videoTitle: string; // Can be a specific video or "Monthly Report"
+  
+  // Core Funnel
+  impressions: number;
+  ctr: number; // Click Through Rate (%)
+  views: number;
+  
+  // Retention & Growth
+  avgDuration: string; // e.g., "04:38"
+  regulars: number; // Returning Viewers (Channel Regulars)
+  subscribers: number; // New Subs Gained
+  
+  // Algorithmic Signals (Optional but powerful)
+  recommendationRate?: number; // % of views from Browse/Suggested
+  deviceTV?: number; // % of views on TV (Crucial for Ambience)
+  
+  notes?: string; // AI Summary
 }
 
 export interface GeneratorOptions {

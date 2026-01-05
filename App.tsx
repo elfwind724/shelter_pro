@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import OutputDisplay from './components/OutputDisplay';
 import HistoryPanel from './components/HistoryPanel';
-import { SelectionState, GeneratedContent, Preset } from './types';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
+import { SelectionState, GeneratedContent, Preset, AnalyticsRecord } from './types';
 import { generateContent, generateRandomSelections } from './services/generator';
 import { CATEGORIES } from './constants';
 import { Edit3, Eye } from 'lucide-react';
@@ -42,8 +43,20 @@ const App: React.FC = () => {
     }
   });
 
+  // NEW: Analytics Data State
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem('shelter_analytics');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to load analytics", e);
+      return [];
+    }
+  });
+
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [activeMobileTab, setActiveMobileTab] = useState<'editor' | 'results'>('editor');
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Save to local storage whenever state changes
   // CRITICAL FIX: Strip images before saving to prevent QuotaExceededError (LocalStorage 5MB limit)
@@ -91,6 +104,15 @@ const App: React.FC = () => {
       console.warn("LocalStorage Quota Exceeded for Presets", e);
     }
   }, [presets]);
+
+  // Save Analytics Data
+  useEffect(() => {
+    try {
+      localStorage.setItem('shelter_analytics', JSON.stringify(analyticsData));
+    } catch (e) {
+      console.warn("LocalStorage Quota Exceeded for Analytics", e);
+    }
+  }, [analyticsData]);
 
   const handleSelectionChange = (categoryId: string, itemId: string) => {
     setSelections(prev => {
@@ -211,6 +233,15 @@ const App: React.FC = () => {
     }
   };
 
+  // --- Analytics Handlers ---
+  const handleAddAnalytics = (record: AnalyticsRecord) => {
+    setAnalyticsData(prev => [record, ...prev]);
+  };
+
+  const handleDeleteAnalytics = (id: string) => {
+    setAnalyticsData(prev => prev.filter(r => r.id !== id));
+  };
+
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-950 overflow-hidden text-slate-200 font-sans">
       
@@ -249,6 +280,7 @@ const App: React.FC = () => {
             onSavePreset={handleSavePreset}
             onLoadPreset={handleLoadPreset}
             onDeletePreset={handleDeletePreset}
+            onOpenAnalytics={() => setShowAnalytics(true)}
           />
         </div>
 
@@ -275,6 +307,16 @@ const App: React.FC = () => {
           
         </div>
       </div>
+
+      {/* Analytics Modal */}
+      {showAnalytics && (
+        <AnalyticsDashboard 
+          data={analyticsData}
+          onAdd={handleAddAnalytics}
+          onDelete={handleDeleteAnalytics}
+          onClose={() => setShowAnalytics(false)}
+        />
+      )}
     </div>
   );
 };

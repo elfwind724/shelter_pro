@@ -15,7 +15,8 @@ const NEGATIVE_PROMPTS = [
   "watermark", "signature", "text", "logo", "username", "error", "cut off", 
   "out of frame", "body out of frame", "draft",
   "simple background", "blank background", "abstract background", "tiling",
-  "open windows", "rain inside", "wet floor", "flooded room" // Added logic safety constraints
+  "open windows", "rain inside", "wet floor", "flooded room", // Added logic safety constraints
+  "tile floor", "marble floor", "cold stone floor", "ceramic tiles", "hospital floor", "clinical" // Added COLD FLOOR constraints
 ].join(", ");
 
 /**
@@ -33,7 +34,7 @@ const cleanPromptForGemini = (prompt: string): string => {
 /**
  * Generate an image using Gemini 2.5 Flash Image
  */
-export const generateImagePreview = async (prompt: string): Promise<string | null> => {
+export const generateImagePreview = async (prompt: string, aspectRatio: string = "16:9"): Promise<string | null> => {
   try {
     const cleanPrompt = cleanPromptForGemini(prompt);
     
@@ -58,7 +59,7 @@ export const generateImagePreview = async (prompt: string): Promise<string | nul
       },
       config: {
         imageConfig: {
-          aspectRatio: "16:9"
+          aspectRatio: aspectRatio // Dynamic aspect ratio
         }
       },
     });
@@ -82,24 +83,51 @@ export const generateImagePreview = async (prompt: string): Promise<string | nul
 export const compositeThumbnail = async (
   imageBase64: string, 
   headlines: string[],
-  config?: ThumbnailLayerConfig
+  config?: ThumbnailLayerConfig,
+  isVertical: boolean = false // New flag for Shorts
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = 1280; // Standard 720p Youtube Thumbnail
-      canvas.height = 720;
+      
+      if (isVertical) {
+        canvas.width = 720;
+        canvas.height = 1280; // 9:16 Shorts Resolution
+      } else {
+        canvas.width = 1280;
+        canvas.height = 720;  // 16:9 Standard Resolution
+      }
+      
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject("Canvas Error");
 
-      // 1. Draw Background
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // 1. Draw Background (Cover mode)
+      // We calculate aspect ratios to ensure the image covers the canvas cleanly
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      let drawW, drawH, drawX, drawY;
+
+      if (imgRatio > canvasRatio) {
+        // Image is wider than canvas
+        drawH = canvas.height;
+        drawW = drawH * imgRatio;
+        drawX = (canvas.width - drawW) / 2;
+        drawY = 0;
+      } else {
+        // Image is taller than canvas
+        drawW = canvas.width;
+        drawH = drawW / imgRatio;
+        drawX = 0;
+        drawY = (canvas.height - drawH) / 2;
+      }
+
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
       // 2. Add subtle dark gradient at bottom for text readability
-      const grad = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+      const grad = ctx.createLinearGradient(0, canvas.height * 0.5, 0, canvas.height);
       grad.addColorStop(0, 'rgba(0,0,0,0)');
-      grad.addColorStop(1, 'rgba(0,0,0,0.8)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.9)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -107,21 +135,41 @@ export const compositeThumbnail = async (
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
-      // Defaults (Fallback if no config provided)
-      const headX = config?.headline.x ?? canvas.width / 2;
-      const headY = config?.headline.y ?? canvas.height * 0.75;
-      const headSize = config?.headline.fontSize ?? 120;
+      let headX, headY, headSize, subX, subY, subSize;
 
-      const subX = config?.subhead.x ?? canvas.width / 2;
-      const subY = config?.subhead.y ?? canvas.height * 0.88;
-      const subSize = config?.subhead.fontSize ?? 50;
+      if (isVertical) {
+        // Vertical Defaults (Shorts) - Auto layout
+        headX = canvas.width / 2;
+        headY = canvas.height * 0.25; // Top quarter
+        headSize = 100; // Slightly smaller than landscape due to width constraint
+
+        subX = canvas.width / 2;
+        subY = canvas.height * 0.85; // Bottom area
+        subSize = 60;
+      } else {
+        // Landscape Defaults (Standard) - Or use Config
+        headX = config?.headline.x ?? canvas.width / 2;
+        headY = config?.headline.y ?? canvas.height * 0.75;
+        headSize = config?.headline.fontSize ?? 120;
+
+        subX = config?.subhead.x ?? canvas.width / 2;
+        subY = config?.subhead.y ?? canvas.height * 0.88;
+        subSize = config?.subhead.fontSize ?? 50;
+      }
       
       // Main Headline
       if (headlines[0]) {
         ctx.font = `900 ${headSize}px Impact, sans-serif`;
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = headSize * 0.12; // Dynamic stroke width based on size
+        ctx.lineWidth = headSize * 0.12; 
+        
+        // Wrap text if needed for vertical
+        if (isVertical && ctx.measureText(headlines[0].toUpperCase()).width > canvas.width - 40) {
+           headSize = headSize * 0.7; // Shrink font
+           ctx.font = `900 ${headSize}px Impact, sans-serif`;
+        }
+
         ctx.strokeText(headlines[0].toUpperCase(), headX, headY);
         ctx.fillText(headlines[0].toUpperCase(), headX, headY);
       }
@@ -131,7 +179,7 @@ export const compositeThumbnail = async (
         ctx.font = `900 ${subSize}px Impact, sans-serif`;
         ctx.fillStyle = '#FF8C00'; // Accent Orange
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = subSize * 0.2; // Dynamic stroke width
+        ctx.lineWidth = subSize * 0.2; 
         ctx.strokeText(headlines[1].toUpperCase(), subX, subY);
         ctx.fillText(headlines[1].toUpperCase(), subX, subY);
       }
@@ -231,6 +279,110 @@ export const editGeneratedImage = async (base64Image: string, instruction: strin
       throw error;
     }
   };
+
+
+/**
+ * OUTPAINTING: Zoom Out / Unzoom
+ * Creates a larger canvas, places the original image in the center, and asks AI to fill the surroundings.
+ */
+export const outpaintImage = async (base64Image: string, originalPrompt: string, zoomFactor: number): Promise<string | null> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Image;
+    img.onload = async () => {
+      const width = img.width;
+      const height = img.height;
+
+      // 1. Prepare Canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject("Canvas Error");
+
+      // 2. Calculate new size for the original image (Inverse of zoom factor)
+      // If Zoom 2x, image becomes 1/2 size in the center.
+      const newW = width / zoomFactor;
+      const newH = height / zoomFactor;
+      const offsetX = (width - newW) / 2;
+      const offsetY = (height - newH) / 2;
+
+      // 3. Draw Original Image Scaled Down in Center
+      ctx.fillStyle = 'black'; // Fill background with black (or noise, but black is fine for mask logic)
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, offsetX, offsetY, newW, newH);
+
+      const compositeImageBase64 = canvas.toDataURL('image/png');
+
+      // 4. Create Mask
+      // White = Edit (The Border), Black = Keep (The Center)
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = width;
+      maskCanvas.height = height;
+      const maskCtx = maskCanvas.getContext('2d');
+      if (!maskCtx) return reject("Mask Canvas Error");
+
+      // Fill whole mask with White (Edit everything by default)
+      maskCtx.fillStyle = 'white'; 
+      maskCtx.fillRect(0, 0, width, height);
+
+      // Draw Black rectangle in center (Protect original)
+      // Note: We overlap slightly to blend edges? No, precision is better.
+      maskCtx.fillStyle = 'black';
+      maskCtx.fillRect(offsetX, offsetY, newW, newH);
+
+      const maskBase64 = maskCanvas.toDataURL('image/png');
+
+      // 5. Call Edit API
+      const outpaintInstruction = `Zoom out. Extend the scene to reveal the surrounding environment. Maintain continuity with: ${originalPrompt}. High detail, cinematic wide shot.`;
+
+      try {
+        const result = await editGeneratedImage(compositeImageBase64, outpaintInstruction, maskBase64);
+        resolve(result);
+      } catch (e) {
+        reject(e);
+      }
+    };
+    img.onerror = () => reject("Failed to load source image for outpainting");
+  });
+};
+
+/**
+ * CROP: Zoom In
+ * Crops the center of the image and scales it back up.
+ * This is a client-side only operation (Fast).
+ */
+export const cropImage = async (base64Image: string, zoomFactor: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Image;
+    img.onload = () => {
+      const width = img.width;
+      const height = img.height;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject("Canvas Error");
+
+      // Calculate crop area
+      // If Zoom 2x, we show 1/2 of the image (center)
+      const cropW = width / zoomFactor;
+      const cropH = height / zoomFactor;
+      const cropX = (width - cropW) / 2;
+      const cropY = (height - cropH) / 2;
+
+      // Draw crop area scaled up to full canvas
+      // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, width, height);
+
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => reject("Failed to load source image for cropping");
+  });
+};
+
 
 /**
  * Vision Sync: 扫描图片反推 4D 物理动效提示词

@@ -4,9 +4,9 @@ import { GeneratedContent, ThumbnailLayerConfig } from '../types';
 import { 
   Copy, Download, Image as ImageIcon, Sparkles, RefreshCw, Star, 
   Palette, FileText, Music, Wand2, Video, Check, Layers, Type, ExternalLink,
-  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper
+  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper, Scan, Minimize2, CheckCircle2, AlertTriangle
 } from 'lucide-react';
-import { generateImagePreview, editGeneratedImage, generateVideoPromptFromImage, compositeThumbnail } from '../services/imageService';
+import { generateImagePreview, editGeneratedImage, generateVideoPromptFromImage, compositeThumbnail, outpaintImage, cropImage } from '../services/imageService';
 import MaskCanvas from './MaskCanvas';
 
 interface Props {
@@ -15,6 +15,45 @@ interface Props {
   isFavorite: boolean;
 }
 
+const StrategyValidator: React.FC<{ content: GeneratedContent }> = ({ content }) => {
+  const checkThreat = content.imagePrompt.includes('storm') || content.imagePrompt.includes('rain') || content.imagePrompt.includes('snow') || content.imagePrompt.includes('dark');
+  const checkLocation = content.youtubeTitle.includes('Cabin') || content.youtubeTitle.includes('Station') || content.youtubeTitle.includes('Shelter') || content.youtubeTitle.includes('Room');
+  const checkSafety = content.imagePrompt.includes('warm') || content.imagePrompt.includes('fire') || content.imagePrompt.includes('dry') || content.imagePrompt.includes('light');
+  const checkKeywords = content.tags.includes('sleep') && content.tags.includes('safe');
+  const checkEmotion = content.youtubeTitle.includes("Safe") || content.youtubeTitle.includes("Sleep") || content.youtubeTitle.includes("Focus");
+
+  const score = [checkThreat, checkLocation, checkSafety, checkKeywords, checkEmotion].filter(Boolean).length;
+  const isPassing = score >= 4;
+
+  return (
+    <div className={`p-4 rounded-2xl border ${isPassing ? 'bg-green-900/10 border-green-500/30' : 'bg-red-900/10 border-red-500/30'} mb-6`}>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className={`text-xs font-black uppercase tracking-widest flex items-center gap-2 ${isPassing ? 'text-green-400' : 'text-red-400'}`}>
+           {isPassing ? <CheckCircle2 size={16}/> : <AlertTriangle size={16}/>} Worldview Strategy Check
+        </h4>
+        <span className="text-[10px] font-mono text-slate-500">{score}/5 Passing</span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-2 text-[10px] font-medium text-slate-400">
+        <div className={`flex items-center gap-1 ${checkThreat ? 'text-slate-300' : 'text-red-400/70'}`}>
+          {checkThreat ? '✅' : '❌'} External Threat
+        </div>
+        <div className={`flex items-center gap-1 ${checkLocation ? 'text-slate-300' : 'text-red-400/70'}`}>
+          {checkLocation ? '✅' : '❌'} Clear Location
+        </div>
+        <div className={`flex items-center gap-1 ${checkSafety ? 'text-slate-300' : 'text-red-400/70'}`}>
+          {checkSafety ? '✅' : '❌'} Safety Visible
+        </div>
+        <div className={`flex items-center gap-1 ${checkKeywords ? 'text-slate-300' : 'text-red-400/70'}`}>
+          {checkKeywords ? '✅' : '❌'} SEO Keywords
+        </div>
+        <div className={`flex items-center gap-1 ${checkEmotion ? 'text-slate-300' : 'text-red-400/70'}`}>
+          {checkEmotion ? '✅' : '❌'} Emotional Arc
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite }) => {
   const [local, setLocal] = useState<GeneratedContent | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,6 +61,7 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   const [editPrompt, setEditPrompt] = useState("");
   const [thumbText, setThumbText] = useState<string[]>([]);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [verticalThumbnailPreview, setVerticalThumbnailPreview] = useState<string | null>(null);
   
   // NEW: State for layout configuration (X, Y, Size)
   const [thumbConfig, setThumbConfig] = useState<ThumbnailLayerConfig>({
@@ -50,23 +90,35 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   // Effect to re-render thumbnail when headlines, image, or LAYOUT changes
   useEffect(() => {
     const updateThumbnail = async () => {
-      if (local?.generatedImage && thumbText.length > 0) {
+      // Horizontal Composite
+      const sourceImage = local?.thumbnailImage || local?.generatedImage;
+      if (sourceImage && thumbText.length > 0) {
         try {
-          // Pass the dynamic configuration to the composite function
-          const thumb = await compositeThumbnail(local.generatedImage, thumbText, thumbConfig);
+          const thumb = await compositeThumbnail(sourceImage, thumbText, thumbConfig, false);
           setThumbnailPreview(thumb);
-          
           // Optional: Update local content object so if we save, we save the config
           setLocal(prev => prev ? { ...prev, thumbnailConfig: thumbConfig } : null);
         } catch (e) {
           console.error("Thumbnail composite failed", e);
         }
       }
+
+      // Vertical Composite (If image exists)
+      const verticalSource = local?.verticalThumbnailImage;
+      if (verticalSource && thumbText.length > 0) {
+        try {
+          // Pass true for isVertical
+          const vThumb = await compositeThumbnail(verticalSource, thumbText, thumbConfig, true);
+          setVerticalThumbnailPreview(vThumb);
+        } catch (e) {
+          console.error("Vertical thumbnail composite failed", e);
+        }
+      }
     };
-    // Debounce slightly for smooth slider performance could be added here, but canvas is fast enough for now
+    // Debounce slightly for smooth slider performance
     const timer = setTimeout(updateThumbnail, 50);
     return () => clearTimeout(timer);
-  }, [local?.generatedImage, thumbText, thumbConfig]);
+  }, [local?.generatedImage, local?.thumbnailImage, local?.verticalThumbnailImage, thumbText, thumbConfig]);
 
   if (!local) return (
     <div className="h-full flex flex-col items-center justify-center text-slate-700 bg-slate-950 p-12 text-center">
@@ -88,10 +140,34 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     } finally { setLoading(false); }
   };
 
+  // NEW: Generate Viral Thumbnail (Horizontal)
+  const handleGenThumbnail = async () => {
+    setLoading(true);
+    try {
+      const url = await generateImagePreview(local.thumbnailPrompt, "16:9"); 
+      if (url) {
+        setLocal({ ...local, thumbnailImage: url });
+      }
+    } finally { setLoading(false); }
+  };
+
+  // NEW: Generate Vertical Shorts Thumbnail
+  const handleGenVerticalThumbnail = async () => {
+    setLoading(true);
+    try {
+      // Use "9:16" aspect ratio
+      const url = await generateImagePreview(local.verticalThumbnailPrompt, "9:16"); 
+      if (url) {
+        setLocal({ ...local, verticalThumbnailImage: url });
+      }
+    } finally { setLoading(false); }
+  };
+
   const handleFix = async (mask: string) => {
     if (!editPrompt.trim()) { alert("请输入你想如何改变画面（如：在窗台加一只睡觉的黑猫）"); return; }
     setLoading(true);
     try {
+      // Only edits the MAIN scene image, not the viral one for now (complexity reduction)
       const url = await editGeneratedImage(local.generatedImage!, editPrompt, mask);
       if (url) { 
         setLocal({ ...local, generatedImage: url }); 
@@ -99,6 +175,38 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
         setEditPrompt(""); 
       }
     } finally { setLoading(false); }
+  };
+
+  const handleZoomOut = async (factor: number) => {
+    if (!local.generatedImage) return;
+    setLoading(true);
+    try {
+      const url = await outpaintImage(local.generatedImage, local.imagePrompt, factor);
+      if (url) {
+        setLocal({ ...local, generatedImage: url });
+      }
+    } catch (e) {
+      alert("Zoom out failed. The model might be busy.");
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleZoomIn = async (factor: number) => {
+    if (!local.generatedImage) return;
+    setLoading(true);
+    try {
+      // Zoom In is client side, very fast
+      const url = await cropImage(local.generatedImage, factor);
+      if (url) {
+        setLocal({ ...local, generatedImage: url });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSync = async () => {
@@ -131,8 +239,16 @@ ${local.i2vPrompt}
   const downloadThumbnail = () => {
     if (!thumbnailPreview) return;
     const link = document.createElement('a');
-    link.download = `THUMB_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 30)}.jpg`;
+    link.download = `THUMB_H_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 30)}.jpg`;
     link.href = thumbnailPreview;
+    link.click();
+  };
+
+  const downloadVerticalThumbnail = () => {
+    if (!verticalThumbnailPreview) return;
+    const link = document.createElement('a');
+    link.download = `THUMB_V_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 30)}.jpg`;
+    link.href = verticalThumbnailPreview;
     link.click();
   };
 
@@ -153,7 +269,6 @@ ${local.i2vPrompt}
             <ShieldCheck className="text-white" size={28}/>
           </div>
           <div className="min-w-0">
-            {/* 修复：移除 truncate，允许换行，调整字体大小适应 */}
             <h2 className="text-white font-black text-xl leading-tight tracking-tighter mb-1 break-words">{local.youtubeTitle}</h2>
             <div className="flex gap-4 items-center">
                <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest whitespace-nowrap">Growth Phase: {local.score >= 90 ? 'Alpha' : 'Beta'}</span>
@@ -220,10 +335,40 @@ ${local.i2vPrompt}
           </div>
 
           {local.generatedImage && !editMode && (
-            <div className="grid grid-cols-4 gap-4 animate-in slide-in-from-top-4 duration-300">
-               <button onClick={() => setEditMode(true)} className="col-span-2 flex items-center justify-center gap-4 py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[2rem] font-black shadow-2xl transition-all active:scale-[0.98]"><Wand2 size={24}/> Magic Fix (涂抹重绘)</button>
-               <button onClick={handleSync} className="flex items-center justify-center gap-4 py-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[2rem] font-black shadow-2xl transition-all active:scale-[0.98]"><Video size={24}/> Vision Sync</button>
-               <button onClick={handleGenImg} className="flex items-center justify-center py-6 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-[2rem] border-2 border-slate-700 transition-all active:scale-95"><RefreshCw size={24}/></button>
+            <div className="grid grid-cols-6 gap-4 animate-in slide-in-from-top-4 duration-300">
+               {/* Row 1: Magic Fix, Sync, Refresh */}
+               <button onClick={() => setEditMode(true)} className="col-span-4 flex items-center justify-center gap-3 py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[2rem] font-black shadow-2xl transition-all active:scale-[0.98]">
+                  <Wand2 size={20}/> Magic Fix (局部重绘)
+               </button>
+               <button onClick={handleSync} className="col-span-1 flex items-center justify-center gap-2 py-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[2rem] font-black shadow-2xl transition-all active:scale-[0.98]" title="Vision Sync">
+                  <Video size={20}/>
+               </button>
+               <button onClick={handleGenImg} className="col-span-1 flex items-center justify-center py-6 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-[2rem] border-2 border-slate-700 transition-all active:scale-95" title="Re-Generate">
+                  <RefreshCw size={20}/>
+               </button>
+
+               {/* Row 2: Lens Control (Zoom In / Zoom Out) */}
+               <div className="col-span-6 grid grid-cols-4 gap-4 p-4 bg-slate-900 rounded-[2.5rem] border border-slate-800">
+                   <div className="col-span-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2 mb-2 justify-center">
+                     <Scan size={14} className="text-orange-500"/> Lens Control (镜头控制)
+                   </div>
+                   
+                   {/* Outpainting (Zoom Out) */}
+                   <button onClick={() => handleZoomOut(2.0)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 hover:border-blue-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
+                      <Scan size={14}/> 2.0x 拉远
+                   </button>
+                   <button onClick={() => handleZoomOut(1.5)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 hover:border-blue-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
+                      <Scan size={14}/> 1.5x 拉远
+                   </button>
+
+                   {/* Cropping (Zoom In) */}
+                   <button onClick={() => handleZoomIn(1.25)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-orange-300 border border-slate-700 hover:border-orange-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
+                      <Minimize2 size={14}/> 1.25x 拉近
+                   </button>
+                   <button onClick={() => handleZoomIn(1.5)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-orange-300 border border-slate-700 hover:border-orange-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
+                      <Minimize2 size={14}/> 1.5x 拉近
+                   </button>
+               </div>
             </div>
           )}
 
@@ -261,7 +406,7 @@ ${local.i2vPrompt}
                     <label className="text-[10px] text-slate-500 uppercase font-black ml-2 tracking-widest">主标题 (Headline)</label>
                     <input value={thumbText[0] || ""} onChange={e => { const n = [...thumbText]; n[0] = e.target.value; setThumbText(n); }} className="w-full bg-slate-950 border-2 border-slate-800 rounded-3xl p-6 text-xl font-black text-white focus:border-orange-500 outline-none shadow-2xl transition-all"/>
                     
-                    {/* 主标题控制滑块 */}
+                    {/* 主标题控制滑块 (Only affects Horizontal for now) */}
                     {showLayoutControls && (
                       <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-800 space-y-4 animate-in slide-in-from-top-2">
                         <div className="flex items-center gap-4">
@@ -318,37 +463,87 @@ ${local.i2vPrompt}
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.4em] flex items-center gap-3">
-                    <Palette size={18} className="text-orange-500"/> 封面预览 (Final Composite)
+              {/* THUMBNAIL PREVIEW AREA */}
+              <div className="space-y-8">
+                
+                {/* 1. HORIZONTAL 16:9 */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.4em] flex items-center gap-3">
+                      <Palette size={18} className="text-orange-500"/> 封面 16:9 (Landscape)
+                    </div>
+                    {thumbnailPreview && (
+                      <button onClick={downloadThumbnail} className="flex items-center gap-2 text-[10px] font-black text-green-400 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/20 hover:bg-green-500/20 transition-all">
+                        <Download size={14}/> 下载
+                      </button>
+                    )}
                   </div>
-                  {thumbnailPreview && (
-                    <button onClick={downloadThumbnail} className="flex items-center gap-2 text-[10px] font-black text-green-400 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/20 hover:bg-green-500/20 transition-all">
-                      <Download size={14}/> 下载高清封面
-                    </button>
-                  )}
+                  
+                  <div className="bg-slate-950/60 aspect-video rounded-[2.5rem] border-2 border-slate-800 flex flex-col justify-center items-center relative overflow-hidden group shadow-2xl">
+                     {thumbnailPreview ? (
+                       <div className="relative w-full h-full group">
+                          <img src={thumbnailPreview} className="w-full h-full object-cover animate-in fade-in duration-500" />
+                       </div>
+                     ) : (
+                       <div className="flex flex-col items-center gap-4 text-slate-700">
+                          <ImageIcon size={48} className="opacity-20"/>
+                          <p className="text-[10px] font-black uppercase tracking-widest">Generate Preview</p>
+                       </div>
+                     )}
+                  </div>
+                  
+                  <button 
+                    onClick={handleGenThumbnail} 
+                    disabled={loading} 
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-[2rem] font-black shadow-lg shadow-orange-900/30 transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
+                  >
+                    {loading ? <RefreshCw className="animate-spin" size={14}/> : <Zap size={14}/>} 
+                    渲染高冲突封面 (Viral)
+                  </button>
                 </div>
-                <div className="bg-slate-950/60 aspect-video rounded-[3rem] border-2 border-slate-800 flex flex-col justify-center items-center relative overflow-hidden group shadow-2xl">
-                   {thumbnailPreview ? (
-                     <div className="relative w-full h-full group">
-                        <img src={thumbnailPreview} className="w-full h-full object-cover animate-in fade-in duration-500" />
-                        <button 
-                            onClick={downloadThumbnail}
-                            className="absolute top-6 right-6 p-4 bg-black/60 hover:bg-black/80 text-white rounded-2xl backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all shadow-2xl border border-white/10 active:scale-95 z-20"
-                            title="立即下载封面"
-                        >
-                            <Download size={24}/>
-                        </button>
-                     </div>
-                   ) : (
-                     <div className="flex flex-col items-center gap-4 text-slate-700">
-                        <ImageIcon size={64} className="opacity-20"/>
-                        <p className="text-xs font-black uppercase tracking-widest">渲染底图后自动合成</p>
-                     </div>
-                   )}
+
+                {/* 2. VERTICAL 9:16 */}
+                <div className="space-y-4 pt-6 border-t border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.4em] flex items-center gap-3">
+                      <Palette size={18} className="text-purple-500"/> Shorts 9:16 (Vertical)
+                    </div>
+                    {verticalThumbnailPreview && (
+                      <button onClick={downloadVerticalThumbnail} className="flex items-center gap-2 text-[10px] font-black text-green-400 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/20 hover:bg-green-500/20 transition-all">
+                        <Download size={14}/> 下载
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex gap-6">
+                    {/* Vertical Preview Container */}
+                    <div className="w-32 aspect-[9/16] bg-slate-950/60 rounded-2xl border-2 border-slate-800 flex flex-col justify-center items-center relative overflow-hidden group shadow-2xl shrink-0">
+                       {verticalThumbnailPreview ? (
+                         <img src={verticalThumbnailPreview} className="w-full h-full object-cover animate-in fade-in duration-500" />
+                       ) : (
+                         <div className="flex flex-col items-center gap-2 text-slate-700">
+                            <ImageIcon size={24} className="opacity-20"/>
+                         </div>
+                       )}
+                    </div>
+
+                    <div className="flex-1 flex flex-col justify-center gap-4">
+                       <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                         专为 TikTok / Shorts / Reels 优化。<br/>
+                         同样采用高冲突视觉策略，自动居中排版。
+                       </p>
+                       <button 
+                        onClick={handleGenVerticalThumbnail} 
+                        disabled={loading} 
+                        className="w-full flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-purple-900/50 hover:text-purple-300 border-2 border-slate-700 hover:border-purple-500/50 text-slate-400 rounded-[2rem] font-black transition-all active:scale-[0.98] text-xs uppercase tracking-widest"
+                      >
+                        {loading ? <RefreshCw className="animate-spin" size={14}/> : <Zap size={14}/>} 
+                        渲染竖屏封面 (Shorts)
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-600 text-center font-bold tracking-widest">自动应用 IMPACT 字体 + 粗黑描边 + 底部阴影渐变</p>
+
               </div>
           </div>
         </section>
@@ -372,16 +567,32 @@ ${local.i2vPrompt}
 
            <div className="space-y-6">
              <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
-               <Layers size={18} className="text-blue-500"/> 03. 原始图像提示词
+               <Layers size={18} className="text-blue-500"/> 03. 原始图像提示词 (Prompt Matrix)
              </div>
-             <div className="bg-slate-900 rounded-[3rem] p-10 border-2 border-slate-800 shadow-2xl">
-                <div className="flex justify-between items-center mb-8">
-                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Midjourney Reference</span>
-                   <button onClick={() => { navigator.clipboard.writeText(local.imagePrompt); alert("Copied!"); }} className="p-3 hover:bg-slate-800 rounded-2xl text-slate-500 transition-all"><Copy size={20}/></button>
+             <div className="bg-slate-900 rounded-[3rem] p-10 border-2 border-slate-800 shadow-2xl space-y-4">
+                
+                {/* Scene Prompt */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">SCENE (正片)</span>
+                     <button onClick={() => { navigator.clipboard.writeText(local.imagePrompt); alert("Copied!"); }} className="p-2 hover:bg-slate-800 rounded-xl text-slate-500 transition-all"><Copy size={14}/></button>
+                  </div>
+                  <div className="text-xs text-slate-400 italic bg-slate-950 p-4 rounded-xl leading-relaxed border border-white/5 shadow-inner max-h-[100px] overflow-y-auto scrollbar-hide">
+                     "{local.imagePrompt}"
+                  </div>
                 </div>
-                <div className="text-sm text-slate-500 italic bg-slate-950 p-8 rounded-[2rem] leading-relaxed border border-white/5 shadow-inner min-h-[160px]">
-                   "{local.imagePrompt}"
+
+                {/* Thumbnail Prompt */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                     <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">COVER (封面)</span>
+                     <button onClick={() => { navigator.clipboard.writeText(local.thumbnailPrompt); alert("Copied!"); }} className="p-2 hover:bg-slate-800 rounded-xl text-slate-500 transition-all"><Copy size={14}/></button>
+                  </div>
+                  <div className="text-xs text-orange-400/80 italic bg-slate-950 p-4 rounded-xl leading-relaxed border border-orange-500/10 shadow-inner max-h-[100px] overflow-y-auto scrollbar-hide">
+                     "{local.thumbnailPrompt}"
+                  </div>
                 </div>
+
              </div>
            </div>
         </section>
@@ -394,6 +605,10 @@ ${local.i2vPrompt}
 
            {/* NEW: 独立的标题展示卡片 */}
            <div className="bg-slate-900 border-2 border-slate-800 rounded-[2.5rem] p-8 shadow-xl relative group overflow-hidden">
+             
+             {/* STRATEGY VALIDATOR COMPONENT INJECTED HERE */}
+             <StrategyValidator content={local} />
+
              <div className="absolute top-6 right-8 opacity-0 group-hover:opacity-100 transition-opacity">
                <button onClick={() => { navigator.clipboard.writeText(local.youtubeTitle); alert("Title Copied!"); }} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all shadow-lg"><Copy size={20}/></button>
              </div>
