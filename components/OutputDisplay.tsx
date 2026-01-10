@@ -198,12 +198,13 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     if (!local.generatedImage) return;
     setLoading(true);
     try {
-      // Zoom In is client side, very fast
-      const url = await cropImage(local.generatedImage, factor);
+      // NOW USING AI SMART ZOOM: Pass imagePrompt for context awareness
+      const url = await cropImage(local.generatedImage, factor, local.imagePrompt);
       if (url) {
         setLocal({ ...local, generatedImage: url });
       }
     } catch (e) {
+      alert("AI Zoom Enhance failed. Please try again.");
       console.error(e);
     } finally {
       setLoading(false);
@@ -356,18 +357,18 @@ ${local.i2vPrompt}
                    
                    {/* Outpainting (Zoom Out) */}
                    <button onClick={() => handleZoomOut(2.0)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 hover:border-blue-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
-                      <Scan size={14}/> 2.0x 拉远
+                      <Scan size={14}/> 2.0x 拉远 (Outpaint)
                    </button>
                    <button onClick={() => handleZoomOut(1.5)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 hover:border-blue-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
-                      <Scan size={14}/> 1.5x 拉远
+                      <Scan size={14}/> 1.5x 拉远 (Outpaint)
                    </button>
 
-                   {/* Cropping (Zoom In) */}
+                   {/* AI Upscale Zoom (Zoom In) */}
                    <button onClick={() => handleZoomIn(1.25)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-orange-300 border border-slate-700 hover:border-orange-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
-                      <Minimize2 size={14}/> 1.25x 拉近
+                      <Minimize2 size={14}/> 1.25x 重构 (Enhance)
                    </button>
                    <button onClick={() => handleZoomIn(1.5)} disabled={loading} className="col-span-1 flex items-center justify-center gap-2 py-4 bg-slate-800 hover:bg-slate-700 text-orange-300 border border-slate-700 hover:border-orange-500/50 rounded-2xl font-black text-xs transition-all active:scale-[0.98]">
-                      <Minimize2 size={14}/> 1.5x 拉近
+                      <Minimize2 size={14}/> 1.5x 重构 (Enhance)
                    </button>
                </div>
             </div>

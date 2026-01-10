@@ -400,15 +400,15 @@ export const outpaintImage = async (base64Image: string, originalPrompt: string,
 };
 
 /**
- * CROP: Zoom In
- * Crops the center of the image and scales it back up.
- * This is a client-side only operation (Fast).
+ * SMART ZOOM IN: AI-Powered Upscale & Detail Reconstruction
+ * 1. Crops the center of the image.
+ * 2. Sends the low-res crop to Gemini with instructions to "re-imagine" and "upscale" it.
  */
-export const cropImage = async (base64Image: string, zoomFactor: number): Promise<string> => {
+export const cropImage = async (base64Image: string, zoomFactor: number, originalPrompt: string = ""): Promise<string | null> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = base64Image;
-    img.onload = () => {
+    img.onload = async () => {
       const width = img.width;
       const height = img.height;
 
@@ -418,18 +418,54 @@ export const cropImage = async (base64Image: string, zoomFactor: number): Promis
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject("Canvas Error");
 
-      // Calculate crop area
-      // If Zoom 2x, we show 1/2 of the image (center)
+      // 1. Calculate crop area (The ROI)
+      // If Zoom 2x, we grab the center 1/2 of the image
       const cropW = width / zoomFactor;
       const cropH = height / zoomFactor;
       const cropX = (width - cropW) / 2;
       const cropY = (height - cropH) / 2;
 
-      // Draw crop area scaled up to full canvas
+      // 2. Draw crop area scaled up to full canvas (This creates the "blurry" input)
       // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
       ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, width, height);
 
-      resolve(canvas.toDataURL('image/png'));
+      const blurryInputBase64 = canvas.toDataURL('image/png');
+      const base64Data = blurryInputBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+
+      // 3. Construct AI Prompt for "Img2Img Upscale"
+      const enhancePrompt = `
+        [TASK] Hyper-Realistic Zoom & Enhance (Upscale).
+        [CONTEXT] This image is a zoomed-in crop of a larger scene: "${cleanPromptForGemini(originalPrompt)}".
+        [INSTRUCTION]
+        1. Re-render this blurry crop with 8K resolution and extreme fidelity.
+        2. Hallucinate missing details: Wood grain, fabric textures, rain droplets, dust motes.
+        3. STRICTLY maintain the current composition, angle, and lighting. Do not change the subject.
+        4. Fix pixelation and blur. Make it look like a native macro lens shot.
+      `;
+
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-image',
+          contents: {
+            parts: [
+              { inlineData: { mimeType: 'image/png', data: base64Data } },
+              { text: enhancePrompt }
+            ],
+          },
+        });
+
+        for (const part of response.candidates[0].content.parts) {
+          if (part.inlineData) {
+            resolve(`data:image/png;base64,${part.inlineData.data}`);
+            return;
+          }
+        }
+        resolve(null);
+      } catch (error) {
+        console.error("Smart Zoom Error:", error);
+        reject(error);
+      }
     };
     img.onerror = () => reject("Failed to load source image for cropping");
   });
