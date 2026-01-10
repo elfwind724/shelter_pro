@@ -17,7 +17,7 @@ interface Props {
 
 const StrategyValidator: React.FC<{ content: GeneratedContent }> = ({ content }) => {
   const checkThreat = content.imagePrompt.includes('storm') || content.imagePrompt.includes('rain') || content.imagePrompt.includes('snow') || content.imagePrompt.includes('dark');
-  const checkLocation = content.youtubeTitle.includes('Cabin') || content.youtubeTitle.includes('Station') || content.youtubeTitle.includes('Shelter') || content.youtubeTitle.includes('Room');
+  const checkLocation = content.youtubeTitle.includes('Cabin') || content.youtubeTitle.includes('Station') || content.youtubeTitle.includes('Shelter') || content.youtubeTitle.includes('Room') || content.youtubeTitle.includes('Bunker');
   const checkSafety = content.imagePrompt.includes('warm') || content.imagePrompt.includes('fire') || content.imagePrompt.includes('dry') || content.imagePrompt.includes('light');
   const checkKeywords = content.tags.includes('sleep') && content.tags.includes('safe');
   const checkEmotion = content.youtubeTitle.includes("Safe") || content.youtubeTitle.includes("Sleep") || content.youtubeTitle.includes("Focus");
@@ -64,9 +64,10 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   const [verticalThumbnailPreview, setVerticalThumbnailPreview] = useState<string | null>(null);
   
   // NEW: State for layout configuration (X, Y, Size)
+  // STRATEGY UPDATE: Default to BOTTOM position to avoid obstructing the view
   const [thumbConfig, setThumbConfig] = useState<ThumbnailLayerConfig>({
-    headline: { x: 640, y: 540, fontSize: 120 },
-    subhead: { x: 640, y: 630, fontSize: 50 }
+    headline: { x: 340, y: 620, fontSize: 130 }, // Bottom Left/Center
+    subhead: { x: 340, y: 530, fontSize: 80 }   // Slightly above headline
   });
   const [showLayoutControls, setShowLayoutControls] = useState(false);
 
@@ -80,8 +81,8 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
       } else {
         // Fallback defaults if old data structure
         setThumbConfig({
-          headline: { x: 640, y: 540, fontSize: 120 },
-          subhead: { x: 640, y: 630, fontSize: 50 }
+            headline: { x: 340, y: 620, fontSize: 130 }, 
+            subhead: { x: 340, y: 530, fontSize: 80 }
         });
       }
     }

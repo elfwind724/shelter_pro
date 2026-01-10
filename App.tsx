@@ -10,7 +10,7 @@ import { CATEGORIES } from './constants';
 import { Edit3, Eye } from 'lucide-react';
 
 const App: React.FC = () => {
-  // LAZY INITIALIZATION: Fixes the bug where data is overwritten by empty arrays on mount
+  // LAZY INITIALIZATION
   const [selections, setSelections] = useState<SelectionState>({});
   
   const [history, setHistory] = useState<GeneratedContent[]>(() => {
@@ -43,7 +43,6 @@ const App: React.FC = () => {
     }
   });
 
-  // NEW: Analytics Data State
   const [analyticsData, setAnalyticsData] = useState<AnalyticsRecord[]>(() => {
     try {
       const saved = localStorage.getItem('shelter_analytics');
@@ -58,8 +57,6 @@ const App: React.FC = () => {
   const [activeMobileTab, setActiveMobileTab] = useState<'editor' | 'results'>('editor');
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  // Save to local storage whenever state changes
-  // CRITICAL FIX: Strip images before saving to prevent QuotaExceededError (LocalStorage 5MB limit)
   useEffect(() => {
     try {
       const safeHistory = history.map(item => {
@@ -69,8 +66,7 @@ const App: React.FC = () => {
       });
       localStorage.setItem('shelter_history', JSON.stringify(safeHistory));
     } catch (e) {
-      console.warn("LocalStorage Quota Exceeded for History. Oldest items might be lost.", e);
-      // Emergency fallback: slice harder if still failing
+      console.warn("LocalStorage Quota Exceeded for History", e);
       try {
         const safeHistory = history.slice(0, 5).map(item => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -105,7 +101,6 @@ const App: React.FC = () => {
     }
   }, [presets]);
 
-  // Save Analytics Data
   useEffect(() => {
     try {
       localStorage.setItem('shelter_analytics', JSON.stringify(analyticsData));
@@ -114,25 +109,37 @@ const App: React.FC = () => {
     }
   }, [analyticsData]);
 
+  // MUTUAL EXCLUSIVITY LOGIC FOR LOCATION CATEGORIES
+  const LOCATION_CATEGORIES = ['cat_vehicles', 'cat_shelters', 'cat_semi_open'];
+
   const handleSelectionChange = (categoryId: string, itemId: string) => {
     setSelections(prev => {
       const category = CATEGORIES.find(c => c.id === categoryId);
       if (!category) return prev;
 
-      const currentSelected = prev[categoryId] || [];
+      // Logic: If user clicks a Location Category (Vehicle, Shelter, Semi-Open)
+      // We must clear the other two location categories to ensure single location.
+      let nextSelections = { ...prev };
+      
+      if (LOCATION_CATEGORIES.includes(categoryId)) {
+          // Clear others
+          LOCATION_CATEGORIES.forEach(c => {
+              if (c !== categoryId) nextSelections[c] = [];
+          });
+      }
+
+      const currentSelected = nextSelections[categoryId] || [];
       let newSelected: string[];
 
       if (category.type === 'single') {
-        // Toggle if same clicked, otherwise set new
         newSelected = currentSelected.includes(itemId) ? [] : [itemId];
       } else {
-        // Multi select
         newSelected = currentSelected.includes(itemId) 
           ? currentSelected.filter(id => id !== itemId)
           : [...currentSelected, itemId];
       }
 
-      return { ...prev, [categoryId]: newSelected };
+      return { ...nextSelections, [categoryId]: newSelected };
     });
   };
 
@@ -141,44 +148,41 @@ const App: React.FC = () => {
   };
 
   const handleGenerate = (selectionsOverride?: SelectionState) => {
-    // 强制识别是否传入了覆盖参数（如从增长计划点击）
-    const isOverride = selectionsOverride && selectionsOverride.structure && selectionsOverride.weather;
-    const currentSelections = isOverride ? selectionsOverride : selections;
-
-    // Basic validation: ensure required categories have selections
-    const missingRequired = CATEGORIES.filter(c => c.required && (!currentSelections[c.id] || currentSelections[c.id].length === 0));
+    const currentSelections = selectionsOverride || selections;
     
-    if (missingRequired.length > 0) {
-      alert(`请完善必填参数: ${missingRequired.map(c => c.title).join(', ')}`);
+    // Check if at least ONE location is selected
+    const hasLocation = LOCATION_CATEGORIES.some(c => currentSelections[c] && currentSelections[c].length > 0);
+    const hasWeather = currentSelections['weather'] && currentSelections['weather'].length > 0;
+
+    if (!hasLocation) {
+      alert("请至少选择一个场景 (载具 / 建筑 / 半开放)");
+      return;
+    }
+    if (!hasWeather) {
+      alert("请选择天气条件");
       return;
     }
 
     const content = generateContent(currentSelections);
     setGeneratedContent(content);
     addToHistory(content);
-    
-    // Auto-switch to results on mobile
     setActiveMobileTab('results');
   };
 
   const handleRandom = () => {
     const randomSelections = generateRandomSelections();
     setSelections(randomSelections);
-    // Auto generate after random selection
     const content = generateContent(randomSelections);
     setGeneratedContent(content);
     addToHistory(content);
-    
-    // Auto-switch to results on mobile
     setActiveMobileTab('results');
   };
 
   const addToHistory = (content: GeneratedContent) => {
     setHistory(prev => {
-      // Remove duplicates based on ID if any
       const filtered = prev.filter(i => i.id !== content.id);
       const newHistory = [content, ...filtered];
-      return newHistory.slice(0, 20); // Limit to 20
+      return newHistory.slice(0, 20);
     });
   };
 
@@ -204,7 +208,7 @@ const App: React.FC = () => {
   const restoreFromHistory = (item: GeneratedContent) => {
     setGeneratedContent(item);
     setSelections(item.selectedItems);
-    setActiveMobileTab('results'); // Switch to view when restored
+    setActiveMobileTab('results'); 
   };
 
   // --- Preset Handlers ---
@@ -245,7 +249,7 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-950 overflow-hidden text-slate-200 font-sans">
       
-      {/* Mobile Tab Navigation (Visible only on Mobile) */}
+      {/* Mobile Tab Navigation */}
       <div className="md:hidden flex items-center border-b border-slate-800 bg-slate-900 shrink-0 h-12">
         <button 
           onClick={() => setActiveMobileTab('editor')}
@@ -268,7 +272,7 @@ const App: React.FC = () => {
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar - Hidden on mobile if tab is 'results' */}
+        {/* Sidebar */}
         <div className={`${activeMobileTab === 'results' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-96 border-r border-slate-800 h-full`}>
           <Sidebar 
             selections={selections} 
@@ -284,10 +288,8 @@ const App: React.FC = () => {
           />
         </div>
 
-        {/* Main Content Area - Hidden on mobile if tab is 'editor' */}
+        {/* Main Content Area */}
         <div className={`${activeMobileTab === 'editor' ? 'hidden' : 'flex'} md:flex flex-1 flex-col h-full min-w-0 bg-slate-950`}>
-          
-          {/* Output Area */}
           <main className="flex-1 overflow-hidden relative">
             <OutputDisplay 
               content={generatedContent} 
@@ -295,8 +297,6 @@ const App: React.FC = () => {
               isFavorite={!!generatedContent && favorites.some(f => f.id === generatedContent.id)}
             />
           </main>
-
-          {/* Bottom Bar */}
           <HistoryPanel 
             history={history} 
             favorites={favorites} 
@@ -304,11 +304,9 @@ const App: React.FC = () => {
             onDelete={deleteItem}
             onClearAll={handleClearAllHistory}
           />
-          
         </div>
       </div>
 
-      {/* Analytics Modal */}
       {showAnalytics && (
         <AnalyticsDashboard 
           data={analyticsData}

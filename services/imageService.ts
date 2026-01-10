@@ -16,7 +16,10 @@ const NEGATIVE_PROMPTS = [
   "out of frame", "body out of frame", "draft",
   "simple background", "blank background", "abstract background", "tiling",
   "open windows", "rain inside", "wet floor", "flooded room", // Added logic safety constraints
-  "tile floor", "marble floor", "cold stone floor", "ceramic tiles", "hospital floor", "clinical" // Added COLD FLOOR constraints
+  "tile floor", "marble floor", "cold stone floor", "ceramic tiles", "hospital floor", "clinical", // Added COLD FLOOR constraints
+  "dark room", "gloomy interior", "scary", "horror", // Prevent accidental dark interiors
+  // NEW: Character Safety
+  "no visible hands", "disembodied arms", "first-person hands", "deformed face", "ugly face", "mutated hands", "missing legs"
 ].join(", ");
 
 /**
@@ -103,19 +106,16 @@ export const compositeThumbnail = async (
       if (!ctx) return reject("Canvas Error");
 
       // 1. Draw Background (Cover mode)
-      // We calculate aspect ratios to ensure the image covers the canvas cleanly
       const imgRatio = img.width / img.height;
       const canvasRatio = canvas.width / canvas.height;
       let drawW, drawH, drawX, drawY;
 
       if (imgRatio > canvasRatio) {
-        // Image is wider than canvas
         drawH = canvas.height;
         drawW = drawH * imgRatio;
         drawX = (canvas.width - drawW) / 2;
         drawY = 0;
       } else {
-        // Image is taller than canvas
         drawW = canvas.width;
         drawH = drawW / imgRatio;
         drawX = 0;
@@ -131,57 +131,109 @@ export const compositeThumbnail = async (
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 3. Configure Font Styles
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
+      // 3. Configure Layout Coordinates
       let headX, headY, headSize, subX, subY, subSize;
 
       if (isVertical) {
-        // Vertical Defaults (Shorts) - Auto layout
         headX = canvas.width / 2;
-        headY = canvas.height * 0.25; // Top quarter
-        headSize = 100; // Slightly smaller than landscape due to width constraint
+        headY = canvas.height * 0.25; 
+        headSize = 100; 
 
         subX = canvas.width / 2;
-        subY = canvas.height * 0.85; // Bottom area
+        subY = canvas.height * 0.85; 
         subSize = 60;
       } else {
-        // Landscape Defaults (Standard) - Or use Config
-        headX = config?.headline.x ?? canvas.width / 2;
-        headY = config?.headline.y ?? canvas.height * 0.75;
-        headSize = config?.headline.fontSize ?? 120;
+        headX = config?.headline.x ?? 70;
+        headY = config?.headline.y ?? 100;
+        headSize = config?.headline.fontSize ?? 100;
 
-        subX = config?.subhead.x ?? canvas.width / 2;
-        subY = config?.subhead.y ?? canvas.height * 0.88;
-        subSize = config?.subhead.fontSize ?? 50;
+        subX = config?.subhead.x ?? 950;
+        subY = config?.subhead.y ?? 600;
+        subSize = config?.subhead.fontSize ?? 80;
       }
       
-      // Main Headline
+      // Helper: Smart Alignment based on X position
+      // If X < 30%, Align Left. If X > 70%, Align Right. Else Center.
+      const getAlign = (x: number, w: number): CanvasTextAlign => {
+          if (isVertical) return 'center'; // Shorts are always center
+          if (x < w * 0.35) return 'left';
+          if (x > w * 0.65) return 'right';
+          return 'center';
+      };
+
+      // --- LAYER 1: HEADLINE ---
       if (headlines[0]) {
+        ctx.textAlign = getAlign(headX, canvas.width);
+        ctx.textBaseline = 'top'; // Top align for headline
         ctx.font = `900 ${headSize}px Impact, sans-serif`;
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = headSize * 0.12; 
+        ctx.lineWidth = headSize * 0.15; // Thick stroke for readability
+        ctx.lineJoin = 'round';
         
-        // Wrap text if needed for vertical
-        if (isVertical && ctx.measureText(headlines[0].toUpperCase()).width > canvas.width - 40) {
-           headSize = headSize * 0.7; // Shrink font
-           ctx.font = `900 ${headSize}px Impact, sans-serif`;
-        }
-
+        // Add shadow for depth
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 10;
         ctx.strokeText(headlines[0].toUpperCase(), headX, headY);
+        ctx.shadowBlur = 0; // Reset shadow for fill
         ctx.fillText(headlines[0].toUpperCase(), headX, headY);
       }
 
-      // Subheadline
+      // --- LAYER 2: SUBHEAD / BADGE ---
       if (headlines[1]) {
+        const text = headlines[1].toUpperCase();
+        
+        // SPECIAL: If text contains "SLEEP", render as a Badge
+        const isBadge = text.includes("SLEEP");
+        
+        ctx.textAlign = getAlign(subX, canvas.width);
+        ctx.textBaseline = 'middle';
         ctx.font = `900 ${subSize}px Impact, sans-serif`;
-        ctx.fillStyle = '#FF8C00'; // Accent Orange
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = subSize * 0.2; 
-        ctx.strokeText(headlines[1].toUpperCase(), subX, subY);
-        ctx.fillText(headlines[1].toUpperCase(), subX, subY);
+
+        if (isBadge && !isVertical) {
+             // Calculate Badge Dimensions
+             const metrics = ctx.measureText(text);
+             const badgePaddingX = subSize * 0.4;
+             const badgePaddingY = subSize * 0.2;
+             const badgeW = metrics.width + (badgePaddingX * 2);
+             const badgeH = subSize * 1.3;
+             
+             let badgeX = subX;
+             // Adjust badgeX based on alignment so the text lands exactly at subX
+             if (ctx.textAlign === 'left') badgeX = subX;
+             if (ctx.textAlign === 'center') badgeX = subX - (badgeW / 2);
+             if (ctx.textAlign === 'right') badgeX = subX - badgeW;
+
+             // Draw Green Badge (Rounded Rect)
+             ctx.fillStyle = '#22c55e'; // Green-500
+             ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+             ctx.lineWidth = 4;
+             ctx.beginPath();
+             ctx.roundRect(badgeX, subY - (badgeH/2), badgeW, badgeH, 15);
+             ctx.fill();
+             ctx.stroke();
+             
+             // Draw Text inside Badge
+             ctx.fillStyle = 'white';
+             ctx.strokeStyle = 'black';
+             ctx.lineWidth = subSize * 0.1;
+             // Center text inside the badge rect
+             const textX = badgeX + (badgeW / 2);
+             ctx.textAlign = 'center'; 
+             
+             ctx.strokeText(text, textX, subY);
+             ctx.fillText(text, textX, subY);
+        } else {
+            // Standard Text Rendering (Orange with black stroke)
+            ctx.fillStyle = '#FF8C00'; // Accent Orange
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = subSize * 0.2; 
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = 10;
+            ctx.strokeText(text, subX, subY);
+            ctx.shadowBlur = 0;
+            ctx.fillText(text, subX, subY);
+        }
       }
 
       resolve(canvas.toDataURL('image/jpeg', 0.9));

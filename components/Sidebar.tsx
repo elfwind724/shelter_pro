@@ -30,7 +30,7 @@ const JAN_2026_PLAN = [
       title: "Story A: The Marine Scientist", 
       selections: { 
         structure: ['ship_cabin'], weather: ['rain', 'thunder'], time: ['night'], warmth: ['fireplace', 'oil_lamp'], 
-        defense: ['shutters'], duration: ['8h'], vibe: ['narrative_scientist'],
+        defense: ['shutters'], duration: ['8h'], 
         danger: ['none'], sleeping: ['corner_bed'], shot_type: ['medium'], amenities: ['books', 'map', 'coffee'],
         pets: ['dog'], perspective: ['standard'], visual_style: ['cinematic_35mm']
       } 
@@ -39,7 +39,7 @@ const JAN_2026_PLAN = [
       title: "Story B: The Refugee",
       selections: { 
         structure: ['ship_cabin'], weather: ['rain', 'wind'], time: ['night'], defense: ['iron_door'], 
-        warmth: ['stove'], duration: ['8h'], vibe: ['narrative_refugee'],
+        warmth: ['stove'], duration: ['8h'], 
         danger: ['none'], sleeping: ['floor_mat'], shot_type: ['medium_close'], amenities: ['canned_food', 'water', 'tea_set'],
         pets: ['dog'], perspective: ['standard'], visual_style: ['vintage_70s']
       } 
@@ -48,7 +48,7 @@ const JAN_2026_PLAN = [
       title: "Story C: The Fugitive",
       selections: { 
         structure: ['ship_cabin'], weather: ['thunder'], time: ['night'], warmth: ['fireplace'], 
-        duration: ['8h'], vibe: ['narrative_fugitive'], defense: ['shutters', 'lock'],
+        duration: ['8h'], defense: ['shutters', 'lock'],
         danger: ['none'], sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['radio', 'map', 'whiskey'],
         pets: ['dog'], perspective: ['standard'], visual_style: ['gothic_noir']
       } 
@@ -57,7 +57,7 @@ const JAN_2026_PLAN = [
       title: "Story D: Fresh Start",
       selections: { 
         structure: ['ship_cabin'], weather: ['rain'], time: ['night'], warmth: ['stove'], 
-        duration: ['8h'], vibe: ['narrative_fresh_start'], defense: ['shutters'],
+        duration: ['8h'], defense: ['shutters'],
         danger: ['none'], sleeping: ['bunk'], shot_type: ['medium'], amenities: ['plants', 'books', 'coffee'],
         pets: ['dog'], perspective: ['standard'], visual_style: ['realistic_8k']
       } 
@@ -66,7 +66,7 @@ const JAN_2026_PLAN = [
       title: "Story E: The Nomad",
       selections: { 
         structure: ['ship_cabin'], weather: ['rain'], time: ['night'], warmth: ['fireplace'], 
-        duration: ['8h'], vibe: ['narrative_nomad'], defense: ['shutters'],
+        duration: ['8h'], defense: ['shutters'],
         danger: ['none'], sleeping: ['hammock'], shot_type: ['medium'], amenities: ['map', 'telescope', 'rugs'],
         pets: ['dog'], perspective: ['standard'], visual_style: ['leica_bw']
       } 
@@ -78,7 +78,7 @@ const JAN_2026_PLAN = [
       title: "01. 钢琴 - 废弃剧院 (Piano)",
       selections: { 
         structure: ['projection_booth'], weather: ['heavy_rain'], warmth: ['oil_lamp'], time: ['night'], 
-        duration: ['2h'], vibe: ['cozy_travel'], character: ['lofi_pianist'],
+        duration: ['2h'], character: ['inst_piano'],
         defense: ['iron_door'], sleeping: ['none'], shot_type: ['wide_interior'], amenities: ['vinyl', 'whiskey', 'velvet_drapes'],
         perspective: ['cinematic'], visual_style: ['gothic_noir'], textures: ['velvet_drapes']
       } 
@@ -88,7 +88,7 @@ const JAN_2026_PLAN = [
       title: "02. 吉他 - 暴雨露营车 (Guitar)",
       selections: { 
         structure: ['camper_van'], weather: ['rain'], time: ['night'], defense: ['none'], warmth: ['fairy_lights', 'diesel_heater'], 
-        duration: ['2h'], vibe: ['cozy_safe'], character: ['lofi_guitarist'],
+        duration: ['2h'], character: ['inst_guitar'],
         danger: ['none'], sleeping: ['car_seat'], shot_type: ['medium_close'], amenities: ['coffee', 'map', 'dog'],
         perspective: ['first_person'], visual_style: ['vintage_70s'], textures: ['chunky_knit']
       } 
@@ -98,7 +98,7 @@ const JAN_2026_PLAN = [
       title: "03. 小提琴 - 古老图书馆 (Violin)",
       selections: { 
         structure: ['library'], weather: ['light_rain'], time: ['morning'], warmth: ['fireplace'], 
-        duration: ['2h'], vibe: ['cozy_travel'], character: ['lofi_violinist'], defense: ['bars'], 
+        duration: ['2h'], character: ['inst_violin'], defense: ['bars'], 
         sleeping: ['none'], shot_type: ['medium'], amenities: ['books', 'tea_set', 'painting'],
         perspective: ['standard'], visual_style: ['cinematic_35mm'], textures: ['wood_floor', 'rugs']
       } 
@@ -108,7 +108,7 @@ const JAN_2026_PLAN = [
       title: "04. 大提琴 - 孤峰灯塔 (Cello)",
       selections: { 
         structure: ['lighthouse'], weather: ['thunder'], time: ['night'], warmth: ['oil_lamp'], 
-        duration: ['2h'], vibe: ['melancholic'], character: ['lofi_cellist'], defense: ['blast_glass'], 
+        duration: ['2h'], defense: ['blast_glass'], 
         sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['radio', 'telescope', 'whiskey'],
         perspective: ['standard'], visual_style: ['leica_bw'], textures: ['rugs']
       } 
@@ -118,7 +118,7 @@ const JAN_2026_PLAN = [
       title: "05. 萨克斯 - 侦探事务所 (Sax)",
       selections: { 
         structure: ['noir_office'], weather: ['rain'], time: ['night'], warmth: ['heater'],
-        duration: ['2h'], vibe: ['mysterious'], character: ['lofi_sax'], defense: ['shutters'],
+        duration: ['2h'], defense: ['shutters'],
         sleeping: ['sofa_island'], shot_type: ['medium'], amenities: ['whiskey', 'typewriter', 'vinyl'],
         perspective: ['cinematic'], visual_style: ['gothic_noir'], textures: ['wood_floor']
       } 
@@ -128,7 +128,7 @@ const JAN_2026_PLAN = [
       title: "06. 竖琴 - 植物实验室 (Harp)",
       selections: { 
         structure: ['botanical_lab'], weather: ['rain_lush'], time: ['morning'], warmth: ['hologram'],
-        duration: ['2h'], vibe: ['cozy_safe'], character: ['lofi_harp'], defense: ['glass_dome'],
+        duration: ['2h'], defense: ['glass_dome'],
         sleeping: ['hammock'], shot_type: ['medium'], amenities: ['plants', 'tea_set', 'books'],
         perspective: ['standard'], visual_style: ['unreal_5'], textures: ['tapestry']
       } 
@@ -138,7 +138,7 @@ const JAN_2026_PLAN = [
       title: "07. 长笛 - 森林树屋 (Flute)",
       selections: { 
         structure: ['forest_aerie'], weather: ['light_rain'], time: ['day'], warmth: ['stove'],
-        duration: ['2h'], vibe: ['cozy_safe'], character: ['lofi_flutist'], defense: ['none'],
+        duration: ['2h'], defense: ['none'],
         sleeping: ['hammock'], shot_type: ['medium_close'], amenities: ['plants', 'fruit_platter', 'books'],
         perspective: ['terrace_view'], visual_style: ['japanese_wafu'], textures: ['wood_floor']
       } 
@@ -148,7 +148,7 @@ const JAN_2026_PLAN = [
       title: "08. 古琴 - 禅意花园 (Koto)",
       selections: { 
         structure: ['zen_garden'], weather: ['light_rain'], time: ['afternoon'], warmth: ['candles'],
-        duration: ['2h'], vibe: ['cozy_travel'], character: ['lofi_koto'], defense: ['none'],
+        duration: ['2h'], defense: ['none'],
         sleeping: ['tatami_raised'], shot_type: ['medium'], amenities: ['tea_set', 'plants', 'scroll'],
         perspective: ['low_angle'], visual_style: ['japanese_wafu'], textures: ['rugs']
       } 
@@ -158,7 +158,7 @@ const JAN_2026_PLAN = [
       title: "09. 手风琴 - 运河窄船 (Accordion)",
       selections: { 
         structure: ['canal_boat'], weather: ['rain'], time: ['dusk'], warmth: ['stove'],
-        duration: ['2h'], vibe: ['cozy_travel'], character: ['lofi_accordion'], defense: ['none'],
+        duration: ['2h'], defense: ['none'],
         sleeping: ['bunk'], shot_type: ['medium'], amenities: ['map', 'canned_food', 'coffee'],
         perspective: ['standard'], visual_style: ['vintage_70s'], textures: ['chunky_knit']
       } 
@@ -168,7 +168,7 @@ const JAN_2026_PLAN = [
       title: "10. 合成器 - 赛博胶囊 (Synth)",
       selections: { 
         structure: ['cyber_pod'], weather: ['acid'], time: ['night'], warmth: ['hologram'],
-        duration: ['2h'], vibe: ['cozy_travel'], character: ['lofi_synth'], defense: ['blast_glass'],
+        duration: ['2h'], defense: ['blast_glass'],
         sleeping: ['cryo_pod'], shot_type: ['medium'], amenities: ['laptop', 'tech', 'coffee'],
         perspective: ['standard'], visual_style: ['cyber_neon'], textures: ['beanbag']
       } 
@@ -178,7 +178,7 @@ const JAN_2026_PLAN = [
       title: "11. 拇指琴 - 窗边卧榻 (Kalimba)",
       selections: { 
         structure: ['attic'], weather: ['snow'], time: ['night'], warmth: ['fairy_lights', 'candles'],
-        duration: ['2h'], vibe: ['cozy_safe'], character: ['lofi_kalimba'], defense: ['none'],
+        duration: ['2h'], defense: ['none'],
         sleeping: ['window_nook'], shot_type: ['close_up'], amenities: ['cocoa', 'plush_carpet', 'cat'],
         perspective: ['first_person'], visual_style: ['realistic_8k'], textures: ['cushion_pile']
       } 
@@ -188,7 +188,7 @@ const JAN_2026_PLAN = [
       title: "12. 电吉他 - 放映室 (Elec. Guitar)",
       selections: { 
         structure: ['projection_booth'], weather: ['fog'], time: ['night'], warmth: ['heater'],
-        duration: ['2h'], vibe: ['melancholic'], character: ['lofi_guitarist'], defense: ['iron_door'],
+        duration: ['2h'], character: ['inst_guitar'], defense: ['iron_door'],
         sleeping: ['sofa_island'], shot_type: ['medium'], amenities: ['vinyl', 'tech', 'sausages'],
         perspective: ['cinematic'], visual_style: ['analog_horror'], textures: ['rugs']
       } 
@@ -250,13 +250,35 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
-        {/* Presets Row */}
-        <div className="flex gap-2 mb-2">
-           <button onClick={props.onRandom} className="flex-1 py-2 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex items-center justify-center gap-2"><RotateCcw size={12}/> Randomize</button>
-           <button onClick={handleSave} className="flex-1 py-2 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex items-center justify-center gap-2"><Save size={12}/> Save Preset</button>
+        {/* Presets Row (Removed Random, kept Save) */}
+        <div className="mb-2">
+           <button onClick={handleSave} className="w-full py-2 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex items-center justify-center gap-2"><Save size={12}/> Save Current as Preset</button>
         </div>
 
-        {/* Categories List (Restored full density) */}
+        {/* Presets List - RESTORED */}
+        {props.presets.length > 0 && (
+          <div className="mb-4 space-y-2">
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Saved Presets</h3>
+            {props.presets.map(preset => (
+              <div key={preset.id} className="group flex items-center gap-2">
+                <button 
+                  onClick={() => props.onLoadPreset(preset.id)}
+                  className="flex-1 text-left px-3 py-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 transition-all truncate"
+                >
+                  {preset.name}
+                </button>
+                <button 
+                  onClick={() => props.onDeletePreset(preset.id)}
+                  className="p-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 size={12}/>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Categories List */}
         {CATEGORIES.map(cat => (
           <div key={cat.id} className="space-y-1">
             <button 
@@ -295,8 +317,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         ))}
       </div>
 
-      <div className="p-4 border-t border-slate-800 bg-slate-950 z-10 sticky bottom-0">
-        <button onClick={() => props.onGenerate()} className="w-full flex items-center justify-center gap-3 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-black shadow-2xl shadow-orange-900/40 transition-all active:scale-[0.98] uppercase tracking-widest text-sm">
+      <div className="p-4 border-t border-slate-800 bg-slate-950 z-10 sticky bottom-0 flex gap-3">
+        <button 
+          onClick={props.onRandom} 
+          className="px-5 py-4 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl font-bold shadow-lg transition-all active:scale-[0.95]" 
+          title="Randomize Parameters"
+        >
+          <RotateCcw size={18}/>
+        </button>
+        <button onClick={() => props.onGenerate()} className="flex-1 flex items-center justify-center gap-3 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-black shadow-2xl shadow-orange-900/40 transition-all active:scale-[0.98] uppercase tracking-widest text-sm">
           <Zap size={18}/> Generate Concept
         </button>
       </div>
