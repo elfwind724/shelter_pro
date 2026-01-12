@@ -23,181 +23,120 @@ interface SidebarProps {
   onOpenAnalytics: () => void; // New prop for Analytics
 }
 
-// 2026年1月 HAVEN NIGHTS 战略发布计划 (NARRATIVE DRIVEN)
-const JAN_2026_PLAN = [
-  { week: "Phase 1: 8-Hour Deep Sleep", theme: "核心叙事 (Narrative Loops)", items: [
-    { 
-      title: "Story A: The Marine Scientist", 
-      selections: { 
-        structure: ['ship_cabin'], weather: ['rain', 'thunder'], time: ['night'], warmth: ['fireplace', 'oil_lamp'], 
-        defense: ['shutters'], duration: ['8h'], 
-        danger: ['none'], sleeping: ['corner_bed'], shot_type: ['medium'], amenities: ['books', 'map', 'coffee'],
-        pets: ['dog'], perspective: ['standard'], visual_style: ['cinematic_35mm']
-      } 
-    },
-    { 
-      title: "Story B: The Refugee",
-      selections: { 
-        structure: ['ship_cabin'], weather: ['rain', 'wind'], time: ['night'], defense: ['iron_door'], 
-        warmth: ['stove'], duration: ['8h'], 
-        danger: ['none'], sleeping: ['floor_mat'], shot_type: ['medium_close'], amenities: ['canned_food', 'water', 'tea_set'],
-        pets: ['dog'], perspective: ['standard'], visual_style: ['vintage_70s']
-      } 
-    },
-    { 
-      title: "Story C: The Fugitive",
-      selections: { 
-        structure: ['ship_cabin'], weather: ['thunder'], time: ['night'], warmth: ['fireplace'], 
-        duration: ['8h'], defense: ['shutters', 'lock'],
-        danger: ['none'], sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['radio', 'map', 'whiskey'],
-        pets: ['dog'], perspective: ['standard'], visual_style: ['gothic_noir']
-      } 
-    },
-    { 
-      title: "Story D: Fresh Start",
-      selections: { 
-        structure: ['ship_cabin'], weather: ['rain'], time: ['night'], warmth: ['stove'], 
-        duration: ['8h'], defense: ['shutters'],
-        danger: ['none'], sleeping: ['bunk'], shot_type: ['medium'], amenities: ['plants', 'books', 'coffee'],
-        pets: ['dog'], perspective: ['standard'], visual_style: ['realistic_8k']
-      } 
-    },
-     { 
-      title: "Story E: The Nomad",
-      selections: { 
-        structure: ['ship_cabin'], weather: ['rain'], time: ['night'], warmth: ['fireplace'], 
-        duration: ['8h'], defense: ['shutters'],
-        danger: ['none'], sleeping: ['hammock'], shot_type: ['medium'], amenities: ['map', 'telescope', 'rugs'],
-        pets: ['dog'], perspective: ['standard'], visual_style: ['leica_bw']
-      } 
-    },
-  ]},
-  { week: "Phase 2: 2-Hour LoFi Musician", theme: "12种乐器/场景 (12 Instruments)", items: [
-    // 1. PIANO - ABANDONED THEATER (DRAMATIC/CLASSICAL)
-    { 
-      title: "01. 钢琴 - 废弃剧院 (Piano)",
-      selections: { 
-        structure: ['projection_booth'], weather: ['heavy_rain'], warmth: ['oil_lamp'], time: ['night'], 
-        duration: ['2h'], character: ['inst_piano'],
-        defense: ['iron_door'], sleeping: ['none'], shot_type: ['wide_interior'], amenities: ['vinyl', 'whiskey', 'velvet_drapes'],
-        perspective: ['cinematic'], visual_style: ['gothic_noir'], textures: ['velvet_drapes']
-      } 
-    },
-    // 2. GUITAR - CAMPER VAN (INTIMATE/ACOUSTIC)
-    { 
-      title: "02. 吉他 - 暴雨露营车 (Guitar)",
-      selections: { 
-        structure: ['camper_van'], weather: ['rain'], time: ['night'], defense: ['none'], warmth: ['fairy_lights', 'diesel_heater'], 
-        duration: ['2h'], character: ['inst_guitar'],
-        danger: ['none'], sleeping: ['car_seat'], shot_type: ['medium_close'], amenities: ['coffee', 'map', 'dog'],
-        perspective: ['first_person'], visual_style: ['vintage_70s'], textures: ['chunky_knit']
-      } 
-    },
-    // 3. VIOLIN - VICTORIAN LIBRARY (CLASSICAL/STUDY)
-    { 
-      title: "03. 小提琴 - 古老图书馆 (Violin)",
-      selections: { 
-        structure: ['library'], weather: ['light_rain'], time: ['morning'], warmth: ['fireplace'], 
-        duration: ['2h'], character: ['inst_violin'], defense: ['bars'], 
-        sleeping: ['none'], shot_type: ['medium'], amenities: ['books', 'tea_set', 'painting'],
-        perspective: ['standard'], visual_style: ['cinematic_35mm'], textures: ['wood_floor', 'rugs']
-      } 
-    },
-    // 4. CELLO - LIGHTHOUSE (MELANCHOLIC/DEEP)
-    { 
-      title: "04. 大提琴 - 孤峰灯塔 (Cello)",
-      selections: { 
-        structure: ['lighthouse'], weather: ['thunder'], time: ['night'], warmth: ['oil_lamp'], 
-        duration: ['2h'], defense: ['blast_glass'], 
-        sleeping: ['corner_bed'], shot_type: ['cinematic'], amenities: ['radio', 'telescope', 'whiskey'],
-        perspective: ['standard'], visual_style: ['leica_bw'], textures: ['rugs']
-      } 
-    },
-    // 5. SAXOPHONE - DETECTIVE OFFICE (JAZZ/NOIR)
-    { 
-      title: "05. 萨克斯 - 侦探事务所 (Sax)",
-      selections: { 
-        structure: ['noir_office'], weather: ['rain'], time: ['night'], warmth: ['heater'],
-        duration: ['2h'], defense: ['shutters'],
-        sleeping: ['sofa_island'], shot_type: ['medium'], amenities: ['whiskey', 'typewriter', 'vinyl'],
-        perspective: ['cinematic'], visual_style: ['gothic_noir'], textures: ['wood_floor']
-      } 
-    },
-    // 6. HARP - BOTANICAL LAB (ETHEREAL/FANTASY)
-    { 
-      title: "06. 竖琴 - 植物实验室 (Harp)",
-      selections: { 
-        structure: ['botanical_lab'], weather: ['rain_lush'], time: ['morning'], warmth: ['hologram'],
-        duration: ['2h'], defense: ['glass_dome'],
-        sleeping: ['hammock'], shot_type: ['medium'], amenities: ['plants', 'tea_set', 'books'],
-        perspective: ['standard'], visual_style: ['unreal_5'], textures: ['tapestry']
-      } 
-    },
-    // 7. FLUTE - TREEHOUSE (NATURE/FOLK)
-    { 
-      title: "07. 长笛 - 森林树屋 (Flute)",
-      selections: { 
-        structure: ['forest_aerie'], weather: ['light_rain'], time: ['day'], warmth: ['stove'],
-        duration: ['2h'], defense: ['none'],
-        sleeping: ['hammock'], shot_type: ['medium_close'], amenities: ['plants', 'fruit_platter', 'books'],
-        perspective: ['terrace_view'], visual_style: ['japanese_wafu'], textures: ['wood_floor']
-      } 
-    },
-    // 8. KOTO - ZEN GARDEN (MEDITATIVE/ASIAN)
-    { 
-      title: "08. 古琴 - 禅意花园 (Koto)",
-      selections: { 
-        structure: ['zen_garden'], weather: ['light_rain'], time: ['afternoon'], warmth: ['candles'],
-        duration: ['2h'], defense: ['none'],
-        sleeping: ['tatami_raised'], shot_type: ['medium'], amenities: ['tea_set', 'plants', 'scroll'],
-        perspective: ['low_angle'], visual_style: ['japanese_wafu'], textures: ['rugs']
-      } 
-    },
-    // 9. ACCORDION - CANAL BOAT (FOLK/TRAVEL)
-    { 
-      title: "09. 手风琴 - 运河窄船 (Accordion)",
-      selections: { 
-        structure: ['canal_boat'], weather: ['rain'], time: ['dusk'], warmth: ['stove'],
-        duration: ['2h'], defense: ['none'],
-        sleeping: ['bunk'], shot_type: ['medium'], amenities: ['map', 'canned_food', 'coffee'],
-        perspective: ['standard'], visual_style: ['vintage_70s'], textures: ['chunky_knit']
-      } 
-    },
-    // 10. SYNTH - CYBER POD (STUDY/BEATS)
-    { 
-      title: "10. 合成器 - 赛博胶囊 (Synth)",
-      selections: { 
-        structure: ['cyber_pod'], weather: ['acid'], time: ['night'], warmth: ['hologram'],
-        duration: ['2h'], defense: ['blast_glass'],
-        sleeping: ['cryo_pod'], shot_type: ['medium'], amenities: ['laptop', 'tech', 'coffee'],
-        perspective: ['standard'], visual_style: ['cyber_neon'], textures: ['beanbag']
-      } 
-    },
-    // 11. KALIMBA - WINDOW NOOK (SLEEP/COZY)
-    { 
-      title: "11. 拇指琴 - 窗边卧榻 (Kalimba)",
-      selections: { 
-        structure: ['attic'], weather: ['snow'], time: ['night'], warmth: ['fairy_lights', 'candles'],
-        duration: ['2h'], defense: ['none'],
-        sleeping: ['window_nook'], shot_type: ['close_up'], amenities: ['cocoa', 'plush_carpet', 'cat'],
-        perspective: ['first_person'], visual_style: ['realistic_8k'], textures: ['cushion_pile']
-      } 
-    },
-    // 12. ELECTRIC GUITAR - PROJECTION BOOTH (POST-ROCK/SOLO)
-    { 
-      title: "12. 电吉他 - 放映室 (Elec. Guitar)",
-      selections: { 
-        structure: ['projection_booth'], weather: ['fog'], time: ['night'], warmth: ['heater'],
-        duration: ['2h'], character: ['inst_guitar'], defense: ['iron_door'],
-        sleeping: ['sofa_island'], shot_type: ['medium'], amenities: ['vinyl', 'tech', 'sausages'],
-        perspective: ['cinematic'], visual_style: ['analog_horror'], textures: ['rugs']
-      } 
-    },
-  ]}
+// 2026年1月 HAVEN NIGHTS 战略发布计划 (CONTENT MATRIX)
+const SHELTER_UNIVERSE_PLAN = [
+  { 
+    week: "Series A: Pure Ambience", 
+    theme: "纯环境音 (SEO Traffic) - 8 Hours", 
+    items: [
+      { 
+        title: "A1: Basement Shelter Rain", 
+        selections: { 
+          structure: ['slt_und_bunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['fireplace'], 
+          defense: ['def_door_heavy'], duration: ['8h'], 
+          danger: ['none'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_medium'], amenities: ['am_bookshelf'],
+          pets: ['none'], perspective: ['cam_standard'], visual_style: ['realistic_8k']
+        } 
+      },
+      { 
+        title: "A2: Attic Hideout Storm",
+        selections: { 
+          structure: ['slt_high_apt'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['candles'], 
+          defense: ['def_window_shutter'], duration: ['8h'], 
+          danger: ['none'], sleeping: ['sleep_window_alcove'], shot_type: ['dist_medium'], amenities: ['am_plants'],
+          pets: ['none'], perspective: ['cam_standard'], visual_style: ['realistic_8k']
+        } 
+      },
+      { 
+        title: "A3: Underground Bunker",
+        selections: { 
+          structure: ['slt_und_civil'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
+          defense: ['def_door_heavy'], duration: ['8h'], 
+          danger: ['none'], sleeping: ['sleep_bunk_curtain'], shot_type: ['dist_medium'], amenities: ['am_radio'],
+          pets: ['none'], perspective: ['cam_cctv'], visual_style: ['waste_gritty']
+        } 
+      },
+      { 
+        title: "A4: Abandoned Cabin",
+        selections: { 
+          structure: ['sem_leanto'], weather: ['wth_rain_lush'], time: ['time_dusk'], warmth: ['firepit'], 
+          defense: ['none'], duration: ['8h'], 
+          danger: ['none'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_long'], amenities: ['am_kitchen'],
+          pets: ['none'], perspective: ['cam_standard'], visual_style: ['nature_earth']
+        } 
+      }
+    ]
+  },
+  { 
+    week: "Series B: Cozy Ambience", 
+    theme: "环境音 + 音乐 (Brand) - 2 Hours", 
+    items: [
+      { 
+        title: "B1: Basement + Soft Piano",
+        selections: { 
+          structure: ['slt_und_apt'], weather: ['wth_rain_med'], time: ['time_night'], warmth: ['oil_lamp'], 
+          duration: ['2h'], character: ['inst_piano'],
+          defense: ['none'], sleeping: ['sleep_sofa_lie'], shot_type: ['dist_medium'], amenities: ['am_plants', 'am_coffee'],
+          perspective: ['cam_standard'], visual_style: ['light_academia'], textures: ['dec_blanket_knit']
+        } 
+      },
+      { 
+        title: "B2: Bunker + Lofi Beats",
+        selections: { 
+          structure: ['slt_und_luxbunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['hologram'], 
+          duration: ['2h'], character: ['act_laptop'],
+          defense: ['def_door_heavy'], sleeping: ['sleep_round_lux'], shot_type: ['dist_medium'], amenities: ['am_gaming', 'am_desk'],
+          perspective: ['cam_standard'], visual_style: ['cyber_neon'], textures: ['dec_beanbag']
+        } 
+      },
+      { 
+        title: "B3: Treehouse + Guitar",
+        selections: { 
+          structure: ['slt_high_treehouse'], weather: ['wth_rain_light'], time: ['time_morning'], warmth: ['stove'], 
+          duration: ['2h'], character: ['inst_guitar'],
+          defense: ['none'], sleeping: ['sleep_hammock_fur'], shot_type: ['dist_medium'], amenities: ['am_plants', 'am_tea'],
+          perspective: ['cam_terrace'], visual_style: ['cottagecore'], textures: ['dec_rug_fur']
+        } 
+      }
+    ]
+  },
+  { 
+    week: "Series C: Cinematic Stories", 
+    theme: "视觉叙事 (Loyalty) - 故事片", 
+    items: [
+      { 
+        title: "C1: Last Night in Bunker",
+        selections: { 
+          structure: ['slt_und_bunker'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['oil_lamp'], 
+          duration: ['2h'], character: ['act_read'],
+          defense: ['def_door_heavy'], sleeping: ['sleep_bunk_curtain'], shot_type: ['dist_medium'], amenities: ['am_map', 'am_radio'],
+          perspective: ['cam_cinematic'], visual_style: ['waste_rusty'], textures: ['dec_tapestry']
+        } 
+      },
+      { 
+        title: "C2: Finding Sanctuary",
+        selections: { 
+          structure: ['slt_gnd_church'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['candles'], 
+          duration: ['2h'], character: ['act_sleep_floor'],
+          defense: ['def_window_bars'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_long'], amenities: ['am_backpack'],
+          perspective: ['cam_low'], visual_style: ['gothic_noir'], textures: ['dec_rug_fur']
+        } 
+      },
+      { 
+        title: "C3: The Safest Place",
+        selections: { 
+          structure: ['slt_und_bank'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
+          duration: ['8h'], character: ['act_sleep_bed'],
+          defense: ['def_door_heavy'], sleeping: ['sleep_platform_low'], shot_type: ['dist_wide'], amenities: ['am_money_stacks'],
+          perspective: ['cam_high'], visual_style: ['cinematic_35mm'], textures: ['dec_pillow_sea']
+        } 
+      }
+    ]
+  }
 ];
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const [openCategories, setOpenCategories] = useState<string[]>(['structure', 'weather', 'warmth', 'character']); // Default expanded
+  const [openCategories, setOpenCategories] = useState<string[]>(['cat_shelters', 'weather', 'warmth']); // Default expanded
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -244,7 +183,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           onClick={() => setIsPlanOpen(true)} 
           className="w-full flex items-center justify-between px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-green-500/50 rounded-xl text-xs font-black text-slate-300 hover:text-white shadow-lg transition-all group"
         >
-          <span className="flex items-center gap-2"><Calendar size={14} className="text-green-500"/> 2026 战略全案 (Phase 1 & 2)</span>
+          <span className="flex items-center gap-2"><Calendar size={14} className="text-green-500"/> 避难所宇宙 (Content Matrix)</span>
           <ChevronDown size={14} className="group-hover:rotate-180 transition-transform"/>
         </button>
       </div>
@@ -336,35 +275,35 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <div className="p-10 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-slate-900 to-slate-950">
               <div>
                 <h3 className="text-3xl font-black text-white flex items-center gap-4 tracking-tighter">
-                  <Calendar className="text-green-500" size={32}/> HAVEN NIGHTS 2026 战略全案
+                  <Calendar className="text-green-500" size={32}/> HAVEN NIGHTS 频道矩阵
                 </h3>
-                <p className="text-slate-500 mt-2 font-medium">8-Hour Deep Sleep + 2-Hour LoFi Musician • 叙事驱动 • 目标 CTR > 4%</p>
+                <p className="text-slate-500 mt-2 font-medium">Series A/B/C • 流量与品牌双轮驱动</p>
               </div>
               <button onClick={() => setIsPlanOpen(false)} className="p-4 hover:bg-slate-800 rounded-full text-slate-500 hover:text-white transition-all"><X size={32}/></button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-10 space-y-12">
-              {JAN_2026_PLAN.map((week, idx) => (
+              {SHELTER_UNIVERSE_PLAN.map((week, idx) => (
                 <div key={idx} className="space-y-6">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <span className="text-xl font-black text-green-400 tracking-tight">{week.week}</span>
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">{week.theme}</span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {week.items.map((item, i) => (
                       <button 
                         key={i} 
                         onClick={() => executePlanItem(item)} 
-                        className="p-6 bg-slate-950 border border-slate-800 rounded-3xl hover:border-green-500 hover:bg-slate-800 transition-all text-left group relative overflow-hidden"
+                        className="p-6 bg-slate-950 border border-slate-800 rounded-3xl hover:border-green-500 hover:bg-slate-800 transition-all text-left group relative overflow-hidden flex flex-col h-full"
                       >
                         <div className="absolute top-0 left-0 w-1 h-full bg-green-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="text-xs font-black text-slate-500 mb-2 uppercase tracking-widest flex justify-between">
                            <span>{item.title.split(':')[0]}</span>
-                           <span className="text-green-500/50">SEO READY</span>
+                           <span className="text-green-500/50">READY</span>
                         </div>
-                        <div className="text-sm font-black text-slate-200 mb-4 group-hover:text-green-400 leading-tight">{item.title.split(':')[1] || item.title}</div>
+                        <div className="text-sm font-black text-slate-200 mb-4 group-hover:text-green-400 leading-tight flex-1">{item.title.split(':')[1] || item.title}</div>
                         <div className="flex items-center gap-2 text-[10px] text-slate-600 font-bold group-hover:text-slate-400">
-                          <PlayCircle size={14}/> 加载全案参数
+                          <PlayCircle size={14}/> 加载参数
                         </div>
                       </button>
                     ))}
@@ -400,7 +339,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                       <p>停止使用关键词堆砌（Tag Soup）。Nano-Banana Pro 是一个“思考型”模型，它理解意图、物理和构图。</p>
                    </div>
                 </section>
-                {/* ... (Kept short for brevity in this update block, assume original content remains) ... */}
                 <div className="text-center pt-10 border-t border-white/10 space-y-6">
                    <p className="text-xs font-black text-slate-600 uppercase tracking-[0.5em]">END OF STRATEGY GUIDE</p>
                 </div>

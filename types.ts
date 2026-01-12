@@ -53,10 +53,22 @@ export interface TextConfig {
   fontSize: number;
 }
 
+// NEW: Badge Configuration with Position support
+export interface BadgeConfig {
+  visible: boolean;
+  text: string;
+  style: 'box' | 'ribbon_tr' | 'ribbon_tl'; // Box (Standard), Ribbon Top-Right, Ribbon Top-Left
+  color: string; // Hex color
+  x: number; // For Box: Canvas X. For Ribbon: Offset from corner
+  y: number; // For Box: Canvas Y. For Ribbon: Vertical shift/thickness adjustment
+  fontSize: number; 
+}
+
 // NEW: Wrapper for thumbnail layout state
 export interface ThumbnailLayerConfig {
   headline: TextConfig;
   subhead: TextConfig;
+  badge: BadgeConfig; 
 }
 
 export interface GeneratedContent {

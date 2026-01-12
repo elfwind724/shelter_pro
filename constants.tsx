@@ -178,6 +178,9 @@ export const CATEGORIES: Category[] = [
     icon: <Camera className="w-4 h-4" />,
     type: 'single',
     items: [
+      // --- SPECIAL VEHICLE ANGLE ---
+      { id: 'cam_back_to_front', label: '车尾向前 (Rear to Front)', value: 'Wide shot from the very back of the living cabin looking forward. The composition must show the bed/living area in the foreground and the Driver Cockpit/Windshield in the distance. Reveals the full depth of the vehicle layout.' },
+
       // --- ANGLE (STATIC) ---
       { id: 'cam_standard', label: '标准人眼 (Standard)', value: 'Standard view, eye level. Natural human perspective.' },
       { id: 'cam_pov', label: '第一人称 (POV)', value: 'First Person Point of View (POV). Visuals strictly from the eye level. No visible hands. Immersive.' },
