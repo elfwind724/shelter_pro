@@ -465,22 +465,30 @@ export const generateDarkVariant = async (base64Image: string, originalPrompt: s
     }
 };
 
-// --- NEW: GENERATE SHORTS STORYLINE (POV INTERACTION) ---
-export const generateShortsStoryline = async (base64Image: string, originalPrompt: string): Promise<ShortsStory> => {
+// --- UPDATED: GENERATE SHORTS STORYLINE WITH USER INPUT ---
+export const generateShortsStoryline = async (base64Image: string, originalPrompt: string, userInstruction?: string): Promise<ShortsStory> => {
     try {
         const cleanPrompt = cleanPromptForGemini(originalPrompt);
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+        // Logic switch based on userInstruction
+        const scenarioInstruction = userInstruction 
+        ? `[USER OVERRIDE]: The user has specifically requested: "${userInstruction}".
+           You MUST adapt the 3 steps to fulfill this request. 
+           If the user lists 3 specific actions, map them to Step 1, 2, and 3.
+           If the user gives a vague vibe, interpret it creatively into 3 POV steps.`
+        : `[SCENARIO] The viewer (POV) is inside this room/shelter.
+           Step 1: ENTERING/APPROACHING. Camera moves into the space or walks towards the main feature (window/fire).
+           Step 2: INTERACTING. POV hands visible. Picking up a mug, touching a book, poking the fire, or holding an instrument.
+           Step 3: SETTLING/RELAXING. POV lying down or sitting back. Legs/Feet visible relaxing on the bed/rug/chair. Ultimate coziness.`;
 
         // STEP 1: SCRIPTING (Text & Metadata)
         const scriptPrompt = `
         [TASK] You are a YouTube Shorts Director. Analyze the provided image (The Scene). 
         Create a 3-Step POV Narrative Script to make this scene feel "ALIVE" and "INTERACTIVE".
         
-        [SCENARIO] The viewer (POV) is inside this room/shelter.
-        Step 1: ENTERING/APPROACHING. Camera moves into the space or walks towards the main feature (window/fire).
-        Step 2: INTERACTING. POV hands visible. Picking up a mug, touching a book, poking the fire, or holding an instrument.
-        Step 3: SETTLING/RELAXING. POV lying down or sitting back. Legs/Feet visible relaxing on the bed/rug/chair. Ultimate coziness.
+        ${scenarioInstruction}
         
         [OUTPUT FORMAT] JSON ONLY.
         {
@@ -488,9 +496,9 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
            "description": "Short engaging description for YouTube Shorts.",
            "tags": "#Shorts #Cozy #Rain...",
            "frames": [
-              { "step": 1, "actionDescription": "Walking towards the rainy window...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Full image generation prompt for Vertical 9:16 POV shot..." },
-              { "step": 2, "actionDescription": "Picking up hot coffee...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "..." },
-              { "step": 3, "actionDescription": "Lying on the bed watching rain...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "..." }
+              { "step": 1, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Full image generation prompt for Vertical 9:16 POV shot..." },
+              { "step": 2, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "..." },
+              { "step": 3, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "..." }
            ]
         }
         
@@ -560,4 +568,55 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
         console.error("Shorts Story Generation Error:", error);
         throw error;
     }
+};
+
+// --- NEW: THUMBNAIL REMASTER SERVICES ---
+export const cleanImageText = async (base64Image: string): Promise<string | null> => {
+  try {
+    const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    // Command explicitly for text removal / inpainting
+    const prompt = `[TASK] Image Cleanup. Remove ALL text, subtitles, logos, watermarks, and UI elements from this image. Inpaint the background to look natural and seamless. Output ONLY the clean background image.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { 
+        parts: [
+          { inlineData: { mimeType: 'image/png', data: base64Data } }, 
+          { text: prompt }
+        ] 
+      },
+    });
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+    }
+    return null;
+  } catch (error) {
+    console.error("Image Cleaning Error:", error);
+    throw error;
+  }
+};
+
+export const analyzeDescriptionForText = async (description: string): Promise<{headline: string, subhead: string}> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `Analyze this YouTube video description. Extract 2 short, punchy keywords for a thumbnail using high-contrast strategy.
+    
+    Format JSON: { "headline": "Main 1-2 words (White Text)", "subhead": "Secondary 1-2 words (Yellow Text)" }
+    
+    Description:
+    ${description.substring(0, 1000)}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image', // Using text model effectively
+      contents: { parts: [{ text: prompt }] },
+      config: { responseMimeType: 'application/json' }
+    });
+
+    return JSON.parse(response.text || '{"headline": "COZY", "subhead": "RAIN"}');
+  } catch (error) {
+    return { headline: "COZY", subhead: "AMBIENCE" };
+  }
 };

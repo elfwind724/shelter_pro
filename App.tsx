@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import OutputDisplay from './components/OutputDisplay';
 import HistoryPanel from './components/HistoryPanel';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import ThumbnailRemaster from './components/ThumbnailRemaster';
 import { SelectionState, GeneratedContent, Preset, AnalyticsRecord } from './types';
 import { generateContent, generateRandomSelections } from './services/generator';
 import { CATEGORIES } from './constants';
@@ -56,6 +57,7 @@ const App: React.FC = () => {
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [activeMobileTab, setActiveMobileTab] = useState<'editor' | 'results'>('editor');
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showRemaster, setShowRemaster] = useState(false); // NEW STATE
 
   useEffect(() => {
     try {
@@ -285,6 +287,7 @@ const App: React.FC = () => {
             onLoadPreset={handleLoadPreset}
             onDeletePreset={handleDeletePreset}
             onOpenAnalytics={() => setShowAnalytics(true)}
+            onOpenRemaster={() => setShowRemaster(true)}
           />
         </div>
 
@@ -314,6 +317,10 @@ const App: React.FC = () => {
           onDelete={handleDeleteAnalytics}
           onClose={() => setShowAnalytics(false)}
         />
+      )}
+
+      {showRemaster && (
+        <ThumbnailRemaster onClose={() => setShowRemaster(false)} />
       )}
     </div>
   );

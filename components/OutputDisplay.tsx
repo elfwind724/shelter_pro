@@ -4,7 +4,7 @@ import { GeneratedContent, ThumbnailLayerConfig } from '../types';
 import { 
   Copy, Download, Image as ImageIcon, Sparkles, RefreshCw, Star, 
   Palette, FileText, Music, Wand2, Video, Check, Layers, Type, ExternalLink,
-  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper, Scan, Minimize2, CheckCircle2, AlertTriangle, Move, Tag, Smartphone, ZoomIn, ZoomOut, Maximize, Loader2, Moon, Flame, Sun, Film, Footprints, Hand, BedDouble
+  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper, Scan, Minimize2, CheckCircle2, AlertTriangle, Move, Tag, Smartphone, ZoomIn, ZoomOut, Maximize, Loader2, Moon, Flame, Sun, Film, Footprints, Hand, BedDouble, Layout
 } from 'lucide-react';
 import { generateImagePreview, editGeneratedImage, generateVideoPromptFromImage, compositeThumbnail, outpaintImage, cropImage, generateDarkVariant, generateShortsStoryline } from '../services/imageService';
 import MaskCanvas from './MaskCanvas';
@@ -66,6 +66,9 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   // DARK MODE SLIDER STATE (Default 20% - Dark)
   const [darknessLevel, setDarknessLevel] = useState(20);
 
+  // SHORTS STORYBOARD INSTRUCTION
+  const [shortsInstruction, setShortsInstruction] = useState("");
+
   // LAYOUT CONFIG: Defaults set to Top/Bottom Split with Badge
   const [thumbConfig, setThumbConfig] = useState<ThumbnailLayerConfig>({
     headline: { x: 640, y: 100, fontSize: 160 }, 
@@ -88,6 +91,8 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
             badge: { visible: true, text: "NO MUSIC", style: 'ribbon_tr', color: '#16a34a', x: 0, y: 80, fontSize: 50 }
         });
       }
+      // Reset instruction when content changes
+      setShortsInstruction("");
     }
   }, [content]);
 
@@ -193,7 +198,7 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     if (!local.generatedImage) return;
     setLoading(true);
     try {
-      const story = await generateShortsStoryline(local.generatedImage, local.imagePrompt);
+      const story = await generateShortsStoryline(local.generatedImage, local.imagePrompt, shortsInstruction);
       if (story) {
         setLocal({ ...local, shortsStory: story });
       }
@@ -320,6 +325,7 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
       </div>
 
       <div className="flex-1 overflow-y-auto p-10 space-y-16 scroll-smooth scrollbar-hide">
+        <StrategyValidator content={local} />
         
         {/* 01: SCENE GENERATION */}
         <section className="space-y-8 animate-in fade-in duration-700">
@@ -555,14 +561,41 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
                                  <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">{local.shortsStory.description}</div>
                              </div>
                          </div>
+                         
+                         {/* REGENERATE CONTROLS */}
+                         <div className="border-t border-pink-900/30 pt-6 mt-6">
+                            <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
+                                <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest shrink-0">AI Director Override</span>
+                                <input 
+                                    value={shortsInstruction}
+                                    onChange={(e) => setShortsInstruction(e.target.value)}
+                                    placeholder="Change actions (e.g. 'Read a book instead')"
+                                    className="flex-1 w-full bg-slate-900 border border-pink-900/30 rounded-xl px-4 py-3 text-xs text-pink-100 placeholder:text-pink-500/30 focus:border-pink-500 outline-none"
+                                />
+                                <button onClick={handleGenShortsStory} disabled={loading} className="px-6 py-3 bg-pink-900/30 hover:bg-pink-600 text-pink-200 hover:text-white rounded-xl text-xs font-black transition-all border border-pink-500/30 flex items-center gap-2">
+                                    {loading ? <Loader2 className="animate-spin" size={14}/> : <RefreshCw size={14}/>} REGENERATE
+                                </button>
+                            </div>
+                         </div>
                      </div>
                  ) : (
                      <div className="bg-slate-900/40 rounded-[2.5rem] border border-pink-900/30 p-12 text-center">
                          <Smartphone size={48} className="text-pink-500/20 mb-6 mx-auto"/>
                          <h3 className="text-lg font-black text-pink-200 mb-2">Generate POV Narrative</h3>
-                         <p className="text-sm text-pink-200/50 max-w-md mx-auto mb-8">
+                         <p className="text-sm text-pink-200/50 max-w-md mx-auto mb-6">
                              Create a 3-step vertical storyboard (9:16) where the character walks in, interacts with an object, and settles down to sleep. Includes viral metadata.
                          </p>
+                         
+                         {/* INPUT AREA */}
+                         <div className="max-w-lg mx-auto mb-8">
+                             <textarea
+                                 value={shortsInstruction}
+                                 onChange={(e) => setShortsInstruction(e.target.value)}
+                                 placeholder="[Optional] Describe the 3 actions (e.g., '1. Open door, 2. Pet the cat, 3. Sleep on rug'). Leave empty for AI auto-director."
+                                 className="w-full bg-slate-950 border border-pink-900/30 rounded-xl p-4 text-xs text-pink-100 placeholder:text-pink-500/30 focus:border-pink-500 outline-none h-24 resize-none shadow-inner"
+                             />
+                         </div>
+
                          <button onClick={handleGenShortsStory} disabled={loading} className="px-12 py-5 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white rounded-[2rem] font-black text-sm shadow-xl shadow-pink-900/40 transition-all flex items-center gap-3 active:scale-95 mx-auto">
                              {loading ? <Loader2 className="animate-spin" size={18}/> : <Film size={18}/>} 生成 POV 互动分镜 (Generate Shorts)
                          </button>
@@ -571,196 +604,130 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
              </section>
         )}
 
-        {/* 02: THUMBNAIL EDITOR */}
-        <section className="space-y-8 animate-in fade-in duration-700">
-          <div className="bg-slate-900 rounded-[4rem] p-12 border-2 border-slate-800 shadow-inner grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-              <div className="space-y-10">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
-                    <Type size={18} className="text-orange-500"/> 封面大字 (Live Editor)
-                  </div>
-                  <button onClick={() => setShowLayoutControls(!showLayoutControls)} className="flex items-center gap-2 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-slate-700 text-slate-500 hover:text-white"><SlidersHorizontal size={12}/> Layout</button>
+        {/* 02: THUMBNAIL EDITOR (16:9) */}
+        {local.generatedImage && (
+          <section className="space-y-8 animate-in fade-in duration-700 bg-slate-900/50 p-8 rounded-[3rem] border border-slate-800/50">
+             <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
+                   <Layout size={18} className="text-yellow-500"/> 02. 封面设计 (Thumbnail Design)
                 </div>
-                
-                <div className="space-y-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-slate-500 uppercase font-black ml-2 tracking-widest">主标题 (White, Top)</label>
-                    <input value={thumbText[0] || ""} onChange={e => { const n = [...thumbText]; n[0] = e.target.value; setThumbText(n); }} className="w-full bg-slate-950 border-2 border-slate-800 rounded-3xl p-6 text-xl font-black text-white focus:border-white outline-none shadow-2xl transition-all"/>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-slate-500 uppercase font-black ml-2 tracking-widest">副标题 (Yellow, Bottom)</label>
-                    <input value={thumbText[1] || ""} onChange={e => { const n = [...thumbText]; n[1] = e.target.value; setThumbText(n); }} className="w-full bg-slate-950 border-2 border-slate-800 rounded-3xl p-6 text-xl font-black text-yellow-400 focus:border-yellow-400 outline-none shadow-2xl transition-all"/>
-                  </div>
-
-                  {/* BADGE EDITOR */}
-                  <div className="p-6 bg-slate-950 border border-slate-800 rounded-3xl space-y-4">
-                     <div className="flex items-center justify-between">
-                        <label className="text-[10px] text-slate-500 uppercase font-black tracking-widest flex items-center gap-2"><Tag size={12}/> Badge (NO MUSIC)</label>
-                        <button 
-                          onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, visible: !thumbConfig.badge.visible}})}
-                          className={`w-10 h-6 rounded-full transition-colors relative ${thumbConfig.badge?.visible ? 'bg-green-600' : 'bg-slate-700'}`}
-                        >
-                           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${thumbConfig.badge?.visible ? 'left-5' : 'left-1'}`}></div>
-                        </button>
-                     </div>
-                     
-                     {thumbConfig.badge?.visible && (
-                        <div className="space-y-4 pt-2 animate-in slide-in-from-top-2">
-                           {/* Text Edit */}
-                           <input 
-                             value={thumbConfig.badge.text} 
-                             onChange={e => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, text: e.target.value}})}
-                             className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white outline-none focus:border-green-500"
-                             placeholder="NO MUSIC / LOFI BEATS"
-                           />
-                           
-                           {/* Style Selection */}
-                           <div className="flex gap-2">
-                              {['box', 'ribbon_tr', 'ribbon_tl'].map((s) => (
-                                 <button 
-                                   key={s}
-                                   onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, style: s as any}})}
-                                   className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase border ${thumbConfig.badge.style === s ? 'bg-slate-800 border-white text-white' : 'border-slate-800 text-slate-500 hover:bg-slate-800'}`}
-                                 >
-                                   {s.replace('_', ' ')}
-                                 </button>
-                              ))}
-                           </div>
-
-                           {/* Color Selection */}
-                           <div className="flex gap-2">
-                              {['#16a34a', '#dc2626', '#a855f7', '#2563eb'].map((c) => (
-                                 <button 
-                                   key={c}
-                                   onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, color: c}})}
-                                   className={`flex-1 h-8 rounded-lg border-2 ${thumbConfig.badge.color === c ? 'border-white' : 'border-transparent'}`}
-                                   style={{backgroundColor: c}}
-                                 />
-                              ))}
-                           </div>
-
-                           {/* Position & Size Control */}
-                           <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800">
-                             <div>
-                               <label className="text-[10px] text-slate-500 font-bold uppercase block mb-1">X / Offset</label>
-                               <input 
-                                 type="number" 
-                                 value={thumbConfig.badge.x || 0}
-                                 onChange={e => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, x: Number(e.target.value)}})}
-                                 className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
-                               />
-                             </div>
-                             <div>
-                               <label className="text-[10px] text-slate-500 font-bold uppercase block mb-1">Y / Pos</label>
-                               <input 
-                                 type="number" 
-                                 value={thumbConfig.badge.y || 80}
-                                 onChange={e => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, y: Number(e.target.value)}})}
-                                 className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
-                               />
-                             </div>
-                             <div>
-                               <label className="text-[10px] text-slate-500 font-bold uppercase block mb-1">Size</label>
-                               <input 
-                                 type="number" 
-                                 value={thumbConfig.badge.fontSize || 50}
-                                 onChange={e => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, fontSize: Number(e.target.value)}})}
-                                 className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
-                               />
-                             </div>
-                           </div>
-                           <p className="text-[10px] text-slate-500 italic">For Ribbon: Y = Distance from corner. For Box: X/Y = Coordinates.</p>
-                        </div>
-                     )}
-                  </div>
-
-                  {showLayoutControls && (
-                       <div className="flex gap-4 p-4 bg-slate-950 rounded-2xl flex-col">
-                          <label className="text-[10px] uppercase font-bold text-slate-500">Headline Y Position</label>
-                          <input type="range" min="0" max="720" value={thumbConfig.headline.y} onChange={e => setThumbConfig({...thumbConfig, headline: {...thumbConfig.headline, y: Number(e.target.value)}})} className="w-full accent-white"/>
-                          <label className="text-[10px] uppercase font-bold text-slate-500">Subhead Y Position</label>
-                          <input type="range" min="0" max="720" value={thumbConfig.subhead.y} onChange={e => setThumbConfig({...thumbConfig, subhead: {...thumbConfig.subhead, y: Number(e.target.value)}})} className="w-full accent-yellow-400"/>
-                       </div>
-                  )}
+                <div className="flex gap-2">
+                   <button onClick={handleGenThumbnail} disabled={loading} className="text-[10px] font-black text-slate-500 hover:text-white flex items-center gap-2 transition-colors border border-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-800">
+                      {loading ? <Loader2 size={14} className="animate-spin"/> : <Sparkles size={14}/>} GEN DEDICATED THUMBNAIL
+                   </button>
+                   <button onClick={downloadThumbnail} className="text-[10px] font-black text-yellow-500 hover:text-yellow-400 flex items-center gap-2 transition-colors border border-yellow-500/30 px-3 py-1.5 rounded-lg hover:bg-yellow-900/20">
+                      <Download size={14}/> DOWNLOAD 16:9
+                   </button>
                 </div>
-              </div>
+             </div>
 
-              <div className="space-y-8">
-                {/* Horizontal 16:9 Preview */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.4em] flex items-center gap-3">
-                      <Palette size={18} className="text-orange-500"/> 封面 16:9
-                    </div>
-                    {thumbnailPreview && <button onClick={downloadThumbnail} className="text-[10px] font-black text-green-400"><Download size={14}/></button>}
-                  </div>
-                  <div className="bg-slate-950/60 aspect-video rounded-[2.5rem] border-2 border-slate-800 relative overflow-hidden shadow-2xl">
-                     {thumbnailPreview ? <img src={thumbnailPreview} className="w-full h-full object-cover"/> : <ImageIcon size={48} className="text-slate-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"/>}
-                  </div>
-                  <button onClick={handleGenThumbnail} disabled={loading} className="w-full py-4 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-[2rem] font-black shadow-lg uppercase text-xs disabled:opacity-50 flex items-center justify-center gap-2">
-                     {loading ? <Loader2 className="animate-spin" size={16}/> : null}
-                     渲染高冲突封面 (Viral)
-                  </button>
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Preview */}
+                <div className="relative aspect-video bg-slate-900 rounded-[2rem] border-2 border-slate-800 overflow-hidden shadow-2xl group">
+                   {thumbnailPreview ? (
+                      <img src={thumbnailPreview} className="w-full h-full object-cover"/>
+                   ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-700">Generating Preview...</div>
+                   )}
                 </div>
 
-                {/* Vertical 9:16 Preview (Shorts) */}
-                <div className="space-y-4 pt-8 border-t border-slate-800/50">
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.4em] flex items-center gap-3">
-                      <Smartphone size={18} className="text-pink-500"/> Shorts 9:16
-                    </div>
-                    {verticalThumbnailPreview && <button onClick={downloadVerticalThumbnail} className="text-[10px] font-black text-green-400"><Download size={14}/></button>}
-                  </div>
-                  <div className="flex justify-center">
-                    <div className="bg-slate-950/60 aspect-[9/16] w-2/3 rounded-[2rem] border-2 border-slate-800 relative overflow-hidden shadow-2xl">
-                       {verticalThumbnailPreview ? <img src={verticalThumbnailPreview} className="w-full h-full object-cover"/> : <ImageIcon size={32} className="text-slate-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"/>}
-                    </div>
-                  </div>
-                  <button onClick={handleGenVerticalThumbnail} disabled={loading} className="w-full py-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-[2rem] font-black shadow-lg uppercase text-xs disabled:opacity-50 flex items-center justify-center gap-2">
-                     {loading ? <Loader2 className="animate-spin" size={16}/> : null}
-                     渲染竖屏封面 (Shorts)
-                  </button>
+                {/* Controls */}
+                <div className="space-y-6 bg-slate-900/50 p-6 rounded-[2rem] border border-slate-800">
+                   <div className="space-y-4">
+                      <div className="space-y-1">
+                         <label className="text-[10px] font-black text-slate-500 uppercase">Headline (White)</label>
+                         <input 
+                           value={thumbText[0] || ""} 
+                           onChange={e => { const n = [...thumbText]; n[0] = e.target.value; setThumbText(n); }}
+                           className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-black text-white focus:border-yellow-500 outline-none"
+                         />
+                      </div>
+                      <div className="space-y-1">
+                         <label className="text-[10px] font-black text-slate-500 uppercase">Subhead (Yellow)</label>
+                         <input 
+                           value={thumbText[1] || ""} 
+                           onChange={e => { const n = [...thumbText]; n[1] = e.target.value; setThumbText(n); }}
+                           className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-black text-yellow-500 focus:border-yellow-500 outline-none"
+                         />
+                      </div>
+                   </div>
+
+                   <div className="pt-6 border-t border-slate-800">
+                      <div className="flex items-center justify-between mb-4">
+                         <span className="text-[10px] font-black text-slate-500 uppercase">Badge Settings</span>
+                         <button onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, visible: !thumbConfig.badge.visible}})} className={`w-10 h-6 rounded-full p-1 transition-colors ${thumbConfig.badge.visible ? 'bg-green-500' : 'bg-slate-700'}`}>
+                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${thumbConfig.badge.visible ? 'translate-x-4' : ''}`}></div>
+                         </button>
+                      </div>
+                      {thumbConfig.badge.visible && (
+                         <div className="grid grid-cols-2 gap-4">
+                            <button 
+                               onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, text: "NO MUSIC", color: "#16a34a"}})}
+                               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${thumbConfig.badge.text === 'NO MUSIC' ? 'bg-green-600 border-green-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-500'}`}
+                            >
+                               NO MUSIC
+                            </button>
+                            <button 
+                               onClick={() => setThumbConfig({...thumbConfig, badge: {...thumbConfig.badge, text: "LOFI BEATS", color: "#a855f7"}})}
+                               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${thumbConfig.badge.text === 'LOFI BEATS' ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-500'}`}
+                            >
+                               LOFI BEATS
+                            </button>
+                         </div>
+                      )}
+                   </div>
                 </div>
-              </div>
-          </div>
-        </section>
-
-        {/* 03: SEO & PROMPT DATA */}
-        <section className="space-y-10">
-           <StrategyValidator content={local} />
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              <div className="bg-slate-900 border-2 border-slate-800 rounded-[2.5rem] p-8">
-                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Title</h4>
-                 <div className="text-2xl font-black text-white">{local.youtubeTitle}</div>
-              </div>
-              <div className="bg-slate-900 border-2 border-slate-800 rounded-[2.5rem] p-8">
-                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Tags</h4>
-                 <div className="flex flex-wrap gap-2">
-                    {local.tags.split(',').map((t, i) => <span key={i} className="px-3 py-1 bg-slate-800 rounded-full text-[10px] text-slate-400 border border-slate-700">{t.trim()}</span>)}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* FIX 3: ADDED I2V PROMPT SECTION */}
-        {local.i2vPrompt && (
-          <section className="bg-emerald-950/20 border border-emerald-900/50 rounded-[2.5rem] p-8 animate-in slide-in-from-bottom-6">
-            <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Video size={14}/> 04. 动态视频提示词 (Motion Prompts)
-            </h4>
-            <div className="bg-slate-950/50 rounded-2xl p-6 font-mono text-sm text-emerald-300 leading-relaxed border border-emerald-900/30">
-              {local.i2vPrompt}
-            </div>
-            <div className="flex justify-end mt-4">
-              <button 
-                onClick={() => {navigator.clipboard.writeText(local.i2vPrompt); alert("Copied!")}}
-                className="px-4 py-2 bg-emerald-900/30 hover:bg-emerald-800 text-emerald-400 rounded-lg text-xs font-bold transition-all"
-              >
-                Copy Prompt
-              </button>
-            </div>
+             </div>
           </section>
+        )}
+        
+        {/* 03: VERTICAL THUMBNAIL (9:16) */}
+        {local.generatedImage && (
+             <section className="space-y-8 animate-in fade-in duration-700">
+                 <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
+                       <Smartphone size={18} className="text-blue-500"/> 03. 竖屏封面 (Shorts Cover)
+                    </div>
+                    <div className="flex gap-2">
+                       <button onClick={handleGenVerticalThumbnail} disabled={loading} className="text-[10px] font-black text-slate-500 hover:text-white flex items-center gap-2 transition-colors border border-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-800">
+                          {loading ? <Loader2 size={14} className="animate-spin"/> : <Sparkles size={14}/>} GEN VERTICAL BASE
+                       </button>
+                       <button onClick={downloadVerticalThumbnail} className="text-[10px] font-black text-blue-500 hover:text-blue-400 flex items-center gap-2 transition-colors border border-blue-500/30 px-3 py-1.5 rounded-lg hover:bg-blue-900/20">
+                          <Download size={14}/> DOWNLOAD 9:16
+                       </button>
+                    </div>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     <div className="md:col-span-1 relative aspect-[9/16] bg-slate-900 rounded-[2rem] border-2 border-slate-800 overflow-hidden shadow-2xl">
+                         {verticalThumbnailPreview ? (
+                             <img src={verticalThumbnailPreview} className="w-full h-full object-cover"/>
+                         ) : (
+                             <div className="w-full h-full flex items-center justify-center text-slate-700">No Preview</div>
+                         )}
+                     </div>
+                     <div className="md:col-span-2 bg-slate-900/50 p-8 rounded-[2rem] border border-slate-800 flex flex-col justify-center text-center">
+                         <Info size={32} className="text-slate-600 mb-4 mx-auto"/>
+                         <h3 className="text-white font-bold mb-2">Auto-Adaptive Layout</h3>
+                         <p className="text-slate-400 text-sm max-w-md mx-auto">The vertical thumbnail automatically adapts the headline and subhead from the main editor, repositioning them for mobile 9:16 displays.</p>
+                     </div>
+                 </div>
+             </section>
+        )}
+
+        {/* 04: MOTION PROMPT */}
+        {local.generatedImage && (
+             <section className="space-y-4 animate-in fade-in duration-700">
+                 <div className="flex items-center gap-3 text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-4">
+                     <Video size={18} className="text-purple-500"/> 04. 视频生成提示词 (Motion Prompt)
+                 </div>
+                 <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 group relative">
+                     <p className="text-sm text-slate-300 font-mono leading-relaxed">{local.i2vPrompt || "Click the Video Icon in Section 01 to generate a motion prompt."}</p>
+                     <button onClick={() => {navigator.clipboard.writeText(local.i2vPrompt); alert("Copied!");}} className="absolute top-4 right-4 p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Copy size={16}/>
+                     </button>
+                 </div>
+             </section>
         )}
 
       </div>

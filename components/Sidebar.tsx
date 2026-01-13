@@ -7,7 +7,7 @@ import {
   Check, ChevronDown, ChevronUp, Zap, RotateCcw, Save, Trash2, FolderOpen, X, 
   BookOpen, Terminal, Calendar, PlayCircle, Info, Wand2, Eye, History, Settings2, Target,
   Cpu, Lightbulb, PenTool, Layers, AlertTriangle, Aperture, Fingerprint, Palette, Link as LinkIcon,
-  Brain, Globe, Layout, Type, Eraser, Box, ScanFace, FileJson, TrendingUp
+  Brain, Globe, Layout, Type, Eraser, Box, ScanFace, FileJson, TrendingUp, ImageMinus
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,7 +20,8 @@ interface SidebarProps {
   onSavePreset: (name: string) => void;
   onLoadPreset: (presetId: string) => void;
   onDeletePreset: (presetId: string) => void;
-  onOpenAnalytics: () => void; // New prop for Analytics
+  onOpenAnalytics: () => void;
+  onOpenRemaster: () => void; // NEW PROP
 }
 
 // 2026年1月 HAVEN NIGHTS 战略发布计划 (CONTENT MATRIX)
@@ -173,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           </h1>
           <div className="flex gap-2">
             <button onClick={() => props.onOpenAnalytics()} className="p-2 bg-green-900/20 text-green-400 rounded-xl border border-green-500/30 hover:bg-green-600 hover:text-white hover:border-green-500 transition-all shadow-lg shadow-green-900/10" title="SEO Analytics Command Center"><TrendingUp size={18} /></button>
-            <button onClick={() => setIsGuideOpen(true)} className="p-2 bg-slate-800 text-slate-400 rounded-xl border border-slate-700 hover:text-orange-400 hover:border-orange-500/50 transition-all" title="Nano Banana Strategy Guide"><BookOpen size={18} /></button>
+            <button onClick={() => props.onOpenRemaster()} className="p-2 bg-pink-900/20 text-pink-400 rounded-xl border border-pink-500/30 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition-all shadow-lg shadow-pink-900/10" title="Thumbnail Remaster Tool"><ImageMinus size={18} /></button>
             <button onClick={() => setIsImportOpen(true)} className="p-2 bg-slate-800 text-slate-400 rounded-xl border border-slate-700 hover:text-white transition-all" title="Reverse Sync"><Terminal size={18} /></button>
           </div>
         </div>
