@@ -71,6 +71,22 @@ export interface ThumbnailLayerConfig {
   badge: BadgeConfig; 
 }
 
+// --- NEW: SHORTS STORYBOARD STRUCTURE ---
+export interface ShortsFrame {
+  step: number;
+  actionDescription: string; // Internal logic
+  overlayText: string; // Short viral text for the video
+  imagePrompt: string; // The prompt used
+  imageUrl?: string; // The generated 9:16 image
+}
+
+export interface ShortsStory {
+  title: string; // Viral Shorts Title
+  description: string; // Short description
+  tags: string; // Hashtags
+  frames: ShortsFrame[]; // 3 Frames
+}
+
 export interface GeneratedContent {
   id: string;
   timestamp: number;
@@ -79,6 +95,14 @@ export interface GeneratedContent {
   verticalThumbnailPrompt: string; // NEW: Dedicated prompt for 9:16 Shorts covers
   videoPrompt: string; // Legacy T2V prompt
   i2vPrompt: string;   // New: Optimized for Image-to-Video (Veo/Sora)
+  
+  // DARK MODE VARIANTS
+  darkImage?: string; // The generated "Lights Off" image
+  darkI2vPrompt?: string; // The motion prompt specifically for the dark image
+  
+  // SHORTS STORYBOARD
+  shortsStory?: ShortsStory; // The generated 3-step narrative
+
   youtubeTitle: string;
   youtubeDescription: string;
   thumbnailText: string[];

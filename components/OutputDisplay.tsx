@@ -4,9 +4,9 @@ import { GeneratedContent, ThumbnailLayerConfig } from '../types';
 import { 
   Copy, Download, Image as ImageIcon, Sparkles, RefreshCw, Star, 
   Palette, FileText, Music, Wand2, Video, Check, Layers, Type, ExternalLink,
-  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper, Scan, Minimize2, CheckCircle2, AlertTriangle, Move, Tag, Smartphone, ZoomIn, ZoomOut, Maximize, Loader2
+  Info, ShieldCheck, Zap, Activity, Trash2, X, Hash, Search, SlidersHorizontal, ArrowDown, ArrowRight, CaseUpper, Scan, Minimize2, CheckCircle2, AlertTriangle, Move, Tag, Smartphone, ZoomIn, ZoomOut, Maximize, Loader2, Moon, Flame, Sun, Film, Footprints, Hand, BedDouble
 } from 'lucide-react';
-import { generateImagePreview, editGeneratedImage, generateVideoPromptFromImage, compositeThumbnail, outpaintImage, cropImage } from '../services/imageService';
+import { generateImagePreview, editGeneratedImage, generateVideoPromptFromImage, compositeThumbnail, outpaintImage, cropImage, generateDarkVariant, generateShortsStoryline } from '../services/imageService';
 import MaskCanvas from './MaskCanvas';
 
 interface Props {
@@ -63,6 +63,9 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [verticalThumbnailPreview, setVerticalThumbnailPreview] = useState<string | null>(null);
   
+  // DARK MODE SLIDER STATE (Default 20% - Dark)
+  const [darknessLevel, setDarknessLevel] = useState(20);
+
   // LAYOUT CONFIG: Defaults set to Top/Bottom Split with Badge
   const [thumbConfig, setThumbConfig] = useState<ThumbnailLayerConfig>({
     headline: { x: 640, y: 100, fontSize: 160 }, 
@@ -166,6 +169,63 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     } finally { setLoading(false); }
   };
 
+  // --- NEW: Handle Dark Variant Generation with Brightness Control ---
+  const handleGenDarkVariant = async () => {
+    if (!local.generatedImage) return;
+    setLoading(true);
+    try {
+      const url = await generateDarkVariant(local.generatedImage, local.imagePrompt, darknessLevel);
+      if (url) {
+         // Auto-generate motion prompt for the dark image too
+         const motionPrompt = await generateVideoPromptFromImage(url);
+         setLocal({ ...local, darkImage: url, darkI2vPrompt: motionPrompt });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate dark variant.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- NEW: Handle Shorts Storyboard Generation ---
+  const handleGenShortsStory = async () => {
+    if (!local.generatedImage) return;
+    setLoading(true);
+    try {
+      const story = await generateShortsStoryline(local.generatedImage, local.imagePrompt);
+      if (story) {
+        setLocal({ ...local, shortsStory: story });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate shorts story.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- NEW: Download All Shots ---
+  const handleDownloadAllShots = () => {
+      if (!local.shortsStory || !local.shortsStory.frames) return;
+      
+      local.shortsStory.frames.forEach((frame, index) => {
+          if (frame.imageUrl) {
+              // Stagger downloads slightly to prevent browser blocking
+              setTimeout(() => {
+                  const link = document.createElement('a');
+                  // Filename: Title_Shot_1.png
+                  const safeTitle = local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 20);
+                  link.download = `Shot_${frame.step}_${safeTitle}.png`;
+                  link.href = frame.imageUrl!;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+              }, index * 500);
+          }
+      });
+  };
+
   const handleZoomOut = async (factor: number) => {
     if (!local.generatedImage) return;
     setLoading(true);
@@ -197,7 +257,7 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   };
 
   const copyAll = () => {
-    const text = `【Title】\n${local.youtubeTitle}\n\n【Description】\n${local.youtubeDescription}\n\n【Tags】\n${local.tags}\n\n【I2V】\n${local.i2vPrompt}`;
+    const text = `【Title】\n${local.youtubeTitle}\n\n【Description】\n${local.youtubeDescription}\n\n【Tags】\n${local.tags}\n\n【I2V】\n${local.i2vPrompt}\n\n【Dark I2V】\n${local.darkI2vPrompt || "N/A"}`;
     navigator.clipboard.writeText(text);
     alert("全案运营参数已复制！");
   };
@@ -218,12 +278,19 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     link.click();
   };
 
-  // FIX: ADDED DOWNLOAD FUNCTION
   const downloadMainImage = () => {
     if (!local?.generatedImage) return;
     const link = document.createElement('a');
     link.download = `SCENE_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 30)}.png`;
     link.href = local.generatedImage;
+    link.click();
+  };
+
+  const downloadDarkImage = () => {
+    if (!local?.darkImage) return;
+    const link = document.createElement('a');
+    link.download = `SCENE_DARK_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0, 30)}.png`;
+    link.href = local.darkImage;
     link.click();
   };
 
@@ -340,6 +407,169 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
             </div>
           )}
         </section>
+
+        {/* 01.5: DARK MODE VARIANT (NEW) */}
+        {local.generatedImage && (
+            <section className="space-y-8 animate-in fade-in duration-700 bg-indigo-950/20 p-8 rounded-[3rem] border border-indigo-900/50">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs font-black text-indigo-400 uppercase tracking-[0.4em]">
+                    <Moon size={18} className="text-indigo-400 fill-indigo-400"/> 01.5 熄灯/微光模式 (Dark Mode)
+                    </div>
+                    {local.darkImage && (
+                        <button onClick={downloadDarkImage} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 flex items-center gap-2 transition-colors">
+                        <Download size={14}/> DOWNLOAD DARK PNG
+                        </button>
+                    )}
+                </div>
+
+                <div className="relative aspect-video bg-slate-900/60 rounded-[2.5rem] border-2 border-indigo-900/30 overflow-hidden shadow-2xl">
+                    {local.darkImage ? (
+                        <div className="relative w-full h-full group">
+                           <img src={local.darkImage} className="w-full h-full object-cover"/>
+                        </div>
+                    ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+                            <Moon size={48} className="text-indigo-500/30 mb-6"/>
+                            <p className="text-xs text-indigo-400/60 font-bold max-w-sm mb-6">生成此场景的“关灯”版本。请使用下方滑块调整目标暗度。</p>
+                            
+                            {/* NEW: BRIGHTNESS SLIDER */}
+                            <div className="w-full max-w-sm mb-8 bg-slate-900/80 p-6 rounded-2xl border border-indigo-900/50 shadow-inner">
+                               <div className="flex justify-between items-center mb-4">
+                                  <div className="flex items-center gap-2 text-indigo-300">
+                                     <Moon size={14} className="fill-indigo-300"/>
+                                     <span className="text-[10px] font-black uppercase tracking-widest">Darkness</span>
+                                  </div>
+                                  <div className="text-xs font-mono font-bold text-white bg-indigo-600 px-2 py-1 rounded">
+                                     {darknessLevel < 25 ? "BLACKOUT" : darknessLevel < 60 ? "DIM" : "BLUE HOUR"} ({darknessLevel}%)
+                                  </div>
+                                  <div className="flex items-center gap-2 text-indigo-300">
+                                     <Sun size={14}/>
+                                  </div>
+                               </div>
+                               <input 
+                                 type="range" 
+                                 min="0" 
+                                 max="100" 
+                                 value={darknessLevel} 
+                                 onChange={(e) => setDarknessLevel(Number(e.target.value))}
+                                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                               />
+                               <div className="flex justify-between mt-2 text-[10px] text-slate-500 font-bold uppercase">
+                                  <span>Pitch Black</span>
+                                  <span>Cinematic Dim</span>
+                                  <span>Ambient Glow</span>
+                               </div>
+                            </div>
+
+                            <button onClick={handleGenDarkVariant} disabled={loading} className="px-12 py-5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-[2rem] font-black text-sm shadow-xl shadow-indigo-900/40 transition-all flex items-center gap-3 active:scale-95">
+                                {loading ? <Loader2 className="animate-spin" size={18}/> : <Flame size={18}/>} 生成暗场图 (Generate Lights Off)
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {local.darkI2vPrompt && (
+                   <div className="bg-slate-900/50 rounded-2xl p-6 border border-indigo-900/30">
+                      <div className="flex items-center justify-between mb-2">
+                         <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Dark Motion Prompt</span>
+                         <button onClick={() => {navigator.clipboard.writeText(local.darkI2vPrompt || ""); alert("Copied!")}} className="text-indigo-400 hover:text-white"><Copy size={12}/></button>
+                      </div>
+                      <p className="text-xs font-mono text-indigo-200/80 leading-relaxed">{local.darkI2vPrompt}</p>
+                   </div>
+                )}
+            </section>
+        )}
+        
+        {/* 05: SHORTS STORYBOARD (NEW) */}
+        {local.generatedImage && (
+             <section className="space-y-8 animate-in fade-in duration-700 bg-pink-950/20 p-8 rounded-[3rem] border border-pink-900/50">
+                 <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs font-black text-pink-400 uppercase tracking-[0.4em]">
+                      <Film size={18} className="text-pink-400"/> 05. SHORTS 第一人称分镜 (POV Storyboard)
+                    </div>
+                    <div className="flex gap-3">
+                        {local.shortsStory && local.shortsStory.frames && local.shortsStory.frames.length > 0 && (
+                            <button onClick={handleDownloadAllShots} className="text-[10px] font-black text-pink-400 hover:text-white flex items-center gap-2 transition-colors border border-pink-500/30 px-3 py-1.5 rounded-lg hover:bg-pink-600">
+                                <Download size={14}/> DOWNLOAD ALL SHOTS
+                            </button>
+                        )}
+                        {local.shortsStory && (
+                            <button onClick={() => {
+                                const md = `TITLE: ${local.shortsStory?.title}\n\nDESC: ${local.shortsStory?.description}\n\nTAGS: ${local.shortsStory?.tags}`;
+                                navigator.clipboard.writeText(md);
+                                alert("Copied Shorts Metadata!");
+                            }} className="text-[10px] font-black text-pink-400 hover:text-white flex items-center gap-2 transition-colors border border-pink-500/30 px-3 py-1.5 rounded-lg hover:bg-pink-600">
+                                <Copy size={14}/> COPY METADATA
+                            </button>
+                        )}
+                    </div>
+                 </div>
+
+                 {local.shortsStory ? (
+                     <div className="space-y-8">
+                         {/* FRAMES GRID */}
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                             {local.shortsStory.frames.map((frame, i) => (
+                                 <div key={i} className="space-y-4">
+                                     <div className="relative aspect-[9/16] bg-slate-900 rounded-3xl border border-pink-900/30 overflow-hidden group shadow-2xl">
+                                         {frame.imageUrl ? (
+                                             <img src={frame.imageUrl} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+                                         ) : (
+                                             <div className="w-full h-full flex items-center justify-center">
+                                                 <Loader2 className="animate-spin text-pink-500"/>
+                                             </div>
+                                         )}
+                                         
+                                         {/* OVERLAY TEXT MOCKUP */}
+                                         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-full text-center px-4">
+                                             <span className="bg-black/40 text-white font-black text-lg px-2 py-1 rounded backdrop-blur-sm shadow-lg">
+                                                 {frame.overlayText}
+                                             </span>
+                                         </div>
+
+                                         <div className="absolute top-4 left-4 bg-pink-600 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-lg">
+                                             Shot {frame.step}
+                                         </div>
+                                     </div>
+                                     <div className="px-2">
+                                         <div className="text-[10px] font-black text-pink-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                             {i===0 ? <Footprints size={12}/> : i===1 ? <Hand size={12}/> : <BedDouble size={12}/>}
+                                             {i===0 ? "Approach" : i===1 ? "Interact" : "Relax"}
+                                         </div>
+                                         <p className="text-xs text-slate-400 leading-relaxed font-medium">{frame.actionDescription}</p>
+                                     </div>
+                                 </div>
+                             ))}
+                         </div>
+                         
+                         {/* METADATA BOX */}
+                         <div className="bg-slate-900/50 p-6 rounded-3xl border border-pink-900/30 grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <div>
+                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Shorts Title</h4>
+                                 <div className="text-lg font-bold text-white mb-4">{local.shortsStory.title}</div>
+                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Tags</h4>
+                                 <div className="text-xs text-pink-300 font-mono leading-relaxed">{local.shortsStory.tags}</div>
+                             </div>
+                             <div>
+                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Description</h4>
+                                 <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">{local.shortsStory.description}</div>
+                             </div>
+                         </div>
+                     </div>
+                 ) : (
+                     <div className="bg-slate-900/40 rounded-[2.5rem] border border-pink-900/30 p-12 text-center">
+                         <Smartphone size={48} className="text-pink-500/20 mb-6 mx-auto"/>
+                         <h3 className="text-lg font-black text-pink-200 mb-2">Generate POV Narrative</h3>
+                         <p className="text-sm text-pink-200/50 max-w-md mx-auto mb-8">
+                             Create a 3-step vertical storyboard (9:16) where the character walks in, interacts with an object, and settles down to sleep. Includes viral metadata.
+                         </p>
+                         <button onClick={handleGenShortsStory} disabled={loading} className="px-12 py-5 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white rounded-[2rem] font-black text-sm shadow-xl shadow-pink-900/40 transition-all flex items-center gap-3 active:scale-95 mx-auto">
+                             {loading ? <Loader2 className="animate-spin" size={18}/> : <Film size={18}/>} 生成 POV 互动分镜 (Generate Shorts)
+                         </button>
+                     </div>
+                 )}
+             </section>
+        )}
 
         {/* 02: THUMBNAIL EDITOR */}
         <section className="space-y-8 animate-in fade-in duration-700">

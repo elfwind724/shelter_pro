@@ -1,6 +1,6 @@
 
-import { GoogleGenAI } from "@google/genai";
-import { ThumbnailLayerConfig, BadgeConfig } from "../types";
+import { GoogleGenAI, Type } from "@google/genai";
+import { ThumbnailLayerConfig, BadgeConfig, ShortsStory, ShortsFrame } from "../types";
 
 // ... (Constants and helper functions like cleanPromptForGemini, generateImagePreview kept the same)
 const NEGATIVE_PROMPTS = "worst quality, normal quality, low quality, low res, blurry, artifacts, jpeg artifacts, washed-out backgrounds, low detail, extra limbs, distorted hands, incorrect anatomy, poorly drawn hands, poorly drawn feet, missing digits, extra digits, interlocked fingers, deformed bows, Polydactyly, multiple limbs, watermark, signature, text, logo, username, error, cut off, out of frame, body out of frame, draft, simple background, blank background, abstract background, tiling, open windows, rain inside, wet floor, flooded room, tile floor, marble floor, cold stone floor, ceramic tiles, hospital floor, clinical, dark room, gloomy interior, scary, horror, no visible hands, disembodied arms, first-person hands, deformed face, ugly face, mutated hands, missing legs";
@@ -367,5 +367,197 @@ export const generateVideoPromptFromImage = async (base64Image: string): Promise
     } catch (error) {
         console.error("Video Prompt Generation Error:", error);
         return "Error analyzing image. Please ensure API key allows Vision tasks.";
+    }
+};
+
+// --- NEW: GENERATE DARK VARIANT (VARIABLE BRIGHTNESS) ---
+export const generateDarkVariant = async (base64Image: string, originalPrompt: string, brightnessLevel: number = 20): Promise<string | null> => {
+    try {
+        // STEP 1: SANITIZE ORIGINAL PROMPT
+        // We must remove all mention of "Fire", "Stove", "Warmth", "Light" from the original context
+        // to stop the AI from hallucinating them back into existence.
+        let sanitizedContext = cleanPromptForGemini(originalPrompt);
+        
+        // Aggressive regex to kill light sources in the prompt text
+        const forbiddenTerms = [
+            /fire/gi, /flame/gi, /burning/gi, /stove/gi, /fireplace/gi, 
+            /warm/gi, /glow/gi, /light/gi, /lamp/gi, /candle/gi, /lit/gi, 
+            /bright/gi, /sun/gi, /day/gi, /morning/gi, /noon/gi
+        ];
+        
+        forbiddenTerms.forEach(term => {
+            sanitizedContext = sanitizedContext.replace(term, "");
+        });
+
+        const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+        // DYNAMIC LOGIC BASED ON BRIGHTNESS LEVEL (0 - 100)
+        let brightnessInstruction = "";
+        let lightSourceConstraint = "";
+
+        // Check if user has explicit candles or oil lamps in the ORIGINAL (we stripped them, but we need to know if they were there to allow small lights)
+        const originalHadCandles = originalPrompt.toLowerCase().includes('candle') || originalPrompt.toLowerCase().includes('oil lamp');
+        
+        if (brightnessLevel < 25) {
+            // LEVEL 0-25: TOTAL BLACKOUT / SILHOUETTE
+            brightnessInstruction = `
+            1. [PHYSICS OVERRIDE]: IGNORE ORIGINAL LIGHTING. RE-RENDER AS PITCH BLACK NIGHT.
+            2. [INTERIOR]: NO ELECTRIC LIGHTS. Total power failure. 
+            3. [FIREPLACE/STOVE STATE]: EXTINGUISHED. COLD ASH. If you must show it, show only 1 tiny red spark (dying ember). NO FLAMES.
+            4. [VISIBILITY]: Objects are barely visible silhouettes against the window.
+            `;
+            if (originalHadCandles) {
+                lightSourceConstraint = "PRIMARY SOURCE: A few small candles/oil lamps creating weak pools of light. Rest of room is DARK.";
+            } else {
+                lightSourceConstraint = "PRIMARY SOURCE: Very faint moonlight from window. FIRE IS OUT (Embers only).";
+            }
+        } else if (brightnessLevel < 60) {
+             // LEVEL 25-60: DEEP SHADOWS
+            brightnessInstruction = `
+            1. [ENVIRONMENT]: Low-light Emergency Mode.
+            2. [INTERIOR]: Deep shadows. Electric lights are OFF.
+            3. [FIREPLACE/STOVE STATE]: DYING EMBERS. A pile of glowing red coals. NO YELLOW FLAMES.
+            `;
+            lightSourceConstraint = originalHadCandles ? "Candlelight + Moonlight mixture." : "Moonlight dominates. Fireplace provides faint red ambient glow only.";
+        } else {
+            // LEVEL 60-100: BLUE HOUR
+            brightnessInstruction = `
+            1. [ENVIRONMENT]: Blue Hour / Twilight.
+            2. [INTERIOR]: Dim, cool ambient light filling the room.
+            `;
+            lightSourceConstraint = "Soft atmospheric blue skylight filling the room. Soft shadows.";
+        }
+
+        const prompt = `[TASK] RE-RENDER this scene as a DEEP NIGHT SCENE with a COMPLETE POWER OUTAGE.
+        [BRIGHTNESS LEVEL]: ${brightnessLevel}% (0% = Pitch Black).
+        
+        [CRITICAL: FORCE LIGHTING CHANGE]
+        - You MUST IGNORE the brightness of the original image. Even if original is Day, output MUST be NIGHT.
+        - TURN OFF ALL CEILING LIGHTS / LAMPS / LEDS. They are now dark objects.
+        - **FIREPLACE/STOVE MANDATE**: If there is a stove or fireplace, DELETE THE FLAMES. Replace them with grey ash and faint red embers. The room must feel COLD.
+        
+        [LIGHTING INSTRUCTIONS]
+        ${brightnessInstruction}
+        ${lightSourceConstraint}
+        
+        [ORIGINAL CONTEXT (Geometry Only)] 
+        ${sanitizedContext}`; // Using the sanitized prompt
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { 
+                parts: [
+                    { inlineData: { mimeType: 'image/png', data: base64Data } }, 
+                    { text: prompt }
+                ] 
+            },
+            config: { imageConfig: { aspectRatio: "16:9" } },
+        });
+
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+        }
+        return null;
+    } catch (error) {
+        console.error("Dark Variant Generation Error:", error);
+        throw error;
+    }
+};
+
+// --- NEW: GENERATE SHORTS STORYLINE (POV INTERACTION) ---
+export const generateShortsStoryline = async (base64Image: string, originalPrompt: string): Promise<ShortsStory> => {
+    try {
+        const cleanPrompt = cleanPromptForGemini(originalPrompt);
+        const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+        // STEP 1: SCRIPTING (Text & Metadata)
+        const scriptPrompt = `
+        [TASK] You are a YouTube Shorts Director. Analyze the provided image (The Scene). 
+        Create a 3-Step POV Narrative Script to make this scene feel "ALIVE" and "INTERACTIVE".
+        
+        [SCENARIO] The viewer (POV) is inside this room/shelter.
+        Step 1: ENTERING/APPROACHING. Camera moves into the space or walks towards the main feature (window/fire).
+        Step 2: INTERACTING. POV hands visible. Picking up a mug, touching a book, poking the fire, or holding an instrument.
+        Step 3: SETTLING/RELAXING. POV lying down or sitting back. Legs/Feet visible relaxing on the bed/rug/chair. Ultimate coziness.
+        
+        [OUTPUT FORMAT] JSON ONLY.
+        {
+           "title": "Viral Shorts Title (e.g. Rainy Night in a Cozy Bunker 🌧️)",
+           "description": "Short engaging description for YouTube Shorts.",
+           "tags": "#Shorts #Cozy #Rain...",
+           "frames": [
+              { "step": 1, "actionDescription": "Walking towards the rainy window...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Full image generation prompt for Vertical 9:16 POV shot..." },
+              { "step": 2, "actionDescription": "Picking up hot coffee...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "..." },
+              { "step": 3, "actionDescription": "Lying on the bed watching rain...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "..." }
+           ]
+        }
+        
+        [CRITICAL VISUAL RULES FOR PROMPTS]
+        - All prompts MUST specify "First Person POV".
+        - All prompts MUST specify "Vertical 9:16 aspect ratio".
+        - Maintain the exact VISUAL STYLE (Lighting, Colors, Architecture) of the input image.
+        - Frame 2 MUST show Hands. Frame 3 MUST show Legs/Feet (optional but recommended for coziness).
+        `;
+
+        const scriptResponse = await ai.models.generateContent({
+             model: 'gemini-2.5-flash-image',
+             contents: {
+                 parts: [
+                     { inlineData: { mimeType: 'image/png', data: base64Data } },
+                     { text: scriptPrompt }
+                 ]
+             },
+             // REMOVED config with responseMimeType as it causes 400 errors on the image model
+        });
+        
+        // Manual JSON Parsing to handle Markdown blocks
+        let jsonString = scriptResponse.text || "{}";
+        const jsonMatch = jsonString.match(/```json\s*([\s\S]*?)\s*```/) || jsonString.match(/```\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+            jsonString = jsonMatch[1];
+        }
+        const scriptData = JSON.parse(jsonString) as ShortsStory;
+        
+        // STEP 2: PARALLEL IMAGE GENERATION
+        // We will generate the 3 images in parallel based on the AI-written prompts
+        const imagePromises = scriptData.frames.map(async (frame) => {
+             // Combine original style context with new specific action prompt
+             const finalImagePrompt = `[STYLE REFERENCE]: ${cleanPrompt}. \n[ACTION]: ${frame.imagePrompt} \n[CONSTRAINT]: Vertical 9:16, First Person POV. Make it look exactly like the same room.`;
+             
+             // We pass the original image as reference to guide consistency (using image-to-image logic roughly)
+             // Note: Gemini 2.5 Flash Image supports image input for context.
+             const imgResponse = await ai.models.generateContent({
+                 model: 'gemini-2.5-flash-image',
+                 contents: {
+                     parts: [
+                         { inlineData: { mimeType: 'image/png', data: base64Data } }, // Reference Base Image
+                         { text: finalImagePrompt }
+                     ]
+                 },
+                 config: { imageConfig: { aspectRatio: "9:16" } }
+             });
+             
+             let generatedUrl = null;
+             for (const part of imgResponse.candidates[0].content.parts) {
+                if (part.inlineData) {
+                    generatedUrl = `data:image/png;base64,${part.inlineData.data}`;
+                    break;
+                }
+             }
+             return { ...frame, imageUrl: generatedUrl || undefined };
+        });
+
+        const completedFrames = await Promise.all(imagePromises);
+        
+        return {
+            ...scriptData,
+            frames: completedFrames
+        };
+
+    } catch (error) {
+        console.error("Shorts Story Generation Error:", error);
+        throw error;
     }
 };
