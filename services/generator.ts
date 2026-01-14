@@ -258,7 +258,14 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
       motionInstructions = `MOTION: The vehicle is in motion. Rain streaks moving horizontally on windows.`;
       
       // HARD CONSTRAINT: Vehicle Structure
-      vehicleLayoutRules = "VEHICLE STRUCTURE MANDATE: The composition MUST show TWO distinct sections. 1. The Living Quarters (Foreground/Midground, Cozy, Warm). 2. The Driver's Cab/Cockpit (Background, visible through open door/partition). DRIVER: A silhouetted driver MUST be visible in the cockpit facing the road.";
+      vehicleLayoutRules = `
+      [VEHICLE/BOAT LAYOUT Z-DEPTH]:
+      1. FOREGROUND (Closest to Camera): The Living Quarters (Bed/Sofa/Table).
+      2. MIDGROUND: A partition or open door leading to the Cockpit/Bridge.
+      3. BACKGROUND: The Driver/Captain's silhouette. IMPORTANT: The driver is sitting/standing with BACK TO CAMERA, facing the windshield.
+      4. FAR BACKGROUND (Furthest): The Steering Wheel/Helm and the Windshield.
+      [LOGIC FIX]: The Steering Wheel MUST be located IN FRONT of the Driver (between Driver and Window). Since the Driver has their back to the camera, the Driver's body MUST BLOCK/OBSCURE the view of the steering wheel. DO NOT put the steering wheel in the Foreground.
+      `;
   }
 
   const weatherDescription = weatherItems.length > 0 ? weatherItems.map(i => i.value).join(' combined with ') : 'stormy weather';
@@ -271,7 +278,7 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
   
   // DRIVER LOGIC: If vehicle and moving, ensure driver exists if not already described
   if (isVehicleMode && !actionItems.some(i => i.id.includes('drive'))) {
-      characterDescriptions.push("[BACKGROUND] Silhouetted driver in the cockpit, hands on wheel, facing the road ahead.");
+      characterDescriptions.push("[BACKGROUND] Silhouetted driver in the cockpit, BACK TURNED, facing the road/sea.");
   }
   
   const familyContext = characterDescriptions.length > 0 ? `[OCCUPANTS] ${characterDescriptions.join(' + ')}` : `[OCCUPANTS] Empty.`;
@@ -293,7 +300,7 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
 
   const subjectText = `${conciseStructureName} interior. ${vehicleLayoutRules}`;
   const compositionRule = "VISUAL COMPOSITION RULE: The image MUST be split roughly 70% WINDOW VIEW (Rain/Storm outside) and 30% INTERIOR (Cozy Shelter).";
-  const GLOBAL_NEGATIVE = "no visible hands, no disembodied arms, no deformed faces, no text, no watermark, no ghost car";
+  const GLOBAL_NEGATIVE = "no visible hands, no disembodied arms, no deformed faces, no text, no watermark, no ghost car, steering wheel in foreground, steering wheel floating";
 
   const ohneilPrompt = {
     subject: subjectText,

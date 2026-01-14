@@ -209,6 +209,9 @@ export const compositeThumbnail = async (
       let headX, headY, headSize, subX, subY, subSize;
 
       if (isVertical) {
+        // Vertical layout auto-adapts, ignoring manual X/Y for now to ensure safety
+        // Or we could adapt them proportionally if requested. 
+        // For now, keeping vertical centered logic for consistency on mobile.
         headX = canvas.width / 2;
         headY = canvas.height * 0.15; 
         headSize = 100; 
@@ -216,6 +219,7 @@ export const compositeThumbnail = async (
         subY = canvas.height * 0.85; 
         subSize = 80;
       } else {
+        // Use Manual Config
         headX = config?.headline.x ?? 640;
         headY = config?.headline.y ?? 100;
         headSize = config?.headline.fontSize ?? 150;
@@ -339,19 +343,26 @@ export const cropImage = async (base64Image: string, zoomFactor: number, origina
       return null;
 };
 
-// --- FIX: IMPLEMENTED REAL I2V PROMPT GENERATION ---
+// --- FIX: IMPLEMENTED STRICT STATIC CAMERA PROMPT ---
 export const generateVideoPromptFromImage = async (base64Image: string): Promise<string> => {
     try {
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
-        // Strict prompt engineering for Veo/Sora style outputs
-        const prompt = `[TASK] Describe this image for a high-end AI Video Generator (like Veo or Sora). 
-        [REQUIREMENTS]
-        1. Describe the movement (rain falling, trees swaying, lights flickering, camera push-in).
-        2. Describe the atmosphere (moody, cinematic, 8k).
-        3. Format: "Cinematic shot of [Subject], [Action/Movement], [Atmosphere/Lighting], [Camera Move]".
-        4. Keep it concise (under 40 words).`;
+        // REVISED: STRICT STATIC CAMERA INSTRUCTIONS
+        const prompt = `[TASK] Describe this image for a high-end AI Video Generator (Veo/Sora).
+        
+        [CRITICAL CAMERA RULES - READ CAREFULLY]
+        1. **STATIC CAMERA ONLY**: The camera must be on a TRIPOD. 
+        2. **NO MOVEMENT**: NO push in, NO zoom, NO pan, NO tilt. 
+        3. **FOCUS**: The only movement should be the internal elements (rain, fire, smoke, lights).
+        
+        [OUTPUT FORMAT]
+        "Static tripod shot of [Subject]. [Internal Motion Description]. [Atmosphere]."
+        
+        Example: "Static tripod shot of a cozy cabin. Rain streaks sliding down the window glass. Fire flickering in the hearth. No camera movement."
+        
+        Keep it under 40 words.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image', 
@@ -478,10 +489,31 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
            You MUST adapt the 3 steps to fulfill this request. 
            If the user lists 3 specific actions, map them to Step 1, 2, and 3.
            If the user gives a vague vibe, interpret it creatively into 3 POV steps.`
-        : `[SCENARIO] The viewer (POV) is inside this room/shelter.
-           Step 1: ENTERING/APPROACHING. Camera moves into the space or walks towards the main feature (window/fire).
-           Step 2: INTERACTING. POV hands visible. Picking up a mug, touching a book, poking the fire, or holding an instrument.
-           Step 3: SETTLING/RELAXING. POV lying down or sitting back. Legs/Feet visible relaxing on the bed/rug/chair. Ultimate coziness.`;
+        : `[AUTO-DIRECTOR MODE]:
+           Analyze the image context (Vehicle? Bunker? Luxury? Wild?). Choose ONE specific narrative arc that fits best:
+           
+           Option A (The Traveler/Driver):
+           1. Driving/Navigating (Hands on wheel or looking at map).
+           2. Parking/Stopping (Turning off engine, rain hits harder).
+           3. Moving to back/Resting (Climbing into bed/seat).
+           
+           Option B (The Survivor/Bunker):
+           1. Securing (Locking heavy door, checking air filter).
+           2. Sustaining (Opening canned food, checking radio).
+           3. Enduring (Cleaning weapon or staring at monitor).
+           
+           Option C (The Scholar/Cozy):
+           1. Preparing (Brewing coffee/tea, lighting candle).
+           2. Focusing (Writing in journal, reading book).
+           3. Contemplating (Looking out window, hand on glass).
+           
+           Option D (The Sleeper - ONLY if bed is main focus):
+           1. Approaching bed/fluffing pillow.
+           2. Getting in/pulling up blanket.
+           3. Closing eyes/dimming light.
+
+           [CRITICAL]: DO NOT DEFAULT TO OPTION D. Pick the one that matches the image details best.
+           [CONSTRAINT]: Step 3 MUST NOT always be "feet on bed". Vary it (e.g., hand turning off lamp, staring at fire, closing curtains).`;
 
         // STEP 1: SCRIPTING (Text & Metadata)
         const scriptPrompt = `
@@ -490,23 +522,27 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
         
         ${scenarioInstruction}
         
+        [CRITICAL CAMERA COMPOSITION RULES - YOU MUST FOLLOW]
+        - Frame 1 (ESTABLISHING): Must be a WIDE or ULTRA-WIDE shot showing the environment context.
+        - Frame 2 (ACTION/HANDS): Must be a MEDIUM SHOT focused on hands doing something (cooking, driving, holding mug).
+        - Frame 3 (INTIMATE/REST): Must be a CLOSE UP or LOW ANGLE or POV shot (e.g. looking at fire, looking at rain on glass).
+        *DO NOT make all 3 frames look the same. Vary the distance and angle.*
+
         [OUTPUT FORMAT] JSON ONLY.
         {
            "title": "Viral Shorts Title (e.g. Rainy Night in a Cozy Bunker 🌧️)",
            "description": "Short engaging description for YouTube Shorts.",
            "tags": "#Shorts #Cozy #Rain...",
            "frames": [
-              { "step": 1, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Full image generation prompt for Vertical 9:16 POV shot..." },
-              { "step": 2, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "..." },
-              { "step": 3, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "..." }
+              { "step": 1, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Wide shot of..." },
+              { "step": 2, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "Medium shot of hands..." },
+              { "step": 3, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "Close up of..." }
            ]
         }
         
         [CRITICAL VISUAL RULES FOR PROMPTS]
-        - All prompts MUST specify "First Person POV".
         - All prompts MUST specify "Vertical 9:16 aspect ratio".
         - Maintain the exact VISUAL STYLE (Lighting, Colors, Architecture) of the input image.
-        - Frame 2 MUST show Hands. Frame 3 MUST show Legs/Feet (optional but recommended for coziness).
         `;
 
         const scriptResponse = await ai.models.generateContent({
@@ -517,7 +553,6 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
                      { text: scriptPrompt }
                  ]
              },
-             // REMOVED config with responseMimeType as it causes 400 errors on the image model
         });
         
         // Manual JSON Parsing to handle Markdown blocks
@@ -566,6 +601,46 @@ export const generateShortsStoryline = async (base64Image: string, originalPromp
 
     } catch (error) {
         console.error("Shorts Story Generation Error:", error);
+        throw error;
+    }
+};
+
+// --- NEW: REGENERATE SINGLE SHORTS FRAME ---
+export const regenerateSingleShortsFrame = async (base64Image: string, originalPrompt: string, frameContext: ShortsFrame): Promise<string | null> => {
+    try {
+        const cleanPrompt = cleanPromptForGemini(originalPrompt);
+        const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+        // Add variance to the prompt to ensure it's not identical
+        const variance = Math.random() > 0.5 ? "Slightly adjust camera angle." : "Shift focus slightly.";
+        
+        const finalImagePrompt = `[TASK] Regenerate this specific shot for a story.
+        [STYLE REFERENCE]: ${cleanPrompt}. 
+        [ACTION REQUIREMENT]: ${frameContext.imagePrompt}
+        [VARIANCE]: ${variance}
+        [CONSTRAINT]: Vertical 9:16, First Person POV. Must match the style of the reference image exactly.`;
+
+        const imgResponse = await ai.models.generateContent({
+             model: 'gemini-2.5-flash-image',
+             contents: {
+                 parts: [
+                     { inlineData: { mimeType: 'image/png', data: base64Data } }, // Reference Base Image
+                     { text: finalImagePrompt }
+                 ]
+             },
+             config: { imageConfig: { aspectRatio: "9:16" } }
+        });
+         
+        for (const part of imgResponse.candidates[0].content.parts) {
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+        return null;
+
+    } catch (error) {
+        console.error("Single Frame Regen Error:", error);
         throw error;
     }
 };
