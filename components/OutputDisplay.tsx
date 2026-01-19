@@ -77,6 +77,9 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
   const [thumbConfig, setThumbConfig] = useState<ThumbnailLayerConfig>({
     headline: { x: 640, y: 100, fontSize: 160 }, 
     subhead: { x: 640, y: 620, fontSize: 130 },
+    // Initialize vertical defaults
+    verticalHeadline: { x: 360, y: 200, fontSize: 100 }, 
+    verticalSubhead: { x: 360, y: 1000, fontSize: 80 },
     badge: { visible: true, text: "NO MUSIC", style: 'ribbon_tr', color: '#16a34a', x: 0, y: 80, fontSize: 50 } 
   });
   const [showLayoutControls, setShowLayoutControls] = useState(false);
@@ -88,9 +91,12 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
       if (content.thumbnailConfig) {
         setThumbConfig(content.thumbnailConfig);
       } else {
+        // Reset defaults if not present
         setThumbConfig({
             headline: { x: 640, y: 100, fontSize: 160 }, 
             subhead: { x: 640, y: 620, fontSize: 130 },
+            verticalHeadline: { x: 360, y: 200, fontSize: 100 }, 
+            verticalSubhead: { x: 360, y: 1000, fontSize: 80 },
             badge: { visible: true, text: "NO MUSIC", style: 'ribbon_tr', color: '#16a34a', x: 0, y: 80, fontSize: 50 }
         });
       }
@@ -110,7 +116,8 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
           setLocal(prev => prev ? { ...prev, thumbnailConfig: thumbConfig } : null);
         } catch (e) { console.error("Thumbnail composite failed", e); }
       }
-      const verticalSource = local?.verticalThumbnailImage;
+      
+      const verticalSource = local?.verticalThumbnailImage || local?.generatedImage; 
       if (verticalSource && thumbText.length > 0) {
         try {
           const vThumb = await compositeThumbnail(verticalSource, thumbText, thumbConfig, true);
@@ -170,7 +177,8 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     if (!local.generatedImage) return;
     setLoading(true);
     try {
-      const p = await generateVideoPromptFromImage(local.generatedImage);
+      // Dynamic Prompt for Light Scene (isStatic = false)
+      const p = await generateVideoPromptFromImage(local.generatedImage, false);
       setLocal({ ...local, i2vPrompt: p });
     } finally { setLoading(false); }
   };
@@ -181,7 +189,8 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
     try {
       const url = await generateDarkVariant(local.generatedImage, local.imagePrompt, darknessLevel);
       if (url) {
-         const motionPrompt = await generateVideoPromptFromImage(url);
+         // Static Prompt for Dark Scene (isStatic = true)
+         const motionPrompt = await generateVideoPromptFromImage(url, true);
          setLocal({ ...local, darkImage: url, darkI2vPrompt: motionPrompt });
       }
     } catch (e) {
@@ -202,7 +211,7 @@ const OutputDisplay: React.FC<Props> = ({ content, onToggleFavorite, isFavorite 
       }
     } catch (e) {
       console.error(e);
-      alert("Failed to generate shorts story.");
+      alert("Failed to generate shorts story. AI might be busy, try again.");
     } finally {
       setLoading(false);
     }
@@ -439,6 +448,142 @@ IMAGE PROMPT: ${f.imagePrompt}
           )}
         </section>
 
+        {/* 01.5: VIRAL THUMBNAIL */}
+        {local.generatedImage && (
+            <section className="space-y-8 animate-in fade-in duration-700 bg-slate-900 p-8 rounded-[3rem] border border-slate-800">
+               <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-xs font-black text-yellow-500 uppercase tracking-[0.4em]">
+                     <Layout size={18} className="text-yellow-500"/> 02. Viral Thumbnail (Cover System)
+                  </div>
+                  {thumbnailPreview && (
+                     <button onClick={() => {
+                        const link = document.createElement('a');
+                        link.download = `THUMB_${local.youtubeTitle.replace(/[^a-z0-9]/gi, '_').slice(0,20)}.jpg`;
+                        link.href = thumbnailPreview;
+                        link.click();
+                     }} className="text-[10px] font-black text-green-400 hover:text-green-300 flex items-center gap-2">
+                        <Download size={14}/> DOWNLOAD
+                     </button>
+                  )}
+               </div>
+               
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* 16:9 Main Cover */}
+                  <div className="space-y-4">
+                      <div className="relative aspect-video bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl group">
+                          {thumbnailPreview ? (
+                              <img src={thumbnailPreview} className="w-full h-full object-cover"/>
+                          ) : (
+                              <div className="flex items-center justify-center h-full text-slate-600 flex-col gap-2">
+                                  <Loader2 className="animate-spin"/>
+                                  <span className="text-[10px] font-bold">COMPOSITING...</span>
+                              </div>
+                          )}
+                      </div>
+                      <div className="flex justify-between items-center px-2">
+                          <span className="text-[10px] font-bold text-slate-500">16:9 YOUTUBE COVER</span>
+                          <button onClick={() => setShowLayoutControls(!showLayoutControls)} className="text-[10px] font-bold text-yellow-500 hover:text-white flex items-center gap-1">
+                              <SlidersHorizontal size={12}/> ADJUST LAYOUT
+                          </button>
+                      </div>
+                  </div>
+
+                  {/* 9:16 Shorts Cover */}
+                  <div className="space-y-4">
+                       <div className="relative aspect-[9/16] bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl w-1/2 mx-auto">
+                           {verticalThumbnailPreview ? (
+                               <img src={verticalThumbnailPreview} className="w-full h-full object-cover"/>
+                           ) : (
+                               <div className="flex items-center justify-center h-full text-slate-600 flex-col gap-2">
+                                   <Loader2 className="animate-spin"/>
+                               </div>
+                           )}
+                       </div>
+                       <div className="text-center">
+                           <span className="text-[10px] font-bold text-slate-500">9:16 SHORTS COVER</span>
+                       </div>
+                  </div>
+               </div>
+
+               {/* Expanded Layout Controls */}
+               {showLayoutControls && (
+                   <div className="p-6 bg-slate-950 rounded-2xl border border-slate-800 animate-in slide-in-from-top-2 space-y-6">
+                       
+                       {/* 16:9 Controls */}
+                       <div>
+                           <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-1">16:9 Horizontal Layout</div>
+                           <div className="grid grid-cols-2 gap-4">
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">Headline Y</label>
+                                   <input type="range" min="50" max="600" value={thumbConfig.headline.y} onChange={e => setThumbConfig({...thumbConfig, headline: {...thumbConfig.headline, y: Number(e.target.value)}})} className="w-full h-1 bg-slate-800 rounded appearance-none accent-yellow-500"/>
+                               </div>
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">Subhead Y</label>
+                                   <input type="range" min="100" max="650" value={thumbConfig.subhead.y} onChange={e => setThumbConfig({...thumbConfig, subhead: {...thumbConfig.subhead, y: Number(e.target.value)}})} className="w-full h-1 bg-slate-800 rounded appearance-none accent-yellow-500"/>
+                               </div>
+                           </div>
+                       </div>
+
+                       {/* 9:16 Controls - NEW INDEPENDENT CONTROLS */}
+                       <div>
+                           <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-1">9:16 Vertical Layout</div>
+                           <div className="grid grid-cols-2 gap-4">
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">V-Headline Y</label>
+                                   <input 
+                                     type="range" min="50" max="1200" 
+                                     value={thumbConfig.verticalHeadline?.y || 200} 
+                                     onChange={e => setThumbConfig({
+                                         ...thumbConfig, 
+                                         verticalHeadline: { ...(thumbConfig.verticalHeadline || { x: 360, fontSize: 100 }), y: Number(e.target.value) }
+                                     })} 
+                                     className="w-full h-1 bg-slate-800 rounded appearance-none accent-pink-500"
+                                   />
+                               </div>
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">V-Headline Size</label>
+                                   <input 
+                                     type="range" min="50" max="250" 
+                                     value={thumbConfig.verticalHeadline?.fontSize || 100} 
+                                     onChange={e => setThumbConfig({
+                                         ...thumbConfig, 
+                                         verticalHeadline: { ...(thumbConfig.verticalHeadline || { x: 360, y: 200 }), fontSize: Number(e.target.value) }
+                                     })} 
+                                     className="w-full h-1 bg-slate-800 rounded appearance-none accent-pink-500"
+                                   />
+                               </div>
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">V-Subhead Y</label>
+                                   <input 
+                                     type="range" min="200" max="1200" 
+                                     value={thumbConfig.verticalSubhead?.y || 1000} 
+                                     onChange={e => setThumbConfig({
+                                         ...thumbConfig, 
+                                         verticalSubhead: { ...(thumbConfig.verticalSubhead || { x: 360, fontSize: 80 }), y: Number(e.target.value) }
+                                     })} 
+                                     className="w-full h-1 bg-slate-800 rounded appearance-none accent-pink-500"
+                                   />
+                               </div>
+                               <div>
+                                   <label className="text-[10px] font-bold text-slate-500 block mb-2">V-Subhead Size</label>
+                                   <input 
+                                     type="range" min="40" max="200" 
+                                     value={thumbConfig.verticalSubhead?.fontSize || 80} 
+                                     onChange={e => setThumbConfig({
+                                         ...thumbConfig, 
+                                         verticalSubhead: { ...(thumbConfig.verticalSubhead || { x: 360, y: 1000 }), fontSize: Number(e.target.value) }
+                                     })} 
+                                     className="w-full h-1 bg-slate-800 rounded appearance-none accent-pink-500"
+                                   />
+                               </div>
+                           </div>
+                       </div>
+
+                   </div>
+               )}
+            </section>
+        )}
+
         {/* 01.5: DARK MODE VARIANT */}
         {local.generatedImage && (
             <section className="space-y-8 animate-in fade-in duration-700 bg-indigo-950/20 p-8 rounded-[3rem] border border-indigo-900/50">
@@ -555,7 +700,7 @@ IMAGE PROMPT: ${f.imagePrompt}
             </section>
         )}
         
-        {/* 05: SHORTS STORYBOARD (NEW) */}
+        {/* 05: SHORTS STORYBOARD */}
         {local.generatedImage && (
             <section className="space-y-8 animate-in fade-in duration-700 bg-slate-900 border border-slate-800 p-8 rounded-[3rem]">
                 <div className="flex items-center justify-between">

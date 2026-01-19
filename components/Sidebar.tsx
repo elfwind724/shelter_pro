@@ -25,6 +25,7 @@ interface SidebarProps {
 }
 
 // 2026年1月 HAVEN NIGHTS 战略发布计划 (CONTENT MATRIX)
+// FIXED: Use correct Category IDs (cat_shelters, etc) instead of 'structure'
 const SHELTER_UNIVERSE_PLAN = [
   { 
     week: "Series A: Pure Ambience", 
@@ -33,7 +34,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "A1: Basement Shelter Rain", 
         selections: { 
-          structure: ['slt_und_bunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['fireplace'], 
+          cat_shelters: ['slt_und_bunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['fireplace'], 
           defense: ['def_door_heavy'], duration: ['8h'], 
           danger: ['none'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_medium'], amenities: ['am_bookshelf'],
           pets: ['none'], perspective: ['cam_standard'], visual_style: ['realistic_8k']
@@ -42,7 +43,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "A2: Attic Hideout Storm",
         selections: { 
-          structure: ['slt_high_apt'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['candles'], 
+          cat_shelters: ['slt_high_apt'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['candles'], 
           defense: ['def_window_shutter'], duration: ['8h'], 
           danger: ['none'], sleeping: ['sleep_window_alcove'], shot_type: ['dist_medium'], amenities: ['am_plants'],
           pets: ['none'], perspective: ['cam_standard'], visual_style: ['realistic_8k']
@@ -51,7 +52,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "A3: Underground Bunker",
         selections: { 
-          structure: ['slt_und_civil'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
+          cat_shelters: ['slt_und_bunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
           defense: ['def_door_heavy'], duration: ['8h'], 
           danger: ['none'], sleeping: ['sleep_bunk_curtain'], shot_type: ['dist_medium'], amenities: ['am_radio'],
           pets: ['none'], perspective: ['cam_cctv'], visual_style: ['waste_gritty']
@@ -60,7 +61,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "A4: Abandoned Cabin",
         selections: { 
-          structure: ['sem_leanto'], weather: ['wth_rain_lush'], time: ['time_dusk'], warmth: ['firepit'], 
+          cat_semi_open: ['sem_leanto'], weather: ['wth_rain_lush'], time: ['time_dusk'], warmth: ['firepit'], 
           defense: ['none'], duration: ['8h'], 
           danger: ['none'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_long'], amenities: ['am_kitchen'],
           pets: ['none'], perspective: ['cam_standard'], visual_style: ['nature_earth']
@@ -75,7 +76,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "B1: Basement + Soft Piano",
         selections: { 
-          structure: ['slt_und_apt'], weather: ['wth_rain_med'], time: ['time_night'], warmth: ['oil_lamp'], 
+          cat_shelters: ['slt_und_apt'], weather: ['wth_rain_med'], time: ['time_night'], warmth: ['oil_lamp'], 
           duration: ['2h'], character: ['inst_piano'],
           defense: ['none'], sleeping: ['sleep_sofa_lie'], shot_type: ['dist_medium'], amenities: ['am_plants', 'am_coffee'],
           perspective: ['cam_standard'], visual_style: ['light_academia'], textures: ['dec_blanket_knit']
@@ -84,7 +85,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "B2: Bunker + Lofi Beats",
         selections: { 
-          structure: ['slt_und_luxbunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['hologram'], 
+          cat_shelters: ['slt_und_luxbunker'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['hologram'], 
           duration: ['2h'], character: ['act_laptop'],
           defense: ['def_door_heavy'], sleeping: ['sleep_round_lux'], shot_type: ['dist_medium'], amenities: ['am_gaming', 'am_desk'],
           perspective: ['cam_standard'], visual_style: ['cyber_neon'], textures: ['dec_beanbag']
@@ -93,7 +94,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "B3: Treehouse + Guitar",
         selections: { 
-          structure: ['slt_high_treehouse'], weather: ['wth_rain_light'], time: ['time_morning'], warmth: ['stove'], 
+          cat_shelters: ['slt_high_treehouse'], weather: ['wth_rain_light'], time: ['time_morning'], warmth: ['stove'], 
           duration: ['2h'], character: ['inst_guitar'],
           defense: ['none'], sleeping: ['sleep_hammock_fur'], shot_type: ['dist_medium'], amenities: ['am_plants', 'am_tea'],
           perspective: ['cam_terrace'], visual_style: ['cottagecore'], textures: ['dec_rug_fur']
@@ -108,7 +109,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "C1: Last Night in Bunker",
         selections: { 
-          structure: ['slt_und_bunker'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['oil_lamp'], 
+          cat_shelters: ['slt_und_bunker'], weather: ['wth_rain_thunder'], time: ['time_night'], warmth: ['oil_lamp'], 
           duration: ['2h'], character: ['act_read'],
           defense: ['def_door_heavy'], sleeping: ['sleep_bunk_curtain'], shot_type: ['dist_medium'], amenities: ['am_map', 'am_radio'],
           perspective: ['cam_cinematic'], visual_style: ['waste_rusty'], textures: ['dec_tapestry']
@@ -117,7 +118,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "C2: Finding Sanctuary",
         selections: { 
-          structure: ['slt_gnd_church'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['candles'], 
+          cat_shelters: ['slt_gnd_church'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['candles'], 
           duration: ['2h'], character: ['act_sleep_floor'],
           defense: ['def_window_bars'], sleeping: ['sleep_floor_pile'], shot_type: ['dist_long'], amenities: ['am_backpack'],
           perspective: ['cam_low'], visual_style: ['gothic_noir'], textures: ['dec_rug_fur']
@@ -126,7 +127,7 @@ const SHELTER_UNIVERSE_PLAN = [
       { 
         title: "C3: The Safest Place",
         selections: { 
-          structure: ['slt_und_bank'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
+          cat_shelters: ['slt_und_bank'], weather: ['wth_rain_heavy'], time: ['time_night'], warmth: ['heater'], 
           duration: ['8h'], character: ['act_sleep_bed'],
           defense: ['def_door_heavy'], sleeping: ['sleep_platform_low'], shot_type: ['dist_wide'], amenities: ['am_money_stacks'],
           perspective: ['cam_high'], visual_style: ['cinematic_35mm'], textures: ['dec_pillow_sea']

@@ -114,6 +114,34 @@ const App: React.FC = () => {
   // MUTUAL EXCLUSIVITY LOGIC FOR LOCATION CATEGORIES
   const LOCATION_CATEGORIES = ['cat_vehicles', 'cat_shelters', 'cat_semi_open'];
 
+  // HELPER: Sanitize Selections to ensure only ONE location category is active
+  const sanitizeSelections = (inputSelections: SelectionState): SelectionState => {
+     const cleanSelections = { ...inputSelections };
+     
+     // Find which location categories have items
+     const activeLocs = LOCATION_CATEGORIES.filter(cat => cleanSelections[cat] && cleanSelections[cat].length > 0);
+     
+     // If multiple exist, keep the last one (or arbitrarily the one that isn't vehicle if possible to fix the bug)
+     // BUT simpler is: Just keep the first one found in the list? 
+     // Let's check logic: if 'cat_vehicles' and 'cat_shelters' both exist, 'vehicle' wins in generator. 
+     // To fix "Supermarket became Boat", we need to prioritize user intent.
+     
+     if (activeLocs.length > 1) {
+         // HEURISTIC: If 'cat_shelters' is present, it's likely specific. Vehicles might be accidental matches (e.g. "Converted").
+         // Let's prioritize Shelters > SemiOpen > Vehicles to fix the "Accidental Boat" bug.
+         let winner = '';
+         if (activeLocs.includes('cat_shelters')) winner = 'cat_shelters';
+         else if (activeLocs.includes('cat_semi_open')) winner = 'cat_semi_open';
+         else winner = activeLocs[0];
+         
+         LOCATION_CATEGORIES.forEach(cat => {
+             if (cat !== winner) delete cleanSelections[cat];
+         });
+     }
+     
+     return cleanSelections;
+  };
+
   const handleSelectionChange = (categoryId: string, itemId: string) => {
     setSelections(prev => {
       const category = CATEGORIES.find(c => c.id === categoryId);
@@ -146,11 +174,14 @@ const App: React.FC = () => {
   };
 
   const handleBatchSelection = (newSelections: SelectionState) => {
-    setSelections(newSelections);
+    // CRITICAL FIX: Sanitize incoming selections to prevent multi-location bugs
+    const clean = sanitizeSelections(newSelections);
+    setSelections(clean);
   };
 
   const handleGenerate = (selectionsOverride?: SelectionState) => {
-    const currentSelections = selectionsOverride || selections;
+    const rawSelections = selectionsOverride || selections;
+    const currentSelections = sanitizeSelections(rawSelections);
     
     // Check if at least ONE location is selected
     const hasLocation = LOCATION_CATEGORIES.some(c => currentSelections[c] && currentSelections[c].length > 0);
@@ -173,6 +204,7 @@ const App: React.FC = () => {
 
   const handleRandom = () => {
     const randomSelections = generateRandomSelections();
+    // Random generator is trusted to be exclusive, but good to double check
     setSelections(randomSelections);
     const content = generateContent(randomSelections);
     setGeneratedContent(content);
@@ -220,7 +252,7 @@ const App: React.FC = () => {
     const newPreset: Preset = {
       id: crypto.randomUUID(),
       name: name.trim(),
-      selections: selections,
+      selections: selections, // selections are already state-managed, assume clean
       timestamp: Date.now()
     };
     setPresets(prev => [newPreset, ...prev]);
@@ -229,7 +261,8 @@ const App: React.FC = () => {
   const handleLoadPreset = (presetId: string) => {
     const preset = presets.find(p => p.id === presetId);
     if (preset) {
-      setSelections(preset.selections);
+      const clean = sanitizeSelections(preset.selections);
+      setSelections(clean);
     }
   };
 

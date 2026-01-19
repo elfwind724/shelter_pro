@@ -2,7 +2,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ThumbnailLayerConfig, BadgeConfig, ShortsStory, ShortsFrame } from "../types";
 
-// ... (Constants and helper functions like cleanPromptForGemini, generateImagePreview kept the same)
 const NEGATIVE_PROMPTS = "worst quality, normal quality, low quality, low res, blurry, artifacts, jpeg artifacts, washed-out backgrounds, low detail, extra limbs, distorted hands, incorrect anatomy, poorly drawn hands, poorly drawn feet, missing digits, extra digits, interlocked fingers, deformed bows, Polydactyly, multiple limbs, watermark, signature, text, logo, username, error, cut off, out of frame, body out of frame, draft, simple background, blank background, abstract background, tiling, open windows, rain inside, wet floor, flooded room, tile floor, marble floor, cold stone floor, ceramic tiles, hospital floor, clinical, dark room, gloomy interior, scary, horror, no visible hands, disembodied arms, first-person hands, deformed face, ugly face, mutated hands, missing legs";
 
 const cleanPromptForGemini = (prompt: string): string => {
@@ -43,7 +42,7 @@ const drawBadge = (
 
   const text = config.text.toUpperCase();
   const color = config.color;
-  const fontSize = config.fontSize || 50;
+  const fontSize = config.fontSize || 30;
 
   // --- STYLE 1: STANDARD BOX (MOVABLE) ---
   if (config.style === 'box') {
@@ -56,11 +55,10 @@ const drawBadge = (
      const badgeH = fontSize + (paddingY * 2);
      
      // Position using Config X/Y (Default to Top Right if 0)
-     // If x/y are 0 (uninitialized), put it in default spot
      let badgeX = config.x;
      let badgeY = config.y;
      
-     // Basic safety default
+     // Basic safety default if uninitialized
      if (badgeX === 0 && badgeY === 0) {
         badgeX = canvasW - badgeW - 40;
         badgeY = 40;
@@ -97,43 +95,38 @@ const drawBadge = (
     ctx.font = `900 ${fontSize}px Impact, sans-serif`;
     
     // Ribbon Geometry
-    // Offset from the corner vertex
-    const offset = config.y || 80; // Distance from corner (hypotenuse distance roughly)
-    const ribbonWidth = fontSize + 40;
-    const ribbonLength = 800; // Long enough to span corner
+    const offset = config.y || 60; 
+    const ribbonWidth = fontSize * 1.6; 
+    // FIX: Massive length to prevent cutoff on any resolution/rotation
+    const ribbonLength = 4000; 
 
     ctx.save();
     
     // 1. Move origin to the target corner
     if (isRight) {
        ctx.translate(canvasW, 0);
-       // 2. Rotate 45 degrees to align diagonal
        ctx.rotate((45 * Math.PI) / 180);
     } else {
        ctx.translate(0, 0);
        ctx.rotate((-45 * Math.PI) / 180);
     }
 
-    // 3. Draw the ribbon as a horizontal strip in rotated space
-    // The "offset" shifts it down the Y axis of the rotated frame
-    // Because we rotated 45 deg, positive Y goes "into" the canvas from the corner.
-    
-    // Fill
+    // 2. Draw the ribbon strip
     ctx.fillStyle = color;
     ctx.fillRect(-ribbonLength / 2, offset, ribbonLength, ribbonWidth);
 
-    // Borders (Top and Bottom of ribbon)
+    // Borders
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 4;
     
     ctx.beginPath();
-    ctx.moveTo(-ribbonLength / 2, offset + 4);
-    ctx.lineTo(ribbonLength / 2, offset + 4);
+    ctx.moveTo(-ribbonLength / 2, offset + 2);
+    ctx.lineTo(ribbonLength / 2, offset + 2);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(-ribbonLength / 2, offset + ribbonWidth - 4);
-    ctx.lineTo(ribbonLength / 2, offset + ribbonWidth - 4);
+    ctx.moveTo(-ribbonLength / 2, offset + ribbonWidth - 2);
+    ctx.lineTo(ribbonLength / 2, offset + ribbonWidth - 2);
     ctx.stroke();
 
     // Text
@@ -143,7 +136,6 @@ const drawBadge = (
     ctx.shadowColor = "rgba(0,0,0,0.5)";
     ctx.shadowBlur = 4;
     
-    // Text is drawn at the center X (0), and center Y of the ribbon strip
     ctx.fillText(text, 0, offset + (ribbonWidth / 2) + 2);
     
     ctx.restore();
@@ -159,9 +151,11 @@ export const compositeThumbnail = async (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    img.crossOrigin = "anonymous"; // Safety
     img.onload = () => {
       const canvas = document.createElement('canvas');
       
+      // FIXED RESOLUTION: Always 1280x720 for thumbnails
       if (isVertical) {
         canvas.width = 720;
         canvas.height = 1280; 
@@ -173,7 +167,7 @@ export const compositeThumbnail = async (
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject("Canvas Error");
 
-      // 1. Draw Background
+      // 1. Draw Background - "Cover" Fit Logic
       const imgRatio = img.width / img.height;
       const canvasRatio = canvas.width / canvas.height;
       let drawW, drawH, drawX, drawY;
@@ -209,17 +203,16 @@ export const compositeThumbnail = async (
       let headX, headY, headSize, subX, subY, subSize;
 
       if (isVertical) {
-        // Vertical layout auto-adapts, ignoring manual X/Y for now to ensure safety
-        // Or we could adapt them proportionally if requested. 
-        // For now, keeping vertical centered logic for consistency on mobile.
-        headX = canvas.width / 2;
-        headY = canvas.height * 0.15; 
-        headSize = 100; 
-        subX = canvas.width / 2;
-        subY = canvas.height * 0.85; 
-        subSize = 80;
+        // Use Vertical Config if present, else fallback to hardcoded defaults
+        headX = config?.verticalHeadline?.x ?? canvas.width / 2;
+        headY = config?.verticalHeadline?.y ?? canvas.height * 0.15;
+        headSize = config?.verticalHeadline?.fontSize ?? 100;
+        
+        subX = config?.verticalSubhead?.x ?? canvas.width / 2;
+        subY = config?.verticalSubhead?.y ?? canvas.height * 0.85;
+        subSize = config?.verticalSubhead?.fontSize ?? 80;
       } else {
-        // Use Manual Config
+        // Use Manual Config for Horizontal
         headX = config?.headline.x ?? 640;
         headY = config?.headline.y ?? 100;
         headSize = config?.headline.fontSize ?? 150;
@@ -235,41 +228,59 @@ export const compositeThumbnail = async (
           return 'center';
       };
 
+      // --- HELPER: AUTO-SCALE TEXT ---
+      const drawFittedText = (
+        text: string, 
+        x: number, 
+        y: number, 
+        initialSize: number, 
+        color: string, 
+        stroke: boolean = true,
+        baseline: CanvasTextBaseline = 'top'
+      ) => {
+          if (!text) return;
+          const uppercaseText = text.toUpperCase();
+          const maxWidth = canvas.width * 0.9; // 90% of canvas width
+          let currentSize = initialSize;
+          
+          ctx.font = `900 ${currentSize}px Impact, sans-serif`;
+          let metrics = ctx.measureText(uppercaseText);
+          
+          // Shrink loop
+          while (metrics.width > maxWidth && currentSize > 40) {
+              currentSize -= 5;
+              ctx.font = `900 ${currentSize}px Impact, sans-serif`;
+              metrics = ctx.measureText(uppercaseText);
+          }
+
+          ctx.textAlign = getAlign(x, canvas.width);
+          ctx.textBaseline = baseline;
+          
+          if (stroke) {
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = currentSize * 0.15;
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 10;
+            ctx.strokeText(uppercaseText, x, y);
+            ctx.shadowBlur = 0; 
+            ctx.shadowOffsetY = 0;
+          }
+          
+          ctx.fillStyle = color;
+          ctx.fillText(uppercaseText, x, y);
+      };
+
       // --- LAYER 1: HEADLINE (WHITE, TOP) ---
       if (headlines[0]) {
-        ctx.textAlign = getAlign(headX, canvas.width);
-        ctx.textBaseline = 'top'; 
-        ctx.font = `900 ${headSize}px Impact, sans-serif`;
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = headSize * 0.15;
-        ctx.lineJoin = 'round';
-        ctx.miterLimit = 2;
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 10;
-        ctx.strokeText(headlines[0].toUpperCase(), headX, headY);
-        ctx.shadowBlur = 0; 
-        ctx.shadowOffsetY = 0;
-        ctx.fillStyle = 'white';
-        ctx.fillText(headlines[0].toUpperCase(), headX, headY);
+        drawFittedText(headlines[0], headX, headY, headSize, 'white', true, 'top');
       }
 
       // --- LAYER 2: SUBHEAD (YELLOW, BOTTOM) ---
       if (headlines[1]) {
-        ctx.textAlign = getAlign(subX, canvas.width);
-        ctx.textBaseline = 'bottom'; 
-        ctx.font = `900 ${subSize}px Impact, sans-serif`;
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = subSize * 0.15;
-        ctx.lineJoin = 'round';
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 10;
-        ctx.strokeText(headlines[1].toUpperCase(), subX, subY);
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.fillStyle = '#FFFF00'; 
-        ctx.fillText(headlines[1].toUpperCase(), subX, subY);
+        drawFittedText(headlines[1], subX, subY, subSize, '#FFFF00', true, 'bottom');
       }
 
       // --- LAYER 3: BADGE (Configurable) ---
@@ -277,7 +288,7 @@ export const compositeThumbnail = async (
           drawBadge(ctx, canvas.width, canvas.height, config.badge, isVertical);
       }
 
-      resolve(canvas.toDataURL('image/jpeg', 0.9));
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
     img.onerror = () => reject("Image Load Error");
     img.src = imageBase64;
@@ -304,6 +315,7 @@ export const editGeneratedImage = async (base64Image: string, instruction: strin
 };
 
 export const outpaintImage = async (base64Image: string, originalPrompt: string, zoomFactor: number): Promise<string | null> => {
+  try {
      const cleanPrompt = cleanPromptForGemini(originalPrompt);
      // Stronger Prompting for Zoom Out
      const prompt = `[TASK] Generate a WIDER SHOT of this scene (Zoom Out ${zoomFactor}x). Show MORE of the surrounding environment while maintaining the exact same style, lighting, and core subject. Create a consistent expansion of the view. Context: ${cleanPrompt}`;
@@ -321,9 +333,11 @@ export const outpaintImage = async (base64Image: string, originalPrompt: string,
         if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
       }
       return null;
+  } catch (error) { console.error(error); throw error; }
 };
 
 export const cropImage = async (base64Image: string, zoomFactor: number, originalPrompt: string = ""): Promise<string | null> => {
+  try {
      const cleanPrompt = cleanPromptForGemini(originalPrompt);
      // Stronger Prompting for Zoom In
      const prompt = `[TASK] Generate a CLOSE UP shot of this scene (Zoom In ${zoomFactor}x). Crop into the center details. Maintain high resolution, sharpness, and the exact same style. Do not lose detail. Context: ${cleanPrompt}`;
@@ -341,128 +355,59 @@ export const cropImage = async (base64Image: string, zoomFactor: number, origina
         if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
       }
       return null;
+  } catch (error) { console.error(error); throw error; }
 };
 
-// --- FIX: IMPLEMENTED STRICT STATIC CAMERA PROMPT ---
-export const generateVideoPromptFromImage = async (base64Image: string): Promise<string> => {
+export const generateVideoPromptFromImage = async (base64Image: string, isStatic: boolean = false): Promise<string> => {
     try {
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
-        // REVISED: STRICT STATIC CAMERA INSTRUCTIONS
-        const prompt = `[TASK] Describe this image for a high-end AI Video Generator (Veo/Sora).
-        
-        [CRITICAL CAMERA RULES - READ CAREFULLY]
-        1. **STATIC CAMERA ONLY**: The camera must be on a TRIPOD. 
-        2. **NO MOVEMENT**: NO push in, NO zoom, NO pan, NO tilt. 
-        3. **FOCUS**: The only movement should be the internal elements (rain, fire, smoke, lights).
-        
-        [OUTPUT FORMAT]
-        "Static tripod shot of [Subject]. [Internal Motion Description]. [Atmosphere]."
-        
-        Example: "Static tripod shot of a cozy cabin. Rain streaks sliding down the window glass. Fire flickering in the hearth. No camera movement."
-        
-        Keep it under 40 words.`;
+        let prompt;
+        if (isStatic) {
+            // DARK MODE: STRICT STATIC & ATMOSPHERIC
+            prompt = `[TASK] Write a TEXT-TO-VIDEO prompt for a STATIC, ATMOSPHERIC NIGHT scene.
+[CRITICAL] CAMERA MUST BE STATIC (TRIPOD). NO MOVEMENT.
+[FOCUS] Describe the subtle, calming movement of light and weather ONLY.
+[DETAILS]:
+- Focus on the flickering light source (fire, lamp, dashboard buttons).
+- Mention the rain/snow patterns hitting the glass (if applicable).
+- Keep the overall scene still and peaceful.
+[OUTPUT] A single, immersive paragraph focusing on atmosphere.`;
+        } else {
+            // LIGHT MODE: RICH DYNAMIC & CINEMATIC
+            prompt = `[TASK] Write a HIGH-END CINEMATIC VIDEO PROMPT for Sora/Veo.
+[CRITICAL] CAMERA MUST BE DYNAMIC. Use professional film terms.
+[MOVEMENT EXAMPLES]: "Slow Push-In towards the window", "Low Angle Tracking Shot across the floor", "Smooth Parallax Pan".
+[ACTION]: Describe the environment coming alive:
+- Wind blowing curtains, plants, or trees outside.
+- Rain streaming heavily on glass.
+- Steam rising dynamically from hot food/drinks.
+- Dust motes dancing in light beams.
+[OUTPUT] A rich, visual, and directional paragraph describing the camera path and scene action.`;
+        }
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image', 
-            contents: { 
-                parts: [
-                    { inlineData: { mimeType: 'image/png', data: base64Data } }, 
-                    { text: prompt }
-                ] 
-            },
+            contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: prompt }] },
         });
-        
-        return response.text || "Failed to generate motion prompt. Please try again.";
-    } catch (error) {
-        console.error("Video Prompt Generation Error:", error);
-        return "Error analyzing image. Please ensure API key allows Vision tasks.";
-    }
+        return response.text || "Failed to generate motion prompt.";
+    } catch (error) { return "Error analyzing image."; }
 };
 
-// --- NEW: GENERATE DARK VARIANT (VARIABLE BRIGHTNESS) ---
 export const generateDarkVariant = async (base64Image: string, originalPrompt: string, brightnessLevel: number = 20): Promise<string | null> => {
     try {
-        // STEP 1: SANITIZE ORIGINAL PROMPT
-        // We must remove all mention of "Fire", "Stove", "Warmth", "Light" from the original context
-        // to stop the AI from hallucinating them back into existence.
         let sanitizedContext = cleanPromptForGemini(originalPrompt);
-        
-        // Aggressive regex to kill light sources in the prompt text
-        const forbiddenTerms = [
-            /fire/gi, /flame/gi, /burning/gi, /stove/gi, /fireplace/gi, 
-            /warm/gi, /glow/gi, /light/gi, /lamp/gi, /candle/gi, /lit/gi, 
-            /bright/gi, /sun/gi, /day/gi, /morning/gi, /noon/gi
-        ];
-        
-        forbiddenTerms.forEach(term => {
-            sanitizedContext = sanitizedContext.replace(term, "");
-        });
+        const forbiddenTerms = [/fire/gi, /flame/gi, /burning/gi, /stove/gi, /fireplace/gi, /warm/gi, /glow/gi, /light/gi, /lamp/gi, /candle/gi, /lit/gi, /bright/gi, /sun/gi, /day/gi, /morning/gi, /noon/gi];
+        forbiddenTerms.forEach(term => { sanitizedContext = sanitizedContext.replace(term, ""); });
 
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-        // DYNAMIC LOGIC BASED ON BRIGHTNESS LEVEL (0 - 100)
-        let brightnessInstruction = "";
-        let lightSourceConstraint = "";
-
-        // Check if user has explicit candles or oil lamps in the ORIGINAL (we stripped them, but we need to know if they were there to allow small lights)
-        const originalHadCandles = originalPrompt.toLowerCase().includes('candle') || originalPrompt.toLowerCase().includes('oil lamp');
+        const prompt = `[TASK] RE-RENDER as PITCH BLACK NIGHT (Brightness: ${brightnessLevel}%). TURN OFF ALL LIGHTS. Context: ${sanitizedContext}`;
         
-        if (brightnessLevel < 25) {
-            // LEVEL 0-25: TOTAL BLACKOUT / SILHOUETTE
-            brightnessInstruction = `
-            1. [PHYSICS OVERRIDE]: IGNORE ORIGINAL LIGHTING. RE-RENDER AS PITCH BLACK NIGHT.
-            2. [INTERIOR]: NO ELECTRIC LIGHTS. Total power failure. 
-            3. [FIREPLACE/STOVE STATE]: EXTINGUISHED. COLD ASH. If you must show it, show only 1 tiny red spark (dying ember). NO FLAMES.
-            4. [VISIBILITY]: Objects are barely visible silhouettes against the window.
-            `;
-            if (originalHadCandles) {
-                lightSourceConstraint = "PRIMARY SOURCE: A few small candles/oil lamps creating weak pools of light. Rest of room is DARK.";
-            } else {
-                lightSourceConstraint = "PRIMARY SOURCE: Very faint moonlight from window. FIRE IS OUT (Embers only).";
-            }
-        } else if (brightnessLevel < 60) {
-             // LEVEL 25-60: DEEP SHADOWS
-            brightnessInstruction = `
-            1. [ENVIRONMENT]: Low-light Emergency Mode.
-            2. [INTERIOR]: Deep shadows. Electric lights are OFF.
-            3. [FIREPLACE/STOVE STATE]: DYING EMBERS. A pile of glowing red coals. NO YELLOW FLAMES.
-            `;
-            lightSourceConstraint = originalHadCandles ? "Candlelight + Moonlight mixture." : "Moonlight dominates. Fireplace provides faint red ambient glow only.";
-        } else {
-            // LEVEL 60-100: BLUE HOUR
-            brightnessInstruction = `
-            1. [ENVIRONMENT]: Blue Hour / Twilight.
-            2. [INTERIOR]: Dim, cool ambient light filling the room.
-            `;
-            lightSourceConstraint = "Soft atmospheric blue skylight filling the room. Soft shadows.";
-        }
-
-        const prompt = `[TASK] RE-RENDER this scene as a DEEP NIGHT SCENE with a COMPLETE POWER OUTAGE.
-        [BRIGHTNESS LEVEL]: ${brightnessLevel}% (0% = Pitch Black).
-        
-        [CRITICAL: FORCE LIGHTING CHANGE]
-        - You MUST IGNORE the brightness of the original image. Even if original is Day, output MUST be NIGHT.
-        - TURN OFF ALL CEILING LIGHTS / LAMPS / LEDS. They are now dark objects.
-        - **FIREPLACE/STOVE MANDATE**: If there is a stove or fireplace, DELETE THE FLAMES. Replace them with grey ash and faint red embers. The room must feel COLD.
-        
-        [LIGHTING INSTRUCTIONS]
-        ${brightnessInstruction}
-        ${lightSourceConstraint}
-        
-        [ORIGINAL CONTEXT (Geometry Only)] 
-        ${sanitizedContext}`; // Using the sanitized prompt
-
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image',
-            contents: { 
-                parts: [
-                    { inlineData: { mimeType: 'image/png', data: base64Data } }, 
-                    { text: prompt }
-                ] 
-            },
+            contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: prompt }] },
             config: { imageConfig: { aspectRatio: "16:9" } },
         });
 
@@ -470,228 +415,243 @@ export const generateDarkVariant = async (base64Image: string, originalPrompt: s
             if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
         }
         return null;
-    } catch (error) {
-        console.error("Dark Variant Generation Error:", error);
-        throw error;
-    }
+    } catch (error) { throw error; }
 };
 
-// --- UPDATED: GENERATE SHORTS STORYLINE WITH USER INPUT ---
 export const generateShortsStoryline = async (base64Image: string, originalPrompt: string, userInstruction?: string): Promise<ShortsStory> => {
     try {
-        const cleanPrompt = cleanPromptForGemini(originalPrompt);
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-        // Logic switch based on userInstruction
-        const scenarioInstruction = userInstruction 
-        ? `[USER OVERRIDE]: The user has specifically requested: "${userInstruction}".
-           You MUST adapt the 3 steps to fulfill this request. 
-           If the user lists 3 specific actions, map them to Step 1, 2, and 3.
-           If the user gives a vague vibe, interpret it creatively into 3 POV steps.`
-        : `[AUTO-DIRECTOR MODE]:
-           Analyze the image context (Vehicle? Bunker? Luxury? Wild?). Choose ONE specific narrative arc that fits best:
-           
-           Option A (The Traveler/Driver):
-           1. Driving/Navigating (Hands on wheel or looking at map).
-           2. Parking/Stopping (Turning off engine, rain hits harder).
-           3. Moving to back/Resting (Climbing into bed/seat).
-           
-           Option B (The Survivor/Bunker):
-           1. Securing (Locking heavy door, checking air filter).
-           2. Sustaining (Opening canned food, checking radio).
-           3. Enduring (Cleaning weapon or staring at monitor).
-           
-           Option C (The Scholar/Cozy):
-           1. Preparing (Brewing coffee/tea, lighting candle).
-           2. Focusing (Writing in journal, reading book).
-           3. Contemplating (Looking out window, hand on glass).
-           
-           Option D (The Sleeper - ONLY if bed is main focus):
-           1. Approaching bed/fluffing pillow.
-           2. Getting in/pulling up blanket.
-           3. Closing eyes/dimming light.
-
-           [CRITICAL]: DO NOT DEFAULT TO OPTION D. Pick the one that matches the image details best.
-           [CONSTRAINT]: Step 3 MUST NOT always be "feet on bed". Vary it (e.g., hand turning off lamp, staring at fire, closing curtains).`;
-
-        // STEP 1: SCRIPTING (Text & Metadata)
+        
+        // --- 1. SCRIPT GENERATION (THE DIRECTOR) ---
+        // Enhanced to analyze specific scene inventory for unique interactions
         const scriptPrompt = `
-        [TASK] You are a YouTube Shorts Director. Analyze the provided image (The Scene). 
-        Create a 3-Step POV Narrative Script to make this scene feel "ALIVE" and "INTERACTIVE".
-        
-        ${scenarioInstruction}
-        
-        [CRITICAL CAMERA COMPOSITION RULES - YOU MUST FOLLOW]
-        - Frame 1 (ESTABLISHING): Must be a WIDE or ULTRA-WIDE shot showing the environment context.
-        - Frame 2 (ACTION/HANDS): Must be a MEDIUM SHOT focused on hands doing something (cooking, driving, holding mug).
-        - Frame 3 (INTIMATE/REST): Must be a CLOSE UP or LOW ANGLE or POV shot (e.g. looking at fire, looking at rain on glass).
-        *DO NOT make all 3 frames look the same. Vary the distance and angle.*
+[ROLE] You are a Viral Shorts Director.
+[TASK] Create a 3-Shot First-Person POV Narrative based on the image context.
+[SCENE CONTEXT]: ${originalPrompt}
 
-        [OUTPUT FORMAT] JSON ONLY.
-        {
-           "title": "Viral Shorts Title (e.g. Rainy Night in a Cozy Bunker 🌧️)",
-           "description": "Short engaging description for YouTube Shorts.",
-           "tags": "#Shorts #Cozy #Rain...",
-           "frames": [
-              { "step": 1, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Finally Safe)", "imagePrompt": "Wide shot of..." },
-              { "step": 2, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Warmth)", "imagePrompt": "Medium shot of hands..." },
-              { "step": 3, "actionDescription": "Detailed action description...", "overlayText": "Short Text (e.g. Goodnight)", "imagePrompt": "Close up of..." }
-           ]
-        }
-        
-        [CRITICAL VISUAL RULES FOR PROMPTS]
-        - All prompts MUST specify "Vertical 9:16 aspect ratio".
-        - Maintain the exact VISUAL STYLE (Lighting, Colors, Architecture) of the input image.
-        `;
+[CRITICAL INSTRUCTION: SCENE CONSISTENCY & INTERACTION]
+1. ANALYZE THE SCENE: What specific objects are in this room? (e.g., Is there a Fish Tank? A Guitar? A Wood Stove? A Computer? A Cat?)
+2. CREATE UNIQUE INTERACTIONS: 
+   - If there is a Fish Tank -> Shot 2 should be "Feeding the fish" or "Touching the glass".
+   - If there is a Stove -> Shot 2 should be "Adding a log" or "Warming hands".
+   - If there is a Book -> Shot 2 should be "Turning a page".
+   - DO NOT default to "Eating/Drinking" unless there is food on the table in the main image.
+
+[STRICT POV RULES]
+⛔️ PROHIBITED: "Silhouette", "Figure", "Person standing", "Third person".
+✅ MANDATORY: STRICT FIRST PERSON POV. The viewer IS the character.
+
+[NARRATIVE STRUCTURE]
+
+1. SHOT 1 (THE GAZE - ESTABLISHING): 
+   - VISUAL: First Person POV standing at the main window/opening.
+   - ACTION: My hands resting on the specific material of the sill (wood/stone/metal). Watching the weather.
+   - TEXT OVERLAY: "STORM OUTSIDE", "ALONE IN SPACE".
+
+2. SHOT 2 (THE INTERACTION - SPECIFIC): 
+   - VISUAL: First Person POV interacting with a UNIQUE object found in the [SCENE CONTEXT].
+   - ACTION: Using hands to interact (Pouring, Typing, Tuning, Feeding, Stroking pet).
+   - TEXT OVERLAY: related to the action (e.g., "FEEDING TIME", "WARM FIRE").
+
+3. SHOT 3 (THE REST - CLOSING LOOP): 
+   - VISUAL: First Person POV lying down on the specific bed/sofa from the scene.
+   - ACTION: Looking down at my own legs under the specific blanket texture from scene. Closing eyes.
+   - TEXT OVERLAY: "GOODNIGHT", "SAFE HERE".
+
+[OUTPUT JSON SCHEMA]
+{
+  "title": "Viral Title",
+  "description": "Caption",
+  "tags": "#tags",
+  "frames": [
+    { "step": 1, "overlayText": "TEXT", "actionDescription": "POV looking out window...", "imagePrompt": "First Person POV standing at window..." },
+    { "step": 2, "overlayText": "TEXT", "actionDescription": "POV interacting with specific object...", "imagePrompt": "First Person POV [Specific Interaction]..." },
+    { "step": 3, "overlayText": "TEXT", "actionDescription": "POV lying down...", "imagePrompt": "First Person POV lying in bed..." }
+  ]
+}
+`;
 
         const scriptResponse = await ai.models.generateContent({
              model: 'gemini-2.5-flash-image',
-             contents: {
-                 parts: [
-                     { inlineData: { mimeType: 'image/png', data: base64Data } },
-                     { text: scriptPrompt }
-                 ]
-             },
+             contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: scriptPrompt }] },
         });
         
-        // Manual JSON Parsing to handle Markdown blocks
         let jsonString = scriptResponse.text || "{}";
         const jsonMatch = jsonString.match(/```json\s*([\s\S]*?)\s*```/) || jsonString.match(/```\s*([\s\S]*?)\s*```/);
-        if (jsonMatch) {
-            jsonString = jsonMatch[1];
-        }
-        const scriptData = JSON.parse(jsonString) as ShortsStory;
+        if (jsonMatch) jsonString = jsonMatch[1];
         
-        // STEP 2: PARALLEL IMAGE GENERATION
-        // We will generate the 3 images in parallel based on the AI-written prompts
+        let scriptData;
+        try {
+            scriptData = JSON.parse(jsonString) as ShortsStory;
+        } catch (e) {
+            console.warn("JSON Parse Failed, falling back to empty.");
+        }
+
+        if (!scriptData || !Array.isArray(scriptData.frames)) {
+            // Fallback
+            scriptData = {
+                title: "Safe Haven",
+                description: "The perfect escape.",
+                tags: "#shorts #cozy",
+                frames: [
+                    { step: 1, actionDescription: "POV standing at window.", overlayText: "STORM", imagePrompt: "First Person POV standing at window looking out." },
+                    { step: 2, actionDescription: "POV warming hands.", overlayText: "WARMTH", imagePrompt: "First Person POV warming hands by the fire." },
+                    { step: 3, actionDescription: "POV lying down.", overlayText: "SLEEP", imagePrompt: "First Person POV lying down looking at legs." }
+                ]
+            } as ShortsStory;
+        }
+
+        // --- 2. IMAGE GENERATION (THE RENDERER) ---
+        // Enhanced Prompt to enforce Scene Consistency
         const imagePromises = scriptData.frames.map(async (frame) => {
-             // Combine original style context with new specific action prompt
-             const finalImagePrompt = `[STYLE REFERENCE]: ${cleanPrompt}. \n[ACTION]: ${frame.imagePrompt} \n[CONSTRAINT]: Vertical 9:16, First Person POV. Make it look exactly like the same room.`;
-             
-             // We pass the original image as reference to guide consistency (using image-to-image logic roughly)
-             // Note: Gemini 2.5 Flash Image supports image input for context.
+             const finalImagePrompt = `[TASK] Generate a 9:16 Vertical Image.
+[MASTER SCENE REFERENCE]: ${originalPrompt}
+[CONSTRAINT]: You are rendering the EXACT SAME ROOM as the Master Scene.
+- SAME Furniture style and placement.
+- SAME Lighting atmosphere.
+- SAME Window shape.
+- Do NOT change the room decor.
+
+[CAMERA ANGLE]: STRICT FIRST PERSON POV (Eyes of the character).
+[ACTION FOCUS]: ${frame.imagePrompt}
+
+[NEGATIVE]: No third person, no silhouette, no visible face, no distorted hands.`;
+
              const imgResponse = await ai.models.generateContent({
                  model: 'gemini-2.5-flash-image',
-                 contents: {
-                     parts: [
-                         { inlineData: { mimeType: 'image/png', data: base64Data } }, // Reference Base Image
-                         { text: finalImagePrompt }
-                     ]
-                 },
+                 contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: finalImagePrompt }] },
                  config: { imageConfig: { aspectRatio: "9:16" } }
              });
-             
-             let generatedUrl = null;
              for (const part of imgResponse.candidates[0].content.parts) {
-                if (part.inlineData) {
-                    generatedUrl = `data:image/png;base64,${part.inlineData.data}`;
-                    break;
-                }
+                if (part.inlineData) return { ...frame, imageUrl: `data:image/png;base64,${part.inlineData.data}` };
              }
-             return { ...frame, imageUrl: generatedUrl || undefined };
+             return { ...frame, imageUrl: undefined };
         });
-
-        const completedFrames = await Promise.all(imagePromises);
-        
-        return {
-            ...scriptData,
-            frames: completedFrames
-        };
-
-    } catch (error) {
-        console.error("Shorts Story Generation Error:", error);
-        throw error;
+        return { ...scriptData, frames: await Promise.all(imagePromises) };
+    } catch (error) { 
+        console.error("Shorts Gen Error", error);
+        throw error; 
     }
 };
 
-// --- NEW: REGENERATE SINGLE SHORTS FRAME ---
 export const regenerateSingleShortsFrame = async (base64Image: string, originalPrompt: string, frameContext: ShortsFrame): Promise<string | null> => {
     try {
-        const cleanPrompt = cleanPromptForGemini(originalPrompt);
         const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-        // Add variance to the prompt to ensure it's not identical
-        const variance = Math.random() > 0.5 ? "Slightly adjust camera angle." : "Shift focus slightly.";
         
-        const finalImagePrompt = `[TASK] Regenerate this specific shot for a story.
-        [STYLE REFERENCE]: ${cleanPrompt}. 
-        [ACTION REQUIREMENT]: ${frameContext.imagePrompt}
-        [VARIANCE]: ${variance}
-        [CONSTRAINT]: Vertical 9:16, First Person POV. Must match the style of the reference image exactly.`;
+        // Same Consistency Logic for Regeneration
+        const finalImagePrompt = `[TASK] Generate a 9:16 Vertical Image.
+[MASTER SCENE REFERENCE]: ${originalPrompt}
+[CONSTRAINT]: You are rendering the EXACT SAME ROOM as the Master Scene.
+- SAME Furniture.
+- SAME Lighting.
+- SAME Window.
+- Do NOT change the room decor.
+
+[CAMERA ANGLE]: STRICT FIRST PERSON POV (Eyes of the character).
+[ACTION FOCUS]: ${frameContext.imagePrompt}
+
+[NEGATIVE]: No third person, no silhouette, no visible face.`;
 
         const imgResponse = await ai.models.generateContent({
              model: 'gemini-2.5-flash-image',
-             contents: {
-                 parts: [
-                     { inlineData: { mimeType: 'image/png', data: base64Data } }, // Reference Base Image
-                     { text: finalImagePrompt }
-                 ]
-             },
+             contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: finalImagePrompt }] },
              config: { imageConfig: { aspectRatio: "9:16" } }
         });
-         
         for (const part of imgResponse.candidates[0].content.parts) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
+            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
         }
         return null;
-
-    } catch (error) {
-        console.error("Single Frame Regen Error:", error);
-        throw error;
-    }
+    } catch (error) { throw error; }
 };
 
-// --- NEW: THUMBNAIL REMASTER SERVICES ---
 export const cleanImageText = async (base64Image: string): Promise<string | null> => {
   try {
     const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
-    // Command explicitly for text removal / inpainting
-    const prompt = `[TASK] Image Cleanup. Remove ALL text, subtitles, logos, watermarks, and UI elements from this image. Inpaint the background to look natural and seamless. Output ONLY the clean background image.`;
-
+    const prompt = `[TASK] Image Cleanup. Remove ALL text, subtitles, logos. Output clean image.`;
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: { 
-        parts: [
-          { inlineData: { mimeType: 'image/png', data: base64Data } }, 
-          { text: prompt }
-        ] 
-      },
+      contents: { parts: [{ inlineData: { mimeType: 'image/png', data: base64Data } }, { text: prompt }] },
     });
-
+    // SAFE CHECK: response.candidates exists
+    if (!response.candidates || !response.candidates[0] || !response.candidates[0].content) return null;
+    
     for (const part of response.candidates[0].content.parts) {
       if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
     }
     return null;
-  } catch (error) {
-    console.error("Image Cleaning Error:", error);
-    throw error;
-  }
+  } catch (error) { throw error; }
 };
 
+// --- HELPER TO REMOVE FLUFF ---
+const cleanSeoTerm = (text: string) => {
+  return text
+    .replace(/LUXURY|COZY|PRIVATE|ABANDONED|UNDERGROUND|CONVERTED|RELAXING|AMBIENCE|SOUNDS|ASMR|VIDEO|4K|8K|HOURS|LOOP|HEAVY/gi, "")
+    .trim()
+    .toUpperCase();
+}
+
 export const analyzeDescriptionForText = async (description: string): Promise<{headline: string, subhead: string}> => {
+  // 1. HEURISTIC PRIORITY: Look for "SHELTER INVENTORY" style formatting first
+  // This matches your specific use case perfectly.
+  const locMatch = description.match(/Location:\s*([^\n•]+)/i);
+  const wthMatch = description.match(/Weather:\s*([^\n•]+)/i);
+
+  if (locMatch && wthMatch) {
+      let h = locMatch[1].trim().toUpperCase();
+      let s = wthMatch[1].trim().toUpperCase();
+      
+      // Cleanup common fluff words from the inventory text, BUT keep core identity
+      h = h.replace(/LUXURY|COZY|PRIVATE|ABANDONED/gi, "").trim(); 
+      s = s.replace(/SOUNDS|AMBIENCE/gi, "").trim(); // Keep 'HEAVY', 'STORM'
+
+      if (h && s) return { headline: h, subhead: s };
+  }
+
+  // 2. AI FALLBACK: If standard format isn't found, force AI to adhere to SEO Noun rules
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const prompt = `Analyze this YouTube video description. Extract 2 short, punchy keywords for a thumbnail using high-contrast strategy.
+    const prompt = `Task: Extract 2-3 word SEO Keywords for a YouTube Thumbnail from this description.
     
-    Format JSON: { "headline": "Main 1-2 words (White Text)", "subhead": "Secondary 1-2 words (Yellow Text)" }
-    
-    Description:
-    ${description.substring(0, 1000)}`;
+    Input Text:
+    "${description.substring(0, 1000)}"
+
+    [CRITICAL SEO RULES]:
+    1. HEADLINE = The physical location/vehicle (Noun). REMOVE adjectives like "Cozy", "Luxury", "Relaxing".
+       - Examples: "YACHT" (Not Cozy Yacht), "TRAIN CABIN" (Not Relaxing Train), "BUNKER".
+    2. SUBHEAD = The weather or major sound event. REMOVE "Ambience", "Sounds", "ASMR".
+       - Examples: "HEAVY RAIN", "BLIZZARD", "THUNDERSTORM", "OCEAN WAVES".
+    3. Output STRICT JSON: { "headline": "...", "subhead": "..." }
+    `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image', // Using text model effectively
+      model: 'gemini-3-flash-preview', // CHANGED FROM gemini-2.5-flash-image TO gemini-3-flash-preview
       contents: { parts: [{ text: prompt }] },
       config: { responseMimeType: 'application/json' }
     });
 
-    return JSON.parse(response.text || '{"headline": "COZY", "subhead": "RAIN"}');
+    let jsonStr = response.text || "";
+    const match = jsonStr.match(/```json\s*([\s\S]*?)\s*```/) || jsonStr.match(/```\s*([\s\S]*?)\s*```/);
+    if (match) jsonStr = match[1];
+
+    if (!jsonStr.trim().startsWith('{')) throw new Error("Invalid JSON");
+    
+    const result = JSON.parse(jsonStr);
+    
+    // Final Safety Scrub in case AI hallucinates "Cozy"
+    if (result.headline) result.headline = cleanSeoTerm(result.headline);
+    if (result.subhead) result.subhead = cleanSeoTerm(result.subhead);
+    
+    // Hard Fallbacks
+    if (!result.headline) result.headline = "SHELTER";
+    if (!result.subhead) result.subhead = "STORM";
+    
+    return result;
   } catch (error) {
-    return { headline: "COZY", subhead: "AMBIENCE" };
+    console.error("Text Analysis Error", error);
+    // Ultimate Fallback
+    return { headline: "LOCATION", subhead: "SOUNDS" };
   }
 };

@@ -234,6 +234,9 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
   const viralThumbConfig = {
       headline: { x: 640, y: 100, fontSize: 160 },
       subhead: { x: 640, y: 620, fontSize: 140 },
+      // Initialize vertical defaults
+      verticalHeadline: { x: 360, y: 200, fontSize: 80 }, 
+      verticalSubhead: { x: 360, y: 1000, fontSize: 80 },
       badge: {
         visible: !hasMusic, 
         text: hasMusic ? "LOFI BEATS" : "NO MUSIC",
@@ -316,7 +319,10 @@ export const generateContent = (selections: SelectionState): GeneratedContent =>
   const imagePrompt = `${metaInstruction}\n\n${JSON.stringify(ohneilPrompt, null, 2)}`;
   const thumbnailPrompt = `[TASK] YouTube Thumbnail. High Contrast. [SUBJECT] POV from INSIDE ${conciseStructureName} looking OUT at ${conciseWeatherName}. [COMPOSITION] 70% Window, 30% Interior.`;
   const verticalThumbnailPrompt = `[TASK] Vertical Shorts Cover (9:16). Cozy interior of ${conciseStructureName} vs Storm outside.`;
-  const i2vPrompt = `[Camera]: Static. [Internal]: Warm. [Exterior]: ${conciseWeatherName}.`;
+  
+  // UPDATED: Narrative-driven Dynamic Prompt for Light Scene by default (Rich Placeholder)
+  const cameraAction = cameraMove?.label || "Slow Push-in";
+  const i2vPrompt = `A high-end cinematic video inside a ${conciseStructureName}. The camera performs a smooth ${cameraAction}, guiding the viewer's eye towards the window. Outside, ${conciseWeatherName} creates a dynamic and immersive atmosphere. Inside, the warm glow of the ${primaryWarmth} contrasts with the cold exterior. The scene feels alive with subtle movement: rain streaking on glass, fabric settling, and soft light flickering.`;
 
   return {
     id: crypto.randomUUID(),

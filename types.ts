@@ -68,6 +68,9 @@ export interface BadgeConfig {
 export interface ThumbnailLayerConfig {
   headline: TextConfig;
   subhead: TextConfig;
+  // NEW: Vertical Specific Configs
+  verticalHeadline?: TextConfig;
+  verticalSubhead?: TextConfig;
   badge: BadgeConfig; 
 }
 
